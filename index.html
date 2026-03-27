@@ -36,134 +36,41 @@
     });
 
 
-</script>
-
-
-<script language="javascript">
-
 var global_data=null; // hoping this is global and stores each airtable lookup
-
-function createSlideshow(dataIndex, startIndex = 0) {
-
-console.log("Global Data is ",global_data);
-console.log("DataIndex is ",dataIndex);
-console.log("Start index is ", startIndex);
+let touchStartX = 0;
 
 
+function remove_slideshow(){
+  document.getElementById("slide_show_container").style.display="none";
+}
 
-
-
-
-  let currentIndex = startIndex;
-
-
-  // Create container
-  const container = document.createElement("div");
-  container.style.position = "fixed";
-  container.style.top = 0;
-  container.style.left = 0;
-  container.style.width = "100vw";
-  container.style.height = "100vh";
-  container.style.background = "black";
-  container.style.display = "flex";
-  container.style.alignItems = "center";
-  container.style.justifyContent = "center";
-  container.style.zIndex = 9999;
-  container.style.overflow = "hidden";
-
-  // Image element
-  const img = document.createElement("img");
-  img.style.maxWidth = "100%";
-  img.style.maxHeight = "100%";
-  img.style.objectFit = "contain";
-  img.style.transition = "opacity 0.3s ease";
-
-
-  // close button
-const closeBtn = document.createElement("button");
-
-closeBtn.textContent = "X"; // fancy X
-closeBtn.style.position = "absolute";
-closeBtn.style.top = "2px";
-closeBtn.style.right = "2px";
-closeBtn.style.fontSize = "24px";
-closeBtn.style.color = "white";
-closeBtn.style.background = "rgba(0,0,0,0.5)";
-closeBtn.style.border = "none";
-closeBtn.style.borderRadius = "4px";
-closeBtn.style.cursor = "pointer";
-closeBtn.style.zIndex = 10000; // make sure it's above the image
-
-closeBtn.style.display = "inline-block"; // shrink to fit content
-closeBtn.style.width = "auto";           // override min-width
-closeBtn.style.minWidth = "0";           // override default min-width
-closeBtn.style.padding = "0 4px";        // optional small padding
-
-closeBtn.addEventListener("click", () => {
-  container.remove(); // removes the slideshow div from DOM
-});
-
-
-  container.appendChild(img);
-  container.appendChild(closeBtn);
-  document.body.appendChild(container);
 
   function showImage(index) {
     currentIndex = (index + imageArray.length) % imageArray.length;
-    img.style.opacity = 0;
+    
+    document.getElementById("slide_show_image").style.opacity = 0;
     setTimeout(() => {
-      img.src = imageArray[currentIndex].url;
-      img.style.opacity = 1;
-    }, 150);
+      document.getElementById("slide_show_image").src = imageArray[currentIndex].url;
+      document.getElementById("slide_show_image").style.opacity = 1;
+    }, 500);
   }
 
-  function next() {
+  function slide_show_next() {
     showImage(currentIndex + 1);
   }
 
-  function prev() {
+  function slide_show_prev() {
     showImage(currentIndex - 1);
   }
 
-  // Click navigation (left/right zones)
-  container.addEventListener("click", (e) => {
-    const x = e.clientX;
-    const width = window.innerWidth;
 
-    if (x < width * 0.3) {
-      prev();
-    } else if (x > width * 0.7) {
-      next();
-    }
-  });
+function createSlideshow(dataIndex, startIndex = 0) {
+
+  let currentIndex = startIndex;
 
   // Touch swipe support
-  let touchStartX = 0;
-
-  container.addEventListener("touchstart", (e) => {
-    touchStartX = e.touches[0].clientX;
-  });
-
-  container.addEventListener("touchend", (e) => {
-    const touchEndX = e.changedTouches[0].clientX;
-    const deltaX = touchEndX - touchStartX;
-
-    if (Math.abs(deltaX) > 50) {
-      if (deltaX > 0) {
-        prev(); // swipe right
-      } else {
-        next(); // swipe left
-      }
-    }
-  });
-
-  // Keyboard navigation (optional bonus)
-  window.addEventListener("keydown", (e) => {
-    if (e.key === "ArrowRight") next();
-    if (e.key === "ArrowLeft") prev();
-    if (e.key === "Escape") container.remove();
-  });
-
+   touchStartX = 0;
+  
   // Initialize
 
   if (dataIndex<0)
@@ -174,50 +81,12 @@ closeBtn.addEventListener("click", () => {
   } else {
     imageArray=global_data.records[dataIndex].fields["Image Preview"];
   }
-    console.log("Image array is ",imageArray);  
+  
 
+
+  document.getElementById("slide_show_container").style.display="block";
   showImage(currentIndex);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     var page_list=[""];
@@ -488,9 +357,13 @@ function share_page(search_for){
 
       <div id="search_results"></div>
 
-		<div id="slide_show_overlay" class="overlay">
-			<div id="slide_show"></div>
-		</div>
+      <div id="slide_show_container" style="position: fixed; top: 0;  left: 0;  width: 100vw;   height: 100vh;  background-color: black; display:none;">
+        <button id="slide_show_close_button" style="position:absolute;top:2px;right:2px;font-size:24px;color:white;border:none;cursor: pointer;z-index: 10000;display: inline-block;width: auto;min-width: 0;background: rgba(0,0,0,0.5);">X</button>"
+        <img id="slide_show_image" style="max-Width:100%;max-Height:100%;object-fit: contain;transition: opacity 0.5s ease; opacity:1;margin-top: 20px;">;
+      </div>
+
+
+
 
   <div class="center" id="footer"></div>
 
@@ -498,6 +371,59 @@ function share_page(search_for){
 
 
   <script language="javascript">
+
+
+  // Click navigation (left/right zones)
+  document.getElementById("slide_show_container").addEventListener("click", (e) => {
+    const x = e.clientX;
+    const width = window.innerWidth;
+
+    if (x < width * 0.3) {
+      slide_show_prev();
+    } else if (x > width * 0.7) {
+      slide_show_next();
+    }
+  });
+
+// Keyboard navigation (optional bonus)
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight") slide_show_next();
+    if (e.key === "ArrowLeft") slide_show_prev();
+    if (e.key === "Escape") remove_slideshow();
+  });
+
+
+  document.getElementById("slide_show_close_button").addEventListener("click", () => {
+  remove_slideshow(); // removes the slideshow div from DOM
+});
+
+
+
+  document.getElementById("slide_show_container").addEventListener("touchstart", (e) => {
+    //e.preventDefault();
+    touchStartX = e.touches[0].clientX;
+  }, { passive: true });
+
+  document.getElementById("slide_show_container").addEventListener("touchmove", (e) => {
+    e.preventDefault();  // prevents scroll while swiping inside the div
+  }, { passive: false });
+
+  document.getElementById("slide_show_container").addEventListener("touchend", (e) => {
+    //e.preventDefault();
+    const touchEndX = e.changedTouches[0].clientX;
+    const deltaX = touchEndX - touchStartX;
+
+    if (Math.abs(deltaX) > 50) {
+      if (deltaX > 0) {
+        slide_show_prev(); // swipe right
+      } else {
+        slide_show_next(); // swipe left
+      }
+    }
+  }, { passive: true });
+
+
+
 
     function newsearch(){
         page_list=[""];
