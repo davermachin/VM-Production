@@ -1,0 +1,72 @@
+<head>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HBL0VL09HC"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-HBL0VL09HC');
+  </script>
+
+  <title>View Master Database - Searchable collection of vintage View-Masters.</title>
+  <meta name="description" content="The world's largest online collection of digitized View Master images.  Includes Wordle, Quiz and Word-Snake games!">
+  <meta name="robots" content="index, archive">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0,user-scalable=0">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<link href='https://fonts.googleapis.com/css?family=Arsenal' rel='stylesheet'>
+<link rel="stylesheet" href="./vm2.css">
+<link rel="stylesheet" href="./slides2.css">
+
+<script>
+  $('document').ready(function(){
+      $("#footer").load("footer.html");
+    });
+</script>
+
+
+</head>
+
+<body>
+  <div class="center">
+        <h1>About the View-Master Database</h1>
+        <div class="center">
+          <button type="button" onclick="window.location.href = './index.html'">Search the Database</button>
+          <p><a href="https://airtable.com/app5Q6OlJ3iMkJ8cd/shrAX8erJY6tr0t3s" target="_blank">See Reels With Alternate Images</a></p>
+        </div>
+        <div class="justify">
+                  <p><img style="float:right;margin:10px;border-radius: 25px;" src="./digitize.jpg" width="50%"></img>
+                    <b>CONTACT</b> - You can reach Dave here: DaveR<!-- abc@def -->Machin@gmail.com.
+                    <br><br>
+                    This website was created by Dave Machin during the pandemic of 2020.  Dave started collecting view-master reels and viewers as a "pandemic-hobby".
+                  </p>
+                  <p>
+                    The initial collection was a few personal viewmaster reels - but those are quite expensive to collect.  The main collection really began with a set of old single-reels and viewer - things like Yosemite and the Grand Canyon.
+                  </p>
+                  <p>
+                    To organize the collection, Dave started entering the reels into an Airtable online database.  Pretty soon the database had over one thousand entries!
+                  </p>
+                  <p>
+                    Once the reels were entered the next logical step was to find a way to digitize all the images on the reels and include them as well.  Dave spent a few weeks experimenting with various ways to digitize reel images.  The goal was to digitze them very quickly but with the a reasonable level of quality.
+                  </p>
+                  <p>
+                    In the end Dave came up with a technique of pointing a DSLR camera directly into a 2D view-master projector and taking a photograph of each image directly.
+                  </p>
+                  <p>
+                    This method allows each reel to be digitized very quickly since the projector can advance the images and a remote release triggers the camera.  It still took several months to digitize thousands of images and load them into the database.
+                  </p>
+                  <p>
+                    This database website is written in javascript using the airtable API to query the database and render the results.  Kudos to Airtable - their product is very robust, the API easy to use, and this development has been a pleasure to do.
+                  </p>
+                  <p>
+                    See below for a few quiz and word-puzzle games based on the View-Master reel data!  <a href="./vmm.html">Word-MasterMIND</a> is based on the "Master Mind" game, which is what the popular Wordle game is base on.  So, it's Wordle - but really it's "Master Mind".
+                    <a href="./bog.html">Word-Snake</a> is a little like Boggle, but really more something I made up.
+                    Then there's <a href="./trivia.html">View-Master QUIZ</a> - where you have to guess the reel title from pictures; or vice-versa - it's challenging!  All these games have high score leaderboards - see how well you do!
+                  </p>
+        </div>
+        <div class="center" id="footer"></div>
+</div>
+
+</body>

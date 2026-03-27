@@ -1,0 +1,359 @@
+body {
+    font-family: 'Arsenal';font-size: 2vw;
+    border: 2px solid lightgrey;
+    border-radius: 25px;
+    box-shadow: 0px 0px 25px 1px grey;
+}
+
+h1 {
+  font-size: 6vw;
+}
+
+
+h2 {
+  font-size: 3vw;
+}
+
+h3 {
+  font-size: 24px;
+}
+
+@media screen and (max-device-width: 450px) {
+  h3 {
+    font-size: 48px;
+  }
+}
+
+img.animated-gif{
+  width: 50%;
+  height: auto;
+}
+
+input         {
+  font-size:3vw;
+  padding:6px 10px 10px 5px;
+  /*display:block;*/
+  width:80%;
+  border:none;
+  border-bottom:2px solid #757575;
+  margin: 2vw;
+  text-align: center;
+}
+
+@media screen and (max-device-width: 450px) {
+  input, select, textarea {
+    font-size: 24px;
+  }
+}
+
+td {
+  font-size: 2vw;
+}
+
+a {
+  text-decoration: underline;
+  color: black;
+}
+
+
+blockquote {
+    font-size: 20px;
+
+}
+
+button {
+  border-radius: 5px;
+  margin: 2vw 2vw 2vw 2vw;
+  min-width: 40%;
+  font-size: 3vw;
+}
+
+@media only screen and (max-device-width: 450px) {
+  button {
+    height:42px;
+
+  }
+}
+
+@media (orientation: landscape) {
+.popup_image{
+
+	max-height: 90vh;
+  height: 90%;
+  max-width: 90vw;
+}
+}
+
+@media (orientation: portrait) {
+  .popup_image {
+    max-height: 80vh;
+    width: 90%;
+    max-width: 90vw;
+  }
+ }
+
+
+
+.overlay {
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: black;
+  display: none;
+  z-index: 2;
+  justify-content: center;
+  align-items: center;
+ }
+
+
+.center {
+  margin: auto;
+  width: 90%;
+  padding: 10px;
+  text-align: center;
+  /*border: 3px solid green;*/
+}
+
+.justify {
+  margin: auto;
+  width: 90%;
+  padding: 10px;
+  text-align: justify;
+  /*border: 3px solid green;*/
+}
+
+.box-shadow {
+    position: relative;
+    text-align: center;
+    /*display: inline;*/
+    height: 20vw; /*100px;*/
+    width: 20vw; /*100px;*/
+    margin: 2vw 1vw 2vw 1vw;
+	cursor: pointer;
+
+}
+
+.box-shadow::after {
+    box-shadow: inset 0 0 1vw 1vw black;
+    border-radius: 25px;
+    bottom: 0;
+    content: "";
+    /*display: block;*/
+    left: 0;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    right: 0;
+    top: 0;
+    /*width: 100px;*/
+}
+
+.box-shadow img {
+    width: 20vw; /*100px;*/
+    height: 20vw; /*100px;*/
+    border-radius: 25px;
+}
+
+.box-shadow_larger {
+    position: relative;
+    text-align: center;
+    /*display: inline;*/
+    /*width: 90vw;*/
+    /*width: 40vw;*/
+    min-height: 40vw;
+
+}
+
+@media screen and (max-device-width: 450px) {
+  .box-shadow_larger {
+      position: relative;
+      text-align: center;
+      /*display: inline;*/
+      /*width: 90vw;*/
+      width: 75vw;
+
+  }
+}
+
+.box-shadow_larger::after {
+    box-shadow: inset 0 0 1vw 1vw black;
+    border-radius: 25px;
+    bottom: 0;
+    content: "";
+    /*display: block;*/
+    left: 0;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    right: 0;
+    top: 0;
+    /*width: 100px;*/
+}
+
+.box-shadow_larger img {
+    width: 40vw;
+    height: 40vw;
+    border-radius: 25px;
+}
+
+@media screen and (max-device-width: 450px) {
+  .box-shadow_larger img {
+      width: 75vw;
+      height: 75vw;
+      border-radius: 25px;
+  }
+}
+
+
+
+
+.box-shadow_med {
+    position: relative;
+    text-align: center;
+    /*display: inline;*/
+    /*width: 90vw;*/
+    /*width: 40vw;*/
+    min-height: 20vw;
+    margin: 5px 5px 5px 5px;
+
+}
+
+@media screen and (orientation:landscape) {
+  .box-shadow_med {
+      position: relative;
+      text-align: center;
+      /*display: inline;*/
+      width: 40vw;
+
+  }
+}
+
+.box-shadow_med::after {
+    box-shadow: inset 0 0 1vw 1vw black;
+    border-radius: 25px;
+    bottom: 0;
+    content: "";
+    /*display: block;*/
+    left: 0;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    right: 0;
+    top: 0;
+    /*width: 100px;*/
+}
+
+.box-shadow_med img {
+    width: 40vw;
+    height: 40vw;
+    border-radius: 25px;
+}
+
+@media screen and (orientation:landscape) {
+  .box-shadow_med img {
+      width: 40vw;
+      height: 40vw;
+      border-radius: 25px;
+  }
+}
+
+.box-shadow_small {
+    position: relative;
+    text-align: center;
+    /*display: inline;*/
+    height: 20vw; /*100px;*/
+    width: 20vw; /*100px;*/
+    margin-top: 2vh;
+    margin-left: 1vw;
+    margin-right: 1vw;
+
+
+
+
+}
+
+.box-shadow_small::after {
+    box-shadow: inset 0 0 1vw 1vw black;
+    border-radius: 25px;
+    bottom: 0;
+    content: "";
+    /*display: block;*/
+    left: 0;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    right: 0;
+    top: 0;
+    /*width: 100px;*/
+}
+
+.box-shadow_small img {
+    width: 20vw; /*100px;*/
+    height: 20vw; /*100px;*/
+    border-radius: 25px;
+
+
+}
+
+
+.card {
+  /* Add shadows to create the "card" effect */
+  box-shadow: 0 4px 8px 5px rgba(0,0,0,0.4);
+  transition: 0.3s;
+  padding: 1vw 2vw 1vw 2vw;
+  margin: 2vw 2vw 2vw 2vw;
+  border-radius: 15px;
+}
+
+.trivia_option {
+  /* Add shadows to create the "card" effect */
+  box-shadow: 0 4px 8px 5px rgba(0,0,0,0.4);
+  transition: 0.3s;
+  padding: 0vw 1vw 0vw 1vw;
+  margin: 1vw 1vw 1vw 1vw;
+  border-radius: 15px;
+  /*max-width: 40vw;*/
+}
+
+/* Add some padding inside the card container */
+.container {
+  padding: 2px 16px 5px 16px;
+}
+
+.image_group {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+
+}
+
+.yt-image-container {
+  position: relative;
+  display: inline-block;
+  justify-content: center;
+  width: 50%;
+
+}
+
+.yt-image-container img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.yt-image-container::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 0;
+  height: 0;
+  border-left: 50px solid rgba(255, 255, 255, 0.7); /* Adjust color and transparency */
+  border-top: 30px solid transparent;
+  border-bottom: 30px solid transparent;
+  pointer-events: none;
+}

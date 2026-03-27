@@ -1,0 +1,426 @@
+<head>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HBL0VL09HC"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-HBL0VL09HC');
+  </script>
+
+
+
+<title>View Master Database - Dave Machin's searchable collection of vintage images and descriptions.</title>
+<meta name="description" content="Dave Machin has scanned thousands of View Master images and made them available online at the VMDatabase.com site.  Probably the world's largest online collection of digitized View Master images.">
+<meta name="robots" content="index, archive">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0,user-scalable=0">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<link href='https://fonts.googleapis.com/css?family=Arsenal' rel='stylesheet'>
+<link rel="stylesheet" href="./vm2.css">
+<link rel="stylesheet" href="./slides2.css">
+
+<meta property="og:url"                content="https://vm.vmdatabase.com/index.html" />
+<meta property="og:title"              content="View-Master Database" />
+<meta property="og:description"        content="Dave Machin's Searcheable Database of View-Master Reels" />
+<meta property="og:image"              content="https://vm.vmdatabase.com/db_OG4.jpg" />
+
+
+
+<script>
+  $('document').ready(function(){
+      $("#footer").load("footer.html");
+
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      const go_to_this = urlParams.get('go')
+      console.log(go_to_this);
+
+      if (go_to_this!=null){
+        document.getElementById("seach_for_text").value=go_to_this;
+        SearchReel(go_to_this.trim(),"");
+      }
+
+      document.getElementById("seach_for_text").focus();
+
+    });
+
+
+</script>
+
+
+<script language="javascript">
+
+var page_list=[""];
+var current_page=0;
+var slideIndex = 1;
+
+
+function highlightOccurrences(target, text) {
+    if (!target || !text) return text; // Return original text if inputs are empty
+
+    // Escape special characters in target string to use in regex
+    const escapedTarget = target.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
+
+    // Create a regex to find all occurrences of target
+    const regex = new RegExp(escapedTarget, 'gi'); // Case insensitive global search
+
+    // Replace occurrences with wrapped HTML tag
+    return text.replace(regex, `<mark>$&</mark>`);
+}
+
+
+function isValidURL(url) {
+    try {
+        new URL(url);
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+
+function getYouTubeThumbnail(url) {
+    var videoId = url.match(/[?&]v=([^&]+)/) || url.match(/youtu\.be\/([^?]+)/);
+    if (videoId && videoId[1]) {
+        return `https://img.youtube.com/vi/${videoId[1]}/maxresdefault.jpg`;
+    }
+    return null;
+}
+
+    function toTitleCase(str) {
+        return str.replace(/\w\S*/g, function(txt){
+            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        });
+    }
+
+    function show_image(show_me){
+        console.log(show_me);
+        document.getElementById("picture_frame").innerHTML="<img  class=\"popup_image fade\" src= \" "+show_me+" \" ><p style=\"color: white;\">[Click to Close]</p>"
+        document.getElementById("picture_frame").style.display = 'block';
+		document.getElementById("picture_frame_overlay").style.display = 'flex';
+
+
+
+    }
+
+    function clear_picture(){
+      document.getElementById("picture_frame").innerHTML=""
+      document.getElementById("picture_frame").style.display = 'none';
+	  document.getElementById("picture_frame_overlay").style.display = 'none';
+
+    }
+
+
+
+
+	// Next/previous controls
+	function plusSlides(n) {
+	  showSlides(slideIndex += n);
+	}
+
+	// Thumbnail image controls
+	function currentSlide(n) {
+	  showSlides(slideIndex = n);
+	}
+
+	function showSlides(n) {
+	  var i;
+	  var slides = document.getElementsByClassName("mySlides");
+	  var dots = document.getElementsByClassName("dot");
+	  if (n > slides.length) {slideIndex = 1}
+	  if (n < 1) {slideIndex = slides.length}
+	  for (i = 0; i < slides.length; i++) {
+		  slides[i].style.display = "none";
+	  }
+	  slides[slideIndex-1].style.display = "block";
+
+	}
+
+
+	function close_slideshow(){
+		document.getElementById("slide_show_overlay").style.display = 'none';
+	}
+
+
+	function slide_show(search_for){
+
+		search_for_url=encodeURI(search_for.toLowerCase());
+		offset="";
+		output_content="";
+
+		  $.ajaxSetup({
+			 headers:{
+				'Authorization': "Bearer patD5dYFBjdTtIAY8.20d135bce39d21c1b5ca51607082cd53bc1e64158373e0aa0065df8d54c79b0e" //read only token
+			 }
+		  });
+
+		// same api request as below but no page limit - limiting slideshow to one page of results
+
+
+		$.get("https://api.airtable.com/v0/app5Q6OlJ3iMkJ8cd/Reels?view=API&pageSize=&sort%5B0%5D%5Bfield%5D=Name&offset="+offset+"&filterByFormula=OR(SEARCH(%22"+search_for_url+"%22%2C+LOWER(%7Bstate%7D))%2CSEARCH(%22"+search_for_url+"%22%2C+LOWER(%7Bimage+description%7D))%2CSEARCH(%22"+search_for_url+"%22%2C+LOWER(%7Bname%7D))%2CSEARCH(%22"+search_for_url+"%22%2C+LOWER(%7BReel+ID+Number%7D)))", function(data, status){
+
+				if (data.records[0]){
+
+					document.getElementById("slide_show_overlay").style.display = 'flex';
+
+					output_content += "<div class=\"slideshow-container\">"
+
+					$.each(data.records, function(index){
+
+						image_preview=data.records[index].fields["Image Preview"];
+
+						$.each(image_preview, function(index2){
+								output_content += "<div class=\"mySlides fade\">"
+								output_content += "<img class=\"popup_image\" src= \" "+image_preview[index2].url+" \"   >"
+								output_content += "</div>"
+							  })
+
+
+					})
+					output_content += "<a class=\"prev\" onclick=\"plusSlides(-1)\">&#10094;</a>"
+					output_content += "<a class=\"next\" onclick=\"plusSlides(1)\">&#10095;</a>"
+					output_content += "<a class=\"close_slideshow\" onclick=\"close_slideshow()\">[Click to Close]</a>"
+					output_content += "</div>"
+
+
+
+					//console.log (output_content);
+
+			        document.getElementById("slide_show").innerHTML=output_content;
+					document.getElementById("slide_show").style.display = 'block';
+
+					slideIndex=1;
+					showSlides(slideIndex);
+
+
+
+				}
+
+		})
+
+	}
+
+  String.prototype.replaceAll = function(strReplace, strWith) {
+      // See http://stackoverflow.com/a/3561711/556609
+      var esc = strReplace.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+      var reg = new RegExp(esc, 'ig');
+      return this.replace(reg, strWith);
+  };
+
+
+function share_page(search_for){
+
+      navigator.clipboard.writeText("https://vm.vmdatabase.com/index.html?go="+encodeURI(search_for)).then(() => {
+            console.log('Search copied to clipboard');
+            alert("Search copied to clipboard - paste away!")
+          })
+          .catch(err => alert(err))
+}
+
+
+  function SearchReel(search_for, offset){
+
+
+      document.getElementById("search_results").innerHTML = "<img class=\"animated-gif\" src=\"./load.gif\">"
+
+
+      search_for_url=encodeURI(search_for.toLowerCase());
+
+      page_list[current_page]=offset;
+
+      console.log(search_for);
+      console.log(current_page);
+      console.log(page_list[current_page]);
+
+      $.ajaxSetup({
+         headers:{
+				       'Authorization': "Bearer patD5dYFBjdTtIAY8.20d135bce39d21c1b5ca51607082cd53bc1e64158373e0aa0065df8d54c79b0e" //read only token
+
+         }
+      });
+
+      $.get("https://api.airtable.com/v0/app5Q6OlJ3iMkJ8cd/Reels?view=API&pageSize=5&sort%5B0%5D%5Bfield%5D=Name&offset="+offset+"&filterByFormula=OR(SEARCH(%22"+search_for_url+"%22%2C+LOWER(%7Bstate%7D))%2CSEARCH(%22"+search_for_url+"%22%2C+LOWER(%7Bimage+description%7D))%2CSEARCH(%22"+search_for_url+"%22%2C+LOWER(%7Bname%7D))%2CSEARCH(%22"+search_for_url+"%22%2C+LOWER(%7BReel+ID+Number%7D)))", function(data, status){
+
+//        var js = JSON.stringify(data);
+  //      console.log(js);
+
+        //console.log(data.records[0].id);
+        document.getElementById("search_results").innerHTML="";
+        output_content="";
+
+        if (data.records[0])
+          {
+
+              window.scrollTo(0, 0);
+
+				if (current_page==0) {
+					//output_content += "<img style=\"cursor:pointer\" src=\"./slide.png\" width=32px onclick=\"slide_show(document.getElementById('seach_for_text').value.trim())\">"
+          output_content += "<button type=\"button\" onclick=\"slide_show(document.getElementById('seach_for_text').value.trim())\">Slideshow</button>"
+
+              if (navigator.share) {
+                  output_content += "<button type=\"button\" onclick=\"share_page('"+search_for+"')\">Copy Search</button>"
+              } else {
+                  // Fallback
+              }
+
+				}
+
+
+
+                $.each(data.records, function(index){
+
+
+                      output_content += "<div class=\"card\">"
+
+                      output_content += "<div class=\"container\"><h2>"
+                      output_content += "<a href=\"https://airtable.com/shrD0s6Tu2cU0XDWL/tblARt16RFYyr6j42/viwutcuhSodIOibzQ/"+data.records[index].id+" \" target=\"_blank\"> "
+                      output_content += data.records[index].fields["Reel ID Number"]+" - "+toTitleCase(data.records[index].fields.Name)
+                      output_content += "</a>"
+
+                      if (data.records[index].fields["Show_Marker"]) {
+                        output_content += "<br><img src='./reel_icon.png'></img>"
+                      }
+
+                      output_content += "</h2>"
+                      output_content += "</div>" //container
+
+                      //output_content += "aaa </a> bbb </div>";
+                      //document.getElementById("search_results").innerHTML += data.records[index].fields["Reel ID Number"]+" - ";
+                      //document.getElementById("search_results").innerHTML += toTitleCase(data.records[index].fields.Name) + "<br>";
+
+                      image_preview=data.records[index].fields["Image Preview"];
+
+                    //  output_content += "<div style=\"display:flex\" >"
+                      output_content += "<div class=\"image_group\">"
+                      $.each(image_preview, function(index2){
+                        output_content += "<div class=\"box-shadow\" onclick=\"show_image('"+image_preview[index2].url+"')\">"
+                        output_content += "<img  src= \" "+image_preview[index2].url+" \"  >"
+                        output_content += "</div>"
+                      })
+                      output_content += "</div>" //image group
+
+
+                      if (data.records[index].fields["Image Description"]) {
+                        //output_content += "<p>"+data.records[index].fields["Image Description"].replaceAll(search_for,"<mark>"+search_for+"</mark>");+"</p>"
+                        output_content += "<p>"+highlightOccurrences(search_for, data.records[index].fields["Image Description"])+"</p>"
+                        output_content += "<font size='-1'>(order of images may not match order of description)</font>"
+                      }
+
+                      if (data.records[index].fields["Contributor"]) {
+                        output_content += "<p>"
+                        output_content += "Reel courtesy of <b>"
+
+                        if (isValidURL(data.records[index].fields["Contributor_URL"])) {
+                          output_content += "<a href='"+data.records[index].fields["Contributor_URL"]+"'>"
+                        }
+
+                        output_content += data.records[index].fields["Contributor"]
+
+                        if (isValidURL(data.records[index].fields["External_URL"])) {
+                          output_content += "</a>"
+                        }
+
+                        output_content += "</b>"
+                        output_content += "</p>"
+                      }
+
+                      if (isValidURL(data.records[index].fields["External_URL"])) {
+
+                        var thumbnailUrl = getYouTubeThumbnail(data.records[index].fields["External_URL"]);
+
+                        output_content += "<p>"
+                        output_content += "<a href='"+data.records[index].fields["External_URL"]+"'>"
+
+                        if (thumbnailUrl) {
+                            output_content += "<div class='yt-image-container'>"
+                            output_content += "<img src='"+thumbnailUrl+"'></img>"
+                            output_content += "</div>"
+                            output_content += "<br><br>"
+                          } else {
+                            output_content += "Click Here For More Info"
+                          }
+
+                        output_content += "</a>";+"</p>"
+                      }
+
+                      //output_content += "<button type=\"button\" onclick=\"slide_show('"+toTitleCase(data.records[index].fields.Name)+"')\">Slideshow</button>"
+                      output_content += "</div>" //card
+                })
+
+                if (current_page>0){
+                  output_content += "<button type=\"button\" onclick=\"current_page--;SearchReel('"+search_for+"','"+page_list[current_page-1]+"')\">Previous</button>"
+                }
+                if (data.offset){
+                  output_content += "<button type=\"button\" onclick=\"current_page++;SearchReel('"+search_for+"','"+data.offset+"')\">Next</button>"
+                }
+                //console.log(data.offset);
+        } else {
+            output_content ="<p>None Found - Need To Buy More View-Masters!</p>"
+        }
+
+        document.getElementById("search_results").innerHTML = output_content;
+      });
+
+
+    }
+
+</script>
+
+</head>
+
+
+
+
+<body>
+  <div class="center">
+        <h1>View-Master Database</h1>
+        <input type="text" id="seach_for_text" autofocus placeholder="Type search text and press enter." onfocus="document.getElementById('search_button').style.display='block';">
+
+        <div id="search_button"><button onclick="newsearch();">Search</button></div>
+
+      <div id="picture_frame_overlay" class="overlay" onclick="clear_picture();">
+        <div id="picture_frame" style="padding: 10% 10% 10% 10%" onclick="clear_picture();"></div>
+      </div>
+
+      <div id="search_results"></div>
+
+		<div id="slide_show_overlay" class="overlay">
+			<div id="slide_show"></div>
+		</div>
+
+  <div class="center" id="footer"></div>
+
+
+
+
+  <script language="javascript">
+
+    function newsearch(){
+        page_list=[""];
+        current_page=0;
+
+    		$("#seach_for_text").blur();
+            document.getElementById("search_button").style.display="none";
+            SearchReel(document.getElementById('seach_for_text').value.trim(), '')
+        }
+
+
+
+        // Get the input field
+        var input = document.getElementById("seach_for_text");
+
+        // Execute a function when the user releases a key on the keyboard
+        input.addEventListener("keyup", function(event) {
+          // Number 13 is the "Enter" key on the keyboard
+          if (event.keyCode === 13 && document.getElementById("seach_for_text").value.length > 0) {
+            event.preventDefault();
+            newsearch();
+          }
+        });
+
+  //  SearchReel("beach","");
+
+  </script>
+</body>

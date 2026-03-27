@@ -1,0 +1,1092 @@
+<html>
+    <head>
+
+      <!-- Google tag (gtag.js) -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-HBL0VL09HC"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-HBL0VL09HC');
+      </script>
+
+        <script src="https://code.jquery.com/jquery-1.12.2.min.js"></script>
+        <script src="https://vm.vmdatabase.com/airtable.browser.js"></script>
+        <link href='https://fonts.googleapis.com/css?family=Arsenal' rel='stylesheet'>
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+        <link rel="stylesheet" href="./vm2.css">
+        <link rel="stylesheet" href="./slides2.css">
+
+        <meta property="og:url"                content="https://vm.vmdatabase.com/bog.html" />
+        <meta property="og:title"              content="Word-Snake" />
+        <meta property="og:description"        content="Find the secret word!" />
+        <meta property="og:image"              content="https://vm.vmdatabase.com/bog_OG2.jpg" />
+
+        <script>
+          $('document').ready(function(){
+              $("#footer").load("footer.html");
+
+
+              read_highscores();
+              update_controls();
+
+              //read_database();
+
+            });
+        </script>
+
+    <script>
+
+
+var all_records = [];
+var all_high_scores = [];
+var correct_answer_history = [];
+var current_guess = ""
+
+var guess_array_size = 5;
+var limit_multipier = 3
+var character_guess_array = [];
+var selected_cell_array = [];
+var actual_word_location_array = [];
+
+var number_of_attempts_allowed = 6;
+var initial_number_of_attempts_allowed = number_of_attempts_allowed
+var current_attempt_counter = 0;
+var empty_cell_value=" "
+var target_word=""
+var show_instructions=1
+
+var score = 0;
+var score_multiplier = 1;
+var correct_option=0;
+var current_question_answered=0;
+var game_over=0;
+var current_game_name=""
+var current_high_score=0
+var current_high_score_id=""
+var current_high_score_initials="Anonymous"
+var score_update_limit=1
+var question_type=1
+var hint_cost=5 // make always > 1
+var hint2_cost=5
+var click_limit_counter = 0
+var anagram_of_word = ""
+var bad_letters = [];
+
+String.prototype.shuffle = function () {
+    var a = this.split(""),
+        n = a.length;
+
+    for(var i = n - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = a[i];
+        a[i] = a[j];
+        a[j] = tmp;
+    }
+    return a.join("");
+}
+
+function toTitleCase(str) {
+  return str.replace(
+    /\w\S*/g,
+    function(txt) {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    }
+  );
+}
+
+function update_highscore(record_id, new_score, new_initials)
+{
+
+  if (new_initials != "" && new_initials != null && score_update_limit==0)
+  {
+      score_update_limit=1 // only resets when new game is started to prevent entering high score twice
+
+      var Airtable = require('airtable');
+      var base = new Airtable({apiKey: 'patGdQwJoutQrsAU0.1d5832b1ecc062b7194d19553d09c6cf888ece581c0ea7faa26ddb74863aded7'}).base('appBFK23PicRLGZyK');
+
+      if (record_id != "") {
+            base('Scores').update([
+              {
+                "id": record_id,
+                "fields": {
+                  "High_Score": new_score,
+                  "Initials": new_initials
+                }
+              }
+            ], function(err, records) {
+              if (err) {
+                console.error(err);
+                return;
+              }
+              records.forEach(function(record) {
+                // console.log(record.get('Trivia_View'));
+              });
+            });
+      } else {
+
+        base('Scores').create([
+          {
+            "fields": {
+              "Trivia_View": current_game_name,
+              "High_Score": new_score,
+              "Initials": new_initials,
+              "Game": "BOG"
+            }
+          }
+        ], function(err, records) {
+          if (err) {
+            console.error(err);
+            return;
+          }
+          records.forEach(function (record) {
+            // console.log(record.getId());
+          });
+        });
+      }
+  }
+
+  read_highscores();
+
+
+}
+
+function read_highscores(){
+
+  var Airtable = require('airtable');
+  var base = new Airtable({apiKey: 'patGdQwJoutQrsAU0.1d5832b1ecc062b7194d19553d09c6cf888ece581c0ea7faa26ddb74863aded7'}).base('appBFK23PicRLGZyK'); // this is to the highscore table from the API user
+
+  all_high_scores = [];
+
+  base('Scores').select({
+
+      maxRecords: 20,
+      view: "BOGView"
+  }).eachPage(function page(records, fetchNextPage) {
+      // This function (`page`) will get called for each page of records.
+
+      records.forEach(function(record) {
+          // console.log('Retrieved', record.get('Trivia_View'));
+
+          all_high_scores_single = {};
+
+          all_high_scores_single.record_id=record.id;
+          all_high_scores_single.trivia_view=record.get('Trivia_View');
+          all_high_scores_single.high_score=record.get('High_Score');
+          all_high_scores_single.initials=record.get('Initials');
+
+          all_high_scores.push(all_high_scores_single);
+
+
+
+      });
+
+      fetchNextPage();
+
+  }, function done(err) {
+      if (err) {
+          console.error(err);
+          document.getElementById("game_controls_content").innerHTML = "Something went wrong :-(  Refresh to try again.)";
+          return;
+        }
+
+      if (document.getElementById("starting_instructions_high_scores") != null)
+        {
+
+          all_high_scores = all_high_scores.sort(function(a,b) {
+            return b.high_score - a.high_score;
+            });
+
+            output_html= "<br><table style='border:1px solid lightgrey;margin: 2px 5px 2px 5px;' cellspacing=0><tr align='center' ><td colspan=3 nowrap bgcolor='AliceBlue'>Current High Scores</td></tr>"
+
+            for (let i=0;i<all_high_scores.length;i++){
+
+              bg_color="white"
+              if (i%2 == 1) {bg_color="WhiteSmoke"}
+              output_html += "<tr bgcolor='"+bg_color+"'><td nowrap>"+all_high_scores[i].trivia_view.replace("Trivia_","").replace("Trivia","All").replace("ROW","World")+"</td><td nowrap>"+all_high_scores[i].high_score+"</td><td nowrap>"+all_high_scores[i].initials+"</td></tr>"
+            }
+
+            output_html += "</table>"
+            document.getElementById("starting_instructions_high_scores").innerHTML += output_html
+      }
+
+  });
+}
+
+
+
+  function get_this_games_high_scores(){
+
+    if (current_game_name != ""){
+
+
+      current_high_score_id=""
+      current_high_score=0
+      current_high_score_initials="Anonymous"
+
+      for (var i = 0; i < all_high_scores.length; i++) {
+
+          if (all_high_scores[i].trivia_view == current_game_name) {
+            current_high_score_id=all_high_scores[i].record_id
+            current_high_score=all_high_scores[i].high_score
+            current_high_score_initials=all_high_scores[i].initials
+
+            break
+          }
+        }
+
+    }
+  }
+
+
+function read_database(view_name){
+
+      //read_highscores();
+
+      var Airtable = require('airtable');
+      var base = new Airtable({apiKey: 'patD5dYFBjdTtIAY8.20d135bce39d21c1b5ca51607082cd53bc1e64158373e0aa0065df8d54c79b0e'}).base('app5Q6OlJ3iMkJ8cd');
+
+      all_records=[];
+      score=0;
+      correct_option=0;
+      current_question_answered=0;
+      game_over=0;
+      correct_answer_history = [];
+      score_update_limit=0;
+
+
+      document.getElementById("game_controls_content").innerHTML = "<div align='center'>Getting reels from database... </div>"
+
+      if (view_name==null){
+        view_name="Trivia_Americas";
+      }
+
+      current_game_name=view_name;
+
+      base('Reels').select({
+
+          maxRecords: 2000,
+          view: view_name
+      }).eachPage(function page(records, fetchNextPage) {
+          // This function (`page`) will get called for each page of records.
+
+          records.forEach(function(record) {
+              // console.log('Retrieved', record.get('Name'));
+
+              //console.log('and ', record.get('Image Preview'));
+
+
+              //console.log('image is ', one_image_from_set)
+
+              //all_records.push(record.get('Name'), one_image_from_set);
+              all_records_single = {};
+
+              all_records_single.title=record.get('Name');
+              all_records_single.image_description=record.get('Image Description');
+
+              this_records_set_of_images=record.get('Image Preview');
+
+              if (typeof this_records_set_of_images != "undefined") {
+                if (typeof this_records_set_of_images[0] != "undefined") all_records_single.image1_url=this_records_set_of_images[0].url;
+                if (typeof this_records_set_of_images[1] != "undefined") all_records_single.image2_url=this_records_set_of_images[1].url;
+                if (typeof this_records_set_of_images[2] != "undefined") all_records_single.image3_url=this_records_set_of_images[2].url;
+                if (typeof this_records_set_of_images[3] != "undefined") all_records_single.image4_url=this_records_set_of_images[3].url;
+                if (typeof this_records_set_of_images[4] != "undefined") all_records_single.image5_url=this_records_set_of_images[4].url;
+                if (typeof this_records_set_of_images[5] != "undefined") all_records_single.image6_url=this_records_set_of_images[5].url;
+                if (typeof this_records_set_of_images[6] != "undefined") all_records_single.image7_url=this_records_set_of_images[6].url;
+              }
+
+              all_records.push(all_records_single);
+
+              document.getElementById("game_controls_content").innerHTML = "<div align='center'>Getting reels from database... ("+all_records.length+")</div>"
+
+          });
+
+          // To fetch the next page of records, call `fetchNextPage`.
+          // If there are more records, `page` will get called again.
+          // If there are no more records, `done` will get called.
+          fetchNextPage();
+
+      }, function done(err) {
+          if (err) {
+              console.error(err);
+              document.getElementById("game_controls_content").innerHTML = "Something went wrong :-(  Refresh to try again.)";
+              return;
+            }
+
+          start();
+      });
+    }
+
+function start(){
+      console.log("Ready to Begin")
+      //console.log(all_records[5].title);
+      //console.log(all_records[5].image_url);
+
+      //start game by showing the first question
+
+
+      display_question(1);
+      update_controls();
+
+
+    }
+
+function give_up(){
+  if (confirm("Give up game but keep your score?")==true) {
+    current_question_answered=1
+    game_over=-1
+    render_guess_array()
+    // update_controls()
+  }
+}
+
+function update_controls(optional_finish){
+
+
+      display_content=""
+      //display_content="<div class=\"container\"><h2>"
+      button_options = "<div>New Game:</div>"
+      button_options += "<button onclick=\"read_database('Trivia')\">All</button>"
+      button_options += "<button onclick=\"read_database('Trivia_Americas')\">Americas</button>"
+      button_options += "<button onclick=\"read_database('Trivia_Europe')\">Europe</button>"
+      button_options += "<button onclick=\"read_database('Trivia_ROW')\">World</button>"
+      button_options += "<button onclick=\"read_database('Trivia_USA')\">USA</button>"
+      button_options += "<button onclick=\"read_database('Trivia_Cartoon')\">Cartoons</button>"
+      button_options += "<button onclick=\"read_database('Trivia_Live')\">Movie/TV</button>"
+      button_options += "<button onclick=\"read_database('Trivia_Diorama')\">Diorama</button>"
+      button_options += "<button onclick=\"read_database('Trivia_Fact')\">Fact</button>"
+      button_options += "<button onclick=\"read_database('Trivia_Fiction')\">Fiction</button>"
+      // find the current high score, if any, for this game name - if none found, assign defaults
+
+      get_this_games_high_scores()
+
+      if (show_instructions == 1) {
+        document.getElementById("keyboard_area").style.display="none"
+        display_content +="<div align='center'>"
+        display_content += "<h3>Select a category to begin.</h3>"
+        display_content += button_options;
+        display_content += "</div>";
+      }
+
+      if (current_question_answered==0 && game_over==0 && show_instructions==0) {
+            document.getElementById("keyboard_area").style.display="flex"
+            display_content +="<div align='center'>"
+            // display_content += "<h3>Spell the secret word before time runs out!</h3>"
+
+            display_content += "<table width=100%><tr><td align=\"left\" width=33%>"
+            // display_content += "<h3>Spell the secret word!</h3>"
+            display_content += "<h3><span onclick=\"give_up()\" style=\"cursor:pointer\"><u>Give Up?</u></span></h3>"
+            display_content += "</td><td align=\"center\" width=33%><h3>"
+            display_content += "Your Total: "+score
+            display_content += "</h3></td><td align=\"right\" width=33%><h3>"
+            if (current_high_score > 0) {
+              display_content += "Best:"+current_high_score+"<br> ("+current_high_score_initials+")"
+            } else {
+              display_content += "No Best Score Yet"
+            }
+
+            display_content += "</h3></td></tr></table>"
+
+
+            display_content += button_options;
+            display_content += "</div>";
+
+      }
+
+        if (current_question_answered==1 && game_over==1 && show_instructions==0 && optional_finish != 1) {
+            document.getElementById("keyboard_area").style.display="none"
+            display_content += "<table width=100%><tr><td align=\"left\" width=33%>"
+            display_content += "<h3>Great Job! That\'s "
+            display_content += target_word.length + " letters!"
+            if (score_multiplier > 1 ) {display_content += " "+score_multiplier+"X Points! "}
+
+            display_content += "</h3></td><td align=\"center\" width=33%><h3>"
+            display_content += "Your Total: "+score
+            display_content += "</h3></td><td align=\"right\" width=33%><h3>"
+            if (current_high_score > 0) {
+              display_content += "Best:"+current_high_score+"<br> ("+current_high_score_initials+")"
+            } else {
+              display_content += "No Best Score Yet"
+            }
+
+            display_content += "</h3></td></tr></table>"
+            // display_content +="<div align='center'>"
+            // // display_content += "<h3>Keep Going:</h3>"
+            // display_content += "<button onclick=\"display_question(1)\">New Word</button>"
+            // // display_content += "<button onclick=\"display_question(2)\">Long Word</button>"
+            // display_content += "<br><button onclick=\"update_controls(1)\">Finish</button>"
+            // display_content += "</div>"
+
+            setTimeout(display_question, 1000)
+
+
+
+
+          }
+
+      if ( (current_question_answered==1 && game_over==-1) || optional_finish==1) {
+
+          display_content +="<div align='center'>"
+          if (optional_finish==1) {
+            display_content += "<h3>Great Game!</h3>"
+          } else {
+          display_content += "<h3>The Word Was <i>"+toTitleCase(target_word)+"</i></h3>"
+          }
+          display_content += "<h3>Final Score: "+score+"</h3>"
+          display_content += button_options;
+          display_content += "</div>";
+
+          // make the title click to the database
+          current_inner_html=document.getElementById("title_area").innerHTML;
+          current_inner_html=current_inner_html.replace("<h2>","");
+          current_inner_html=current_inner_html.replace("</h2>","");
+          current_inner_html="<h2><a href='./index.html?go="+current_inner_html+"'><u>"+current_inner_html+"</u></a></h2>"
+          document.getElementById("title_area").innerHTML=current_inner_html;
+
+console.log(score)
+console.log(current_high_score)
+console.log(show_instructions)
+
+          if (score > current_high_score && show_instructions==0) {
+            setTimeout(function(){
+              new_score_initials=prompt("High Score! Enter Your Initials:", "ABC")
+
+                new_score_initials=new_score_initials.substring(0,20)
+                update_highscore(current_high_score_id, score, new_score_initials)
+
+            }, 500);
+
+          }
+
+          document.getElementById("keyboard_area").style.display="none"
+        }
+
+      document.getElementById("game_controls_content").innerHTML = display_content;
+
+    }
+
+
+function display_question(difficulty){
+
+
+  current_guess = ""
+  anagram_of_word=""
+  selected_cell_array = []
+  current_attempt_counter=0;
+  show_instructions=0;
+  game_over=0;
+  current_question_answered=0;
+  bad_letters = [];
+  number_of_attempts_allowed=initial_number_of_attempts_allowed // in case they increased it with a hint it needs to be reset
+
+  document.getElementById("picture_area").style="display:flex;"
+
+// pick a random reel from the set
+
+  limit=0;
+
+  do {
+    option_1 = Math.floor(Math.random()*all_records.length); // pick any random entry from the list, not already used
+    limit++
+
+    if (limit>10) {break;}
+  } while (correct_answer_history.includes(option_1))
+
+  // console.log("Selected random reel" + option_1)
+
+        current_question_answered=0;
+
+        current_question_title = all_records[option_1].title;
+        current_question_description = all_records[option_1].image_description;
+// first question uses a word from the title (if the title is long enough) to make it easier, or if there is not enough description do the same
+        if (current_question_description =="" || current_question_description == null || current_question_description.length<25 || (correct_answer_history.length==0 && current_question_title.length>24)) {current_question_description=current_question_title}
+
+        current_question_pictures=[];
+        current_question_pictures.push(all_records[option_1].image1_url)
+        current_question_pictures.push(all_records[option_1].image2_url)
+        current_question_pictures.push(all_records[option_1].image3_url)
+        current_question_pictures.push(all_records[option_1].image4_url)
+        current_question_pictures.push(all_records[option_1].image5_url)
+        current_question_pictures.push(all_records[option_1].image6_url)
+        current_question_pictures.push(all_records[option_1].image7_url)
+
+
+        // console.log(current_question_title)
+        // console.log(current_question_description)
+        // console.log(current_question_pictures)
+
+        // remove punctuation
+        current_question_description = current_question_description.toLowerCase().replace(/[^a-zA-Z]+/g, " ")
+
+        // split into an array
+        current_question_wordarray = current_question_description.split(' ');
+
+        // sort descending by length
+
+        current_question_wordarray = current_question_wordarray.sort((a,b) => b.length - a.length);
+
+        // remove all words < 5
+
+        current_question_wordarray = current_question_wordarray.filter(function(value, index, arr){
+            return value.length > 4;
+          });
+
+          // remove all words over 10 ??
+
+          current_question_wordarray = current_question_wordarray.filter(function(value, index, arr){
+              return value.length < 11;
+            });
+
+        // based on difficulty remove top or bottom half
+        // not using this for now
+
+        score_multiplier=1
+
+        // median_length=Math.floor((current_question_wordarray[0].length + current_question_wordarray[current_question_wordarray.length-1].length) / 2)
+        //
+        // if (difficulty > 1) {
+        //   //score_multiplier=difficulty
+        //   score_multiplier=1
+        //
+        //   current_question_wordarray = current_question_wordarray.filter(function(value, index, arr){
+        //       return value.length > median_length;
+        //     });
+        // } else {
+        //   score_multiplier=1
+        //   current_question_wordarray = current_question_wordarray.filter(function(value, index, arr){
+        //       return value.length <= median_length;
+        //     });
+        // }
+
+        current_question_longest_word = current_question_wordarray[0]
+        current_question_random_word = current_question_wordarray[Math.floor(Math.random()*current_question_wordarray.length)]
+
+
+
+// fix this to be based on options?
+        target_word=current_question_random_word
+
+
+
+// first go always gets shortest word
+
+        if (correct_answer_history.length==0) {
+          console.log(current_question_wordarray)
+          target_word=current_question_wordarray[current_question_wordarray.length-1]
+        }
+
+
+
+        console.log(target_word)
+        //display question parts
+
+        document.getElementById("title_area").innerHTML="<h2>"+toTitleCase(current_question_title)+"</h2>"
+
+        current_question_pictures.forEach(function(element, index) {
+          // console.log(element)
+          document.getElementById("picture_"+index).innerHTML="<img src=\""+element+"\">"
+        })
+
+
+        // guess_array_size is width and height of Array
+        // 5 attempts - since it may not always be possible to put the word into the array
+console.log ("Putting target in array")
+console.log (character_guess_array)
+
+        for (attempt_count=0;attempt_count<10;attempt_count++) {
+          // empty the guess array
+
+              character_guess_array = Array.from(Array(guess_array_size), () => new Array(guess_array_size))
+
+              for (i=0;i<guess_array_size;i++) {
+
+                for (j=0;j<guess_array_size;j++) {
+
+                  character_guess_array[i][j]=empty_cell_value
+                }
+              }
+
+              pass_fail=put_target_in_guess_array()
+
+              if (pass_fail == "GOOD") {
+                break
+              } else {
+                console.log("Picking a different tagret word")
+                target_word=current_question_wordarray[Math.floor(Math.random()*current_question_wordarray.length)]
+                console.log("Now is "+target_word)
+              }
+
+            }
+
+            if (attempt_count == 10) {
+              // WHAT DO WE DO HERE???  5 tries at loading word failed
+              console.log("FAILED to load target onto array")
+              if (confirm("Failed to load question - Press OK to load a new question.")==true) {
+                  display_question(1)
+              } else {
+                update_controls(1)
+              }
+            }
+
+        // fill the rest of the array with leters
+
+        for (i=0;i<guess_array_size;i++) {
+
+          for (j=0;j<guess_array_size;j++) {
+
+            if (character_guess_array[i][j] == empty_cell_value) {
+              character_guess_array[i][j] = String.fromCharCode(65+Math.floor(Math.random() * 26))
+            }
+
+          }
+
+        }
+
+
+
+console.log ("Ending array is ")
+console.log (character_guess_array)
+
+
+        document.body.scrollTop = 0; // For Safari
+        document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+
+        // draw the array on the screen
+
+        click_limit_counter = target_word.length * limit_multipier
+
+        // maybe this hint is too expensive this way
+        //hint_cost = target_word.length
+
+        render_guess_array()
+
+        // log the right answer for tracking so they dont repeat
+        correct_answer_history.push(option_1)
+        //update_controls();
+
+}
+
+function put_target_in_guess_array(){
+
+  //pick a starting cell
+  //write first letter into starting cell
+  //(LOOP) pick a direction
+  //check validity of cell in that direction
+  //if valid, break LOOP
+  //if LOOP ends, and not the last letter can't write the word - RETURN
+
+  actual_word_location_array = []
+  cell_x = Math.floor(Math.random() * guess_array_size);
+  cell_y = Math.floor(Math.random() * guess_array_size);
+
+// first push here, remaining below
+  character_guess_array[cell_x][cell_y]=target_word[0].toUpperCase()
+  actual_word_location_array.push([cell_y.toString(),cell_x.toString()])
+
+
+  for (target_letter_loop=1;target_letter_loop<target_word.length;target_letter_loop++){
+
+    next_letter_direction=Math.floor(Math.random() * 4)
+      for (direction_loop=0;direction_loop<4;direction_loop++){
+
+// x and y are backwards below :-(  but leave it for simplicity
+
+          if (next_letter_direction==0 && cell_y-1 >= 0) {
+            if (character_guess_array[cell_x][cell_y-1] == empty_cell_value) {
+              cell_y=cell_y-1
+              character_guess_array[cell_x][cell_y]=target_word[target_letter_loop].toUpperCase()
+              actual_word_location_array.push([cell_y.toString(),cell_x.toString()])
+              break
+            }
+          }
+
+          if (next_letter_direction==1 && cell_x+1 < guess_array_size) {
+            if (character_guess_array[cell_x+1][cell_y] == empty_cell_value) {
+              cell_x=cell_x+1
+              character_guess_array[cell_x][cell_y]=target_word[target_letter_loop].toUpperCase()
+              actual_word_location_array.push([cell_y.toString(),cell_x.toString()])
+              break
+            }
+          }
+
+          if (next_letter_direction==2 && cell_y+1 < guess_array_size) {
+            if (character_guess_array[cell_x][cell_y+1] == empty_cell_value) {
+              cell_y=cell_y+1
+              character_guess_array[cell_x][cell_y]=target_word[target_letter_loop].toUpperCase()
+              actual_word_location_array.push([cell_y.toString(),cell_x.toString()])
+              break
+            }
+          }
+
+          if (next_letter_direction==3 && cell_x-1 >= 0) {
+            if (character_guess_array[cell_x-1][cell_y] == empty_cell_value) {
+              cell_x=cell_x-1
+              character_guess_array[cell_x][cell_y]=target_word[target_letter_loop].toUpperCase()
+              actual_word_location_array.push([cell_y.toString(),cell_x.toString()])
+              break
+            }
+          }
+
+          next_letter_direction++
+
+          if (next_letter_direction > 3){next_letter_direction=0}
+
+      }
+
+      if (direction_loop == 4) {
+        break
+      }
+    }
+
+
+    if (direction_loop == 4) {
+      return "BAD"
+    } else {
+      return "GOOD"
+    }
+
+}
+
+function hint_buy_letter(){
+
+  if (current_question_answered==1) {return}
+
+  if (confirm("Reveal the next letter for "+hint_cost+" points? You have "+score)==true) {
+
+      var num_correct=current_guess.length // assume they're all corect
+
+// figure out how many letters are correct, starting from the beginning
+        for (i=0;i<selected_cell_array.length;i++){
+
+          if (selected_cell_array[i].toString()!=actual_word_location_array[i].toString()) {
+            console.log(i)
+            num_correct=i
+            break
+          }
+        }
+
+// reset current_guess and selected_cell_array to that many correct letters
+
+        current_guess = current_guess.substring(0,num_correct)
+
+        starting_array_length=selected_cell_array.length
+        selected_cell_array.splice(num_correct)
+
+// add one more correct letter to the end
+
+        next_letter_index=selected_cell_array.length
+
+        next_letter = target_word[next_letter_index]
+
+        selected_cell_array.push([actual_word_location_array[next_letter_index][0].toString(),actual_word_location_array[next_letter_index][1].toString()])
+
+        current_guess += next_letter.toUpperCase()
+
+        console.log(selected_cell_array)
+        console.log(current_guess)
+
+        score=score-hint_cost
+        if (score<0) {score=0}
+        render_guess_array()
+
+      }
+}
+
+function hint_get_anagram(){
+  if (confirm("See anagram of secret word for "+hint2_cost+" points? You have "+score)==true) {
+    console.log("anagram")
+
+    anagram_of_word=target_word.shuffle()
+
+    console.log(anagram_of_word)
+
+    score=score-hint_cost
+    if (score<0) {score=0}
+    render_guess_array()
+
+  }
+}
+
+function render_guess_array(){
+
+
+  if (current_guess.toLowerCase() == target_word.toLowerCase()) {
+    console.log("WIN")
+    game_over=1
+    current_question_answered=1
+    score += target_word.length * score_multiplier
+  } else if (click_limit_counter <= 0) { // only lose if you didn't win on this click
+      console.log ("LOSE")
+      game_over=-1
+      current_question_answered=1
+    }
+
+
+  html_output=""
+
+
+  html_output += "<div>"
+
+
+//row
+  for (i=0;i<guess_array_size;i++){
+
+    number_of_green_letters=0
+    html_output += "<div class=\"flex-container_vmm_options\" id=\"Guess_Array_Row_"+i+"\">"
+
+
+
+//cols
+    for (j=0;j<guess_array_size;j++){
+
+
+      show_this_letter = character_guess_array[i][j]
+
+      // if this row is not the last row (current guess counter row) then it's a committed row and should be color coded
+
+      cell_color="White"
+
+
+      if (game_over>=0){
+            for(k=0;k<selected_cell_array.length;k++){
+              if (selected_cell_array[k][0]==j && selected_cell_array[k][1]==i) {
+                cell_color="LightYellow"
+
+                if (current_question_answered==1) {
+                  cell_color="PaleGreen"
+                } else if (current_guess.length == target_word.length) {
+                  cell_color="Tomato"
+                }
+              }
+            }
+      } else {
+        for(k=0;k<actual_word_location_array.length;k++){
+          if (actual_word_location_array[k][0]==j && actual_word_location_array[k][1]==i) {
+            cell_color="Tomato"
+          }
+        }
+      }
+
+
+      html_output += "<div style=\"background-color:"+cell_color+"\" class=\"vmm_letter\" id=\"Cell_"+j+"_"+i+"\" onclick=\"click_a_letter('Cell_"+j+"_"+i+"')\" >"
+      html_output += show_this_letter
+      html_output += "</div>"
+
+
+    }
+
+    html_output += "</div>"
+
+  }
+
+  if (game_over==0) {
+      html_output += "<br><div class=\"flex-container_vmm_options\">"
+
+      if (score >= hint_cost && current_question_answered == 0) {
+          html_output += "<div onclick=\"hint_buy_letter()\"><img src=\"./q_icon.png\">&nbsp;&nbsp;&nbsp;</div>"
+      }
+
+      for (i=0;i<current_guess.length;i++) {
+        html_output += "<div class=\"bog_letter\">"+current_guess[i]+"</div>"
+      }
+
+      for (i=0;i<(target_word.length-current_guess.length);i++) {
+        html_output += "<div class=\"bog_letter\">"+empty_cell_value+"</div>"
+      }
+
+      if (current_question_answered!=1 && selected_cell_array.length>0 || 1==1) {
+        html_output += "&nbsp;"
+        html_output += "<div class=\"bog_button\" onclick=\"delete_option()\">Delete</div>"
+      }
+
+      if (score >= hint2_cost && anagram_of_word=="" && current_question_answered == 0) {
+          html_output += "<div onclick=\"hint_get_anagram()\">&nbsp;&nbsp;&nbsp;<img src=\"./a_icon.png\">&nbsp;&nbsp;&nbsp;</div>"
+      }
+
+      html_output += "</div>"
+
+
+      if (anagram_of_word.length>0){
+
+        html_output += "<div align=\"center\">(Hint: <i>"+anagram_of_word.toUpperCase()+"</i>)</div>"
+      }
+
+      progress_to_show=click_limit_counter / (target_word.length * limit_multipier) * 100
+
+      if (progress_to_show>=0) {
+          label_text="&nbsp;"
+
+          if (current_guess.length == 0 && progress_to_show > 50){
+            label_text="Click a letter to start"
+          }
+
+          if (current_guess.length == target_word.length && progress_to_show > 25) {
+            label_text="Click delete"
+          }
+
+          html_output += "<br><div class=\"w3-light-grey w3-round-xlarge\">"
+          html_output += "<div align=\"center\"class=\"w3-container w3-blue w3-round-xlarge\" style=\"width:"+progress_to_show+"%\">"+label_text+"</div>"
+          html_output += "</div>"
+      }
+
+  }
+
+  html_output += "</div>"
+
+
+  document.getElementById("main_play_area").innerHTML=html_output
+
+  update_controls();
+
+
+}
+
+function click_a_letter(click_this){
+
+  if (current_question_answered==1) {return}
+
+  click_this = click_this.replace("Cell_","")
+
+  click_x=click_this.substring(0,click_this.indexOf("_"))
+  click_y=click_this.substring(click_this.indexOf("_")+1)
+
+  valid_click=1
+
+// ONLY DO THIS IF VALID
+
+// not already picked full length of letters
+
+  if (selected_cell_array.length == target_word.length) {
+    valid_click=0
+  }
+
+// not already clicked
+
+for(k=0;k<selected_cell_array.length;k++){
+  if (selected_cell_array[k][0]==click_x && selected_cell_array[k][1]==click_y) {
+    valid_click=0
+  }
+}
+
+
+// one cell away from last click, if there was a last click
+
+  if (selected_cell_array.length > 0) {
+
+
+    last_click_location=selected_cell_array[selected_cell_array.length-1]
+
+    last_click_x = parseInt(last_click_location[0][0])
+    last_click_y = parseInt(last_click_location[1][0])
+
+    valid_left=last_click_x-1
+    valid_right=last_click_x+1
+    valid_up=last_click_y-1
+    valid_down=last_click_y+1
+
+    valid_count=0
+
+    if (click_x == valid_left && click_y == last_click_y) {
+      ++valid_count
+    }
+
+    if (click_x == valid_right && click_y == last_click_y) {
+      ++valid_count
+    }
+
+    if (click_x == last_click_x && click_y == valid_up) {
+      ++valid_count
+    }
+
+    if (click_x == last_click_x && click_y == valid_down) {
+      ++valid_count
+    }
+
+    if (valid_count == 0) {valid_click=0}
+
+
+  }
+
+
+
+  if (valid_click==1 && current_question_answered!=1) {
+    click_limit_counter--
+    selected_cell_array.push([click_x,click_y])
+    current_guess += character_guess_array[click_y][click_x] // y first then x
+  }
+
+  render_guess_array()
+}
+
+function delete_option(){
+
+  current_guess=current_guess.substring(0,current_guess.length-1)
+  selected_cell_array.splice(-1,1)
+
+  render_guess_array()
+
+}
+
+    </script>
+    </head>
+
+    <body>
+
+
+      <div id="main_div" class="flex-container_vmm">
+          <div>&nbsp;</div>
+          <div id="title_area" class="trivia_option" align="center">
+            <h2>Word-Snake</h2>
+          </div>
+
+          <div id="picture_area" class="flex-container_vmm_images" style="display:none;">
+            <div id="picture_0" class="box-shadow_small" >
+            </div>
+            <div id="picture_1" class="box-shadow_small" >
+            </div>
+            <div id="picture_2" class="box-shadow_small" >
+            </div>
+            <div id="picture_3" class="box-shadow_small" >
+            </div>
+            <div id="picture_4" class="box-shadow_small" >
+            </div>
+            <div id="picture_5" class="box-shadow_small" >
+            </div>
+            <div id="picture_6" class="box-shadow_small" >
+            </div>
+          </div>
+
+          <div id="main_play_area" class="flex-container_vmm_images">
+            <h3 align="center">Instructions</h3>
+              <div style="display:flex;flex-direction: row;">
+                <div align="center" id="starting_instruction_text">
+                  <div style="float:right;" id="starting_instructions_high_scores"></div>
+                    <p>
+                      The game will select a View-Master reel and show you the title and the pictures from the reel.
+                      It will select a secret word from the image descriptions and it's your job to guess that word.  Try and spell your guess by selecting letters from the word grid.
+                    </p>
+                    <p>
+                      <img src="./bog_instruction.png">
+                    </p>
+                    <p><h3>The secret word was <i>Passengers</i></h3></p>
+                    <p>
+                        <img src="./progress_bar.png">
+                      </p>
+                      <p><h3>This is your guess limit - if it runs out, you lose!</h3></p>
+              </div>
+            </div>
+      </div>
+      <div id="keyboard_area" class="flex-container_vmm_images">
+      </div>
+
+      <div id="game_controls" class="card" style="width:90vw;">
+          <div id="game_controls_content"></div>
+      </div>
+
+
+      <div class="center" id="footer"></div>
+
+    </body>
+</html>

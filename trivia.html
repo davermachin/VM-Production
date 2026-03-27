@@ -1,0 +1,693 @@
+<html>
+    <head>
+
+      <!-- Google tag (gtag.js) -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-HBL0VL09HC"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-HBL0VL09HC');
+      </script>
+
+        <script src="https://code.jquery.com/jquery-1.12.2.min.js"></script>
+        <script src="https://vm.vmdatabase.com/airtable.browser.js"></script>
+        <link href='https://fonts.googleapis.com/css?family=Arsenal' rel='stylesheet'>
+        <link rel="stylesheet" href="./vm2.css">
+        <link rel="stylesheet" href="./slides2.css">
+
+        <meta property="og:url"                content="https://vm.vmdatabase.com/trivia.html" />
+        <meta property="og:title"              content="View-Master Quiz" />
+        <meta property="og:description"        content="How many of these vintage view-master pictures can you identify?" />
+        <meta property="og:image"              content="https://vm.vmdatabase.com/Quiz_OG3.jpg" />
+
+        <script>
+          $('document').ready(function(){
+              $("#footer").load("footer.html");
+              read_highscores();
+              update_controls();
+
+
+
+
+            });
+        </script>
+
+    <script>
+
+
+var all_records = [];
+var all_high_scores = [];
+var correct_answer_history = [];
+var score = 0;
+var correct_option=0;
+var current_question_answered=0;
+var game_over=0;
+var current_game_name=""
+var current_high_score=0
+var current_high_score_id=""
+var current_high_score_initials="Anonymous"
+var score_update_limit=1
+var question_type=1
+
+
+function toTitleCase(str) {
+  return str.replace(
+    /\w\S*/g,
+    function(txt) {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    }
+  );
+}
+
+function update_highscore(record_id, new_score, new_initials)
+{
+
+  if (new_initials != "" && new_initials != null && score_update_limit==0)
+  {
+      score_update_limit=1 // only resets when new game is started to prevent entering high score twice
+
+      var Airtable = require('airtable');
+      var base = new Airtable({apiKey: 'patGdQwJoutQrsAU0.1d5832b1ecc062b7194d19553d09c6cf888ece581c0ea7faa26ddb74863aded7'}).base('appBFK23PicRLGZyK');
+
+      if (record_id != "") {
+            base('Scores').update([
+              {
+                "id": record_id,
+                "fields": {
+                  "High_Score": new_score,
+                  "Initials": new_initials
+                }
+              }
+            ], function(err, records) {
+              if (err) {
+                console.error(err);
+                return;
+              }
+              records.forEach(function(record) {
+                console.log(record.get('Trivia_View'));
+              });
+            });
+      } else {
+
+        base('Scores').create([
+          {
+            "fields": {
+              "Trivia_View": current_game_name,
+              "High_Score": new_score,
+              "Initials": new_initials,
+              "Game": "Trivia"
+            }
+          }
+        ], function(err, records) {
+          if (err) {
+            console.error(err);
+            return;
+          }
+          records.forEach(function (record) {
+            console.log(record.getId());
+          });
+        });
+      }
+  }
+
+  read_highscores();
+
+
+}
+
+function read_highscores(){
+
+  var Airtable = require('airtable');
+  var base = new Airtable({apiKey: 'patGdQwJoutQrsAU0.1d5832b1ecc062b7194d19553d09c6cf888ece581c0ea7faa26ddb74863aded7'}).base('appBFK23PicRLGZyK'); // this is to the highscore table from the API user
+
+  all_high_scores = [];
+
+  base('Scores').select({
+
+      maxRecords: 20,
+      view: "ScoreView"
+  }).eachPage(function page(records, fetchNextPage) {
+      // This function (`page`) will get called for each page of records.
+
+      records.forEach(function(record) {
+          console.log('Retrieved', record.get('Trivia_View'));
+
+          all_high_scores_single = {};
+
+          all_high_scores_single.record_id=record.id;
+          all_high_scores_single.trivia_view=record.get('Trivia_View');
+          all_high_scores_single.high_score=record.get('High_Score');
+          all_high_scores_single.initials=record.get('Initials');
+
+          all_high_scores.push(all_high_scores_single);
+
+
+
+      });
+
+      fetchNextPage();
+
+  }, function done(err) {
+      if (err) {
+          console.error(err);
+          document.getElementById("game_controls_content").innerHTML = "Something went wrong :-(  Refresh to try again.)";
+          return;
+        }
+
+      if (document.getElementById("starting_instructions_high_scores") != null)
+        {
+
+          all_high_scores = all_high_scores.sort(function(a,b) {
+            return b.high_score - a.high_score;
+            });
+
+            output_html= "<br><table style='border:1px solid lightgrey;margin: 2px 5px 2px 5px;' cellspacing=0><tr align='center' ><td colspan=3 nowrap bgcolor='AliceBlue'>Current High Scores</td></tr>"
+
+            for (let i=0;i<all_high_scores.length;i++){
+
+              bg_color="white"
+              if (i%2 == 1) {bg_color="WhiteSmoke"}
+              output_html += "<tr bgcolor='"+bg_color+"'><td nowrap>"+all_high_scores[i].trivia_view.replace("Trivia_","").replace("Trivia","All").replace("ROW","World")+"</td><td nowrap>"+all_high_scores[i].high_score+"</td><td nowrap>"+all_high_scores[i].initials+"</td></tr>"
+            }
+
+            output_html += "</table>"
+            document.getElementById("starting_instructions_high_scores").innerHTML += output_html
+      }
+
+  });
+}
+
+
+
+  function get_this_games_high_scores(){
+
+    if (current_game_name != ""){
+
+
+      current_high_score_id=""
+      current_high_score=0
+      current_high_score_initials="Anonymous"
+
+      for (var i = 0; i < all_high_scores.length; i++) {
+
+          if (all_high_scores[i].trivia_view == current_game_name) {
+            current_high_score_id=all_high_scores[i].record_id
+            current_high_score=all_high_scores[i].high_score
+            current_high_score_initials=all_high_scores[i].initials
+
+            break
+          }
+        }
+
+    }
+  }
+
+
+    function read_database(view_name){
+
+      read_highscores();
+
+      var Airtable = require('airtable');
+      var base = new Airtable({apiKey: 'patD5dYFBjdTtIAY8.20d135bce39d21c1b5ca51607082cd53bc1e64158373e0aa0065df8d54c79b0e'}).base('app5Q6OlJ3iMkJ8cd');
+
+      all_records=[];
+      score=0;
+      correct_option=0;
+      current_question_answered=0;
+      game_over=0;
+      correct_answer_history = [];
+      score_update_limit=0;
+
+
+// force all the divs to the initial class set - this is repeated below :-(
+
+      document.getElementById("main_div").className=""
+      document.getElementById("main_div").classList.add("flex-container")
+
+      document.getElementById("options_group").className=""
+      document.getElementById("options_group").classList.add("flex-container_options")
+
+
+      document.getElementById("picture_area_content").className=""
+      document.getElementById("picture_area_content").classList.add("box-shadow_larger")
+
+      document.getElementById("options_group_0").className=""
+      document.getElementById("options_group_0").classList.add("trivia_option")
+      document.getElementById("options_group_1").className=""
+      document.getElementById("options_group_1").classList.add("trivia_option")
+      document.getElementById("options_group_2").className=""
+      document.getElementById("options_group_2").classList.add("trivia_option")
+      document.getElementById("options_group_3").className=""
+      document.getElementById("options_group_3").classList.add("trivia_option")
+
+      document.getElementById("options_area").style="display:block;"
+      document.getElementById("options_group_0").innerHTML = "<div align='center'>Loading...</div>"
+      document.getElementById("options_group_1").innerHTML = "<div align='center'>Loading...</div>"
+      document.getElementById("options_group_2").innerHTML = "<div align='center'>Loading...</div>"
+      document.getElementById("options_group_3").innerHTML = "<div align='center'>Loading...</div>"
+      document.getElementById("game_controls_content").innerHTML = "<div align='center'>Loading...</div>"
+
+      document.getElementById("picture_area_content").innerHTML = "<img src=\"./load.gif\">";
+
+
+      // turn off all right/wrong elements
+            document.getElementById("options_group_0").style.backgroundColor = "white";
+            document.getElementById("options_group_1").style.backgroundColor = "white";
+            document.getElementById("options_group_2").style.backgroundColor = "white";
+            document.getElementById("options_group_3").style.backgroundColor = "white";
+
+            document.getElementById("options_group_0").style = "  filter: sepia(0%) saturate(100%) brightness(100%) hue-rotate(0deg);";
+            document.getElementById("options_group_1").style = "  filter: sepia(0%) saturate(100%) brightness(100%) hue-rotate(0deg);";
+            document.getElementById("options_group_2").style = "  filter: sepia(0%) saturate(100%) brightness(100%) hue-rotate(0deg);";
+            document.getElementById("options_group_3").style = "  filter: sepia(0%) saturate(100%) brightness(100%) hue-rotate(0deg);";
+
+
+      if (view_name==null){
+        view_name="Trivia_Americas";
+      }
+
+      current_game_name=view_name;
+
+      base('Reels').select({
+
+          maxRecords: 2000,
+          view: view_name
+      }).eachPage(function page(records, fetchNextPage) {
+          // This function (`page`) will get called for each page of records.
+
+          records.forEach(function(record) {
+              //console.log('Retrieved', record.get('Name'));
+              //console.log('and ', record.get('Image Preview'));
+              this_records_set_of_images=record.get('Image Preview');
+
+              var one_image_from_set = this_records_set_of_images[Math.floor(Math.random()*this_records_set_of_images.length)].url;
+
+              //console.log('image is ', one_image_from_set)
+
+              //all_records.push(record.get('Name'), one_image_from_set);
+              all_records_single = {};
+
+              all_records_single.title=record.get('Name');
+              all_records_single.image_url=one_image_from_set;
+
+              all_records.push(all_records_single);
+
+              document.getElementById("game_controls_content").innerHTML = "<div align='center'>Getting reels from database... ("+all_records.length+")</div>"
+
+          });
+
+          // To fetch the next page of records, call `fetchNextPage`.
+          // If there are more records, `page` will get called again.
+          // If there are no more records, `done` will get called.
+          fetchNextPage();
+
+      }, function done(err) {
+          if (err) {
+              console.error(err);
+              document.getElementById("game_controls_content").innerHTML = "Something went wrong :-(  Refresh to try again.)";
+              return;
+            }
+
+          start();
+      });
+    }
+
+    function start(){
+      console.log("Ready to Begin")
+      //console.log(all_records[5].title);
+      //console.log(all_records[5].image_url);
+
+      //start game by showing the first question
+
+      display_question();
+
+
+    }
+
+    function update_controls(){
+      display_content=""
+      //display_content="<div class=\"container\"><h2>"
+      button_options = "<div>Start a New Quiz:</div>"
+      button_options += "<button onclick=\"read_database('Trivia')\">All</button>"
+      button_options += "<button onclick=\"read_database('Trivia_Americas')\">Americas</button>"
+      button_options += "<button onclick=\"read_database('Trivia_Europe')\">Europe</button>"
+      button_options += "<button onclick=\"read_database('Trivia_ROW')\">World</button>"
+      button_options += "<button onclick=\"read_database('Trivia_USA')\">USA</button>"
+      button_options += "<button onclick=\"read_database('Trivia_Cartoon')\">Cartoons</button>"
+      button_options += "<button onclick=\"read_database('Trivia_Live')\">Movie/TV</button>"
+      button_options += "<button onclick=\"read_database('Trivia_Diorama')\">Diorama</button>"
+      button_options += "<button onclick=\"read_database('Trivia_Fact')\">Fact</button>"
+      button_options += "<button onclick=\"read_database('Trivia_Fiction')\">Fiction</button>"
+      // find the current high score, if any, for this game name - if none found, assign defaults
+
+      get_this_games_high_scores()
+
+
+
+      if (current_question_answered==0 && game_over==0) {
+          if (current_high_score>0) {
+            display_content += "<h2 style='text-align:left;'>"
+            if (score > current_high_score) {
+              display_content += "<span style='color:darkgreen'>"
+            }
+            display_content += "Your Score: "+score
+            if (score > current_high_score) {
+              display_content += "</span>"
+            }
+            display_content += "<span style='float:right;'>Best Score: "+current_high_score+" ( "+current_high_score_initials+" )</span></h2>"
+            display_content += "<div align='center'>"
+            display_content += button_options
+            display_content += "</div>";
+          } else {
+            display_content +="<div align='center'>"
+            display_content += "<h2>Score: "+score+"</h2>"
+            display_content += button_options;
+            display_content += "</div>";
+        }
+      }
+
+        if (current_question_answered==1 && game_over==1) {
+            display_content +="<div align='center'>"
+            display_content += "<h2>Game Over!  Final Score: "+score+"</h2>";
+            display_content += button_options;
+            display_content += "</div>";
+
+            if (score > current_high_score) {
+              setTimeout(function(){
+                new_score_initials=prompt("High Score! Enter Your Initials:", "ABC")
+                new_score_initials=new_score_initials.substring(0,20)
+                update_highscore(current_high_score_id, score, new_score_initials)
+              }, 500);
+
+            }
+          }
+
+      if (current_question_answered==1 && game_over==0) {
+        if (current_high_score>0) {
+          display_content += "<h2 style='text-align:left;'>"
+          if (score > current_high_score) {
+            display_content += "<span style='color:darkgreen'>"
+          }
+          display_content += "Your Score: "+score
+          if (score > current_high_score) {
+            display_content += "</span>"
+          }
+          display_content += "<span style='float:right;'>Best Score: "+current_high_score+" ( "+current_high_score_initials+" )</span></h2>"
+          display_content += "<div align='center'>"
+          display_content += button_options
+          display_content += "</div>";
+        } else {
+          display_content +="<div align='center'>"
+          display_content += "<h2>Score: "+score+"</h2>"
+          display_content += button_options;
+          display_content += "</div>";
+      }
+
+        setTimeout(display_question, 1000)
+      }
+
+      document.getElementById("game_controls_content").innerHTML = display_content;
+
+    }
+
+    function click_answer(clicked_this){
+
+      group_clicked="options_group_"+clicked_this;
+      correct_group="options_group_"+correct_option;
+
+      if (current_question_answered==0){
+
+        current_question_answered=1;
+
+        if (clicked_this == correct_option) {
+
+          if (question_type==1) {
+            document.getElementById(group_clicked).style = "  filter: sepia(100%) saturate(300%) brightness(70%) hue-rotate(90deg);"; //green tint
+          } else {
+            document.getElementById(group_clicked).style.backgroundColor = "lightgreen";
+          }
+
+          score++;
+          game_over=0;
+
+        } else {
+
+          if (question_type==1) {
+            document.getElementById(correct_group).style = "  filter: sepia(100%) saturate(300%) brightness(70%) hue-rotate(90deg);"; //green tint
+            document.getElementById(group_clicked).style = "  filter: sepia(100%) saturate(300%) brightness(70%) hue-rotate(300deg);"; //red tint
+
+            // make the title click to the database
+            current_inner_html=document.getElementById("picture_area_content").innerHTML;
+            current_inner_html=current_inner_html.replace("<h2 align=\"center\">","");
+            current_inner_html=current_inner_html.replace("</h2>","");
+            current_inner_html="<a href='./index.html?go="+current_inner_html+"'><h2 align=\"center\"><u>"+current_inner_html+"</u></<h2></a>"
+            document.getElementById("picture_area_content").innerHTML=current_inner_html;
+
+          } else {
+            document.getElementById(group_clicked).style.backgroundColor = "red";
+            document.getElementById(correct_group).style.backgroundColor = "lightgreen";
+
+            // make right answer click to the database
+
+            current_inner_html=document.getElementById(correct_group).innerHTML;
+            current_inner_html=current_inner_html.replace("<h3 align=\"center\">","");
+            current_inner_html=current_inner_html.replace("</h3>","");
+            current_inner_html="<a href='./index.html?go="+current_inner_html+"'><h3 align=\"center\"><u>"+current_inner_html+"</u></<h3></a>"
+            document.getElementById(correct_group).innerHTML=current_inner_html;
+
+          }
+
+          game_over=1;
+        }
+
+      }
+
+      update_controls();
+
+    }
+
+
+
+    function display_question(){
+
+
+      current_question_options = select_question();
+
+      correct_option=Math.floor(Math.random()*current_question_options.length);
+
+
+      correct_answer_history.push(current_question_options[correct_option])
+
+      question_type = 1 - (correct_answer_history.length % 2) // alternate back and forth between the two question types
+
+      if (question_type==1) {
+        // pick from pictures
+        // show the correct reel title in the top div
+
+        document.getElementById("main_div").className=""
+        document.getElementById("main_div").classList.add("flex-container_images")
+
+        document.getElementById("options_group").className=""
+        document.getElementById("options_group").classList.add("flex-container_options_images")
+
+
+        document.getElementById("picture_area_content").className=""
+        document.getElementById("picture_area_content").classList.add("trivia_option")
+
+        document.getElementById("options_group_0").className=""
+        document.getElementById("options_group_0").classList.add("box-shadow_med")
+        document.getElementById("options_group_1").className=""
+        document.getElementById("options_group_1").classList.add("box-shadow_med")
+        document.getElementById("options_group_2").className=""
+        document.getElementById("options_group_2").classList.add("box-shadow_med")
+        document.getElementById("options_group_3").className=""
+        document.getElementById("options_group_3").classList.add("box-shadow_med")
+
+        document.getElementById("picture_area_content").innerHTML = "<h2 align='center'>"+toTitleCase(all_records[current_question_options[correct_option]].title)+"</h2>";
+
+        // show 4 possible images as choices
+
+        document.getElementById("options_group_0").innerHTML = "<img src='"+all_records[current_question_options[0]].image_url+"'></img>";
+        document.getElementById("options_group_1").innerHTML = "<img src='"+all_records[current_question_options[1]].image_url+"'></img>";
+        document.getElementById("options_group_2").innerHTML = "<img src='"+all_records[current_question_options[2]].image_url+"'></img>";
+        document.getElementById("options_group_3").innerHTML = "<img src='"+all_records[current_question_options[3]].image_url+"'></img>";
+
+      } else {
+
+      // original question Type
+          correct_image=all_records[current_question_options[correct_option]].image_url;
+          // make sure divs are the right class
+
+          document.getElementById("main_div").className=""
+          document.getElementById("main_div").classList.add("flex-container")
+
+          document.getElementById("options_group").className=""
+          document.getElementById("options_group").classList.add("flex-container_options")
+
+
+          document.getElementById("picture_area_content").className=""
+          document.getElementById("picture_area_content").classList.add("box-shadow_larger")
+
+          document.getElementById("options_group_0").className=""
+          document.getElementById("options_group_0").classList.add("trivia_option")
+          document.getElementById("options_group_1").className=""
+          document.getElementById("options_group_1").classList.add("trivia_option")
+          document.getElementById("options_group_2").className=""
+          document.getElementById("options_group_2").classList.add("trivia_option")
+          document.getElementById("options_group_3").className=""
+          document.getElementById("options_group_3").classList.add("trivia_option")
+
+          document.getElementById("picture_area_content").innerHTML = "<img src='"+correct_image+"'>";
+
+          document.getElementById("options_group_0").innerHTML = "<h3 align='center'>"+toTitleCase(all_records[current_question_options[0]].title)+"</h3>";
+          document.getElementById("options_group_1").innerHTML = "<h3 align='center'>"+toTitleCase(all_records[current_question_options[1]].title)+"</h3>";
+          document.getElementById("options_group_2").innerHTML = "<h3 align='center'>"+toTitleCase(all_records[current_question_options[2]].title)+"</h3>";
+          document.getElementById("options_group_3").innerHTML = "<h3 align='center'>"+toTitleCase(all_records[current_question_options[3]].title)+"</h3>";
+
+
+
+
+      }
+
+// turn off all right/wrong elements
+      document.getElementById("options_group_0").style.backgroundColor = "white";
+      document.getElementById("options_group_1").style.backgroundColor = "white";
+      document.getElementById("options_group_2").style.backgroundColor = "white";
+      document.getElementById("options_group_3").style.backgroundColor = "white";
+
+      document.getElementById("options_group_0").style = "  filter: sepia(0%) saturate(100%) brightness(100%) hue-rotate(0deg);";
+      document.getElementById("options_group_1").style = "  filter: sepia(0%) saturate(100%) brightness(100%) hue-rotate(0deg);";
+      document.getElementById("options_group_2").style = "  filter: sepia(0%) saturate(100%) brightness(100%) hue-rotate(0deg);";
+      document.getElementById("options_group_3").style = "  filter: sepia(0%) saturate(100%) brightness(100%) hue-rotate(0deg);";
+
+        current_question_answered=0;
+
+        update_controls();
+    }
+
+    function select_question(){
+
+      final_array=[];
+
+      limit=0;
+
+      if (correct_answer_history.length % 10 < 9 || 1==1) {
+          do {
+            option_1 = Math.floor(Math.random()*all_records.length); // pick any random entry from the list, not already used
+            limit++
+
+            if (limit>10) {break;}
+          } while (correct_answer_history.includes(option_1))
+
+          limit=0;
+
+          do {
+            option_2 = Math.floor(Math.random()*all_records.length);
+            limit++;
+
+            if (limit>10) {break;}
+
+          } while (option_1 == option_2 || correct_answer_history.includes(option_2)) // keep going until the second entry is different and not repeated
+
+          limit=0;
+
+          do {
+            option_3 = Math.floor(Math.random()*all_records.length);
+            limit++;
+
+            if (limit>10) {break;}
+
+          } while ( option_3 == option_1 || option_3==option_2 || correct_answer_history.includes(option_3)) // keep going until the entry is different and not repeated
+
+          limit=0;
+
+          do {
+            option_4 = Math.floor(Math.random()*all_records.length);
+            limit++;
+
+            if (limit>10) {break;}
+
+          } while ( option_4 == option_1 || option_4==option_2 || option_4==option_3 || correct_answer_history.includes(option_4)) // keep going until the entry is different and not repeated
+
+        } else {
+console.log("HARD")
+          // is this harder?
+          // pick a random reel
+          do {
+            option_1 = Math.floor(Math.random()*all_records.length); // pick any random entry from the list, not already used
+            limit++
+
+            if (limit>10) {break;}
+          } while (correct_answer_history.includes(option_1))
+
+          limit=0;
+
+          option_2=option_1+1
+
+          // I think only this option could be out of bounds, once its set to 0 op3 and op4 must be OK
+
+          if (option_2 > all_records.length) { option_2 = 0}
+
+          option_3=option_2+1
+          option_4=option_3+1
+
+        }
+
+
+      final_array.push(option_1);
+      final_array.push(option_2);
+      final_array.push(option_3);
+      final_array.push(option_4);
+
+      return final_array;
+    }
+
+    </script>
+    </head>
+
+    <body>
+
+
+      <div id="main_div" class="flex-container">
+        <div>&nbsp;</div>
+        <div id="picture_area">
+          <div id="picture_area_content" class="box-shadow_larger" style="margin:auto;">
+
+
+            <div style="display:flex;flex-direction: row; align-items: center; margin: 25px">
+              <div  id="starting_instruction_text">
+                <div style="float:right;" id="starting_instructions_high_scores">
+                </div>
+                <h2>View-Master Quiz</h2>
+                  <p>Test your view-master knowledge!</p>
+                  <p>See how many view-master reels you can name based on just one single image.</p>
+                  <p>When you see a view-master picture or title at the top of the screen - try and guess which reel it is by selecting from the four options.  If you're right, you'll get a new reel to guess.  If you're wrong, it's <i>game over</i>.</p>
+                  <p>Select a topic below to begin.</p>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div id="options_area" class="card" style="display:none">
+          <div id="options_group" class="flex-container_options">
+            <div id="options_group_0" class="trivia_option" style="text-align:center;cursor:pointer;" onclick="click_answer(0);">&nbsp;</div>
+            <div id="options_group_1" class="trivia_option" style="text-align:center;cursor:pointer;" onclick="click_answer(1);">&nbsp;</div>
+            <div id="options_group_2" class="trivia_option" style="text-align:center;cursor:pointer;" onclick="click_answer(2);">&nbsp;</div>
+            <div id="options_group_3" class="trivia_option" style="text-align:center;cursor:pointer;" onclick="click_answer(3);">&nbsp;</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="game_controls" class="card" style="width:90vw;">
+          <div id="game_controls_content"></div>
+      </div>
+
+
+      <div class="center" id="footer"></div>
+
+    </body>
+</html>

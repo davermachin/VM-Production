@@ -1,0 +1,926 @@
+<html>
+    <head>
+
+      <!-- Google tag (gtag.js) -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-HBL0VL09HC"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-HBL0VL09HC');
+      </script>
+
+
+        <script src="https://code.jquery.com/jquery-1.12.2.min.js"></script>
+        <script src="https://vm.vmdatabase.com/airtable.browser.js"></script>
+        <link href='https://fonts.googleapis.com/css?family=Arsenal' rel='stylesheet'>
+        <link rel="stylesheet" href="./vm2.css">
+        <link rel="stylesheet" href="./slides2.css">
+
+        <meta property="og:url"                content="https://vm.vmdatabase.com/vmm.html" />
+        <meta property="og:title"              content="View-MasterMIND" />
+        <meta property="og:description"        content="Like wordle but with Vintage View-Master reels!" />
+        <meta property="og:image"              content="https://vm.vmdatabase.com/vmmthumb2.jpg" />
+
+        <script>
+          $('document').ready(function(){
+              $("#footer").load("footer.html");
+
+              document.addEventListener('keydown', handle_a_keypress)
+
+              read_highscores();
+              update_controls();
+
+              //read_database();
+
+            });
+        </script>
+
+    <script>
+
+
+var all_records = [];
+var all_high_scores = [];
+var correct_answer_history = [];
+var character_guess_array = [];
+var number_of_attempts_allowed = 6;
+var initial_number_of_attempts_allowed = number_of_attempts_allowed
+var current_attempt_counter = 0;
+var empty_cell_value=" "
+var target_word=""
+var show_instructions=1
+
+var score = 0;
+var score_multiplier = 1;
+var correct_option=0;
+var current_question_answered=0;
+var game_over=0;
+var current_game_name=""
+var current_high_score=0
+var current_high_score_id=""
+var current_high_score_initials="Anonymous"
+var score_update_limit=1
+var question_type=1
+var hint_cost=5 // make always > 1
+
+var bad_letters = [];
+
+
+function toTitleCase(str) {
+  return str.replace(
+    /\w\S*/g,
+    function(txt) {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    }
+  );
+}
+
+function update_highscore(record_id, new_score, new_initials)
+{
+
+  if (new_initials != "" && new_initials != null && score_update_limit==0)
+  {
+      score_update_limit=1 // only resets when new game is started to prevent entering high score twice
+
+      var Airtable = require('airtable');
+      var base = new Airtable({apiKey: 'patGdQwJoutQrsAU0.1d5832b1ecc062b7194d19553d09c6cf888ece581c0ea7faa26ddb74863aded7'}).base('appBFK23PicRLGZyK');
+
+      if (record_id != "") {
+            base('Scores').update([
+              {
+                "id": record_id,
+                "fields": {
+                  "High_Score": new_score,
+                  "Initials": new_initials
+                }
+              }
+            ], function(err, records) {
+              if (err) {
+                console.error(err);
+                return;
+              }
+              records.forEach(function(record) {
+                // console.log(record.get('Trivia_View'));
+              });
+            });
+      } else {
+
+        base('Scores').create([
+          {
+            "fields": {
+              "Trivia_View": current_game_name,
+              "High_Score": new_score,
+              "Initials": new_initials,
+              "Game": "VMM"
+            }
+          }
+        ], function(err, records) {
+          if (err) {
+            console.error(err);
+            return;
+          }
+          records.forEach(function (record) {
+            // console.log(record.getId());
+          });
+        });
+      }
+  }
+
+  read_highscores();
+
+
+}
+
+function read_highscores(){
+
+  var Airtable = require('airtable');
+  var base = new Airtable({apiKey: 'patGdQwJoutQrsAU0.1d5832b1ecc062b7194d19553d09c6cf888ece581c0ea7faa26ddb74863aded7'}).base('appBFK23PicRLGZyK'); // this is to the highscore table from the API user
+
+  all_high_scores = [];
+
+  base('Scores').select({
+
+      maxRecords: 20,
+      view: "VMMView"
+  }).eachPage(function page(records, fetchNextPage) {
+      // This function (`page`) will get called for each page of records.
+
+      records.forEach(function(record) {
+          // console.log('Retrieved', record.get('Trivia_View'));
+
+          all_high_scores_single = {};
+
+          all_high_scores_single.record_id=record.id;
+          all_high_scores_single.trivia_view=record.get('Trivia_View');
+          all_high_scores_single.high_score=record.get('High_Score');
+          all_high_scores_single.initials=record.get('Initials');
+
+          all_high_scores.push(all_high_scores_single);
+
+
+
+      });
+
+      fetchNextPage();
+
+  }, function done(err) {
+      if (err) {
+          console.error(err);
+          document.getElementById("game_controls_content").innerHTML = "Something went wrong :-(  Refresh to try again.)";
+          return;
+        }
+
+      if (document.getElementById("starting_instructions_high_scores") != null)
+        {
+
+          all_high_scores = all_high_scores.sort(function(a,b) {
+            return b.high_score - a.high_score;
+            });
+
+            output_html= "<br><table style='border:1px solid lightgrey;margin: 2px 5px 2px 5px;' cellspacing=0><tr align='center' ><td colspan=3 nowrap bgcolor='AliceBlue'>Current High Scores</td></tr>"
+
+            for (let i=0;i<all_high_scores.length;i++){
+
+              bg_color="white"
+              if (i%2 == 1) {bg_color="WhiteSmoke"}
+              output_html += "<tr bgcolor='"+bg_color+"'><td nowrap>"+all_high_scores[i].trivia_view.replace("Trivia_","").replace("Trivia","All").replace("ROW","World")+"</td><td nowrap>"+all_high_scores[i].high_score+"</td><td nowrap>"+all_high_scores[i].initials+"</td></tr>"
+            }
+
+            output_html += "</table>"
+            document.getElementById("starting_instructions_high_scores").innerHTML += output_html
+      }
+
+  });
+}
+
+
+
+  function get_this_games_high_scores(){
+
+    if (current_game_name != ""){
+
+
+      current_high_score_id=""
+      current_high_score=0
+      current_high_score_initials="Anonymous"
+
+      for (var i = 0; i < all_high_scores.length; i++) {
+
+          if (all_high_scores[i].trivia_view == current_game_name) {
+            current_high_score_id=all_high_scores[i].record_id
+            current_high_score=all_high_scores[i].high_score
+            current_high_score_initials=all_high_scores[i].initials
+
+            break
+          }
+        }
+
+    }
+  }
+
+
+function read_database(view_name){
+
+      //read_highscores();
+
+      var Airtable = require('airtable');
+      var base = new Airtable({apiKey: 'patD5dYFBjdTtIAY8.20d135bce39d21c1b5ca51607082cd53bc1e64158373e0aa0065df8d54c79b0e'}).base('app5Q6OlJ3iMkJ8cd');
+
+      all_records=[];
+      score=0;
+      correct_option=0;
+      current_question_answered=0;
+      game_over=0;
+      correct_answer_history = [];
+      score_update_limit=0;
+
+
+      document.getElementById("game_controls_content").innerHTML = "<div align='center'>Getting reels from database... </div>"
+
+      if (view_name==null){
+        view_name="Trivia_Americas";
+      }
+
+      current_game_name=view_name;
+
+      base('Reels').select({
+
+          maxRecords: 2000,
+          view: view_name
+      }).eachPage(function page(records, fetchNextPage) {
+          // This function (`page`) will get called for each page of records.
+
+          records.forEach(function(record) {
+              // console.log('Retrieved', record.get('Name'));
+
+              //console.log('and ', record.get('Image Preview'));
+
+
+              //console.log('image is ', one_image_from_set)
+
+              //all_records.push(record.get('Name'), one_image_from_set);
+              all_records_single = {};
+
+              all_records_single.title=record.get('Name');
+              all_records_single.image_description=record.get('Image Description');
+
+              this_records_set_of_images=record.get('Image Preview');
+
+              if (typeof this_records_set_of_images != "undefined") {
+                if (typeof this_records_set_of_images[0] != "undefined") all_records_single.image1_url=this_records_set_of_images[0].url;
+                if (typeof this_records_set_of_images[1] != "undefined") all_records_single.image2_url=this_records_set_of_images[1].url;
+                if (typeof this_records_set_of_images[2] != "undefined") all_records_single.image3_url=this_records_set_of_images[2].url;
+                if (typeof this_records_set_of_images[3] != "undefined") all_records_single.image4_url=this_records_set_of_images[3].url;
+                if (typeof this_records_set_of_images[4] != "undefined") all_records_single.image5_url=this_records_set_of_images[4].url;
+                if (typeof this_records_set_of_images[5] != "undefined") all_records_single.image6_url=this_records_set_of_images[5].url;
+                if (typeof this_records_set_of_images[6] != "undefined") all_records_single.image7_url=this_records_set_of_images[6].url;
+              }
+
+              all_records.push(all_records_single);
+
+              document.getElementById("game_controls_content").innerHTML = "<div align='center'>Getting reels from database... ("+all_records.length+")</div>"
+
+          });
+
+          // To fetch the next page of records, call `fetchNextPage`.
+          // If there are more records, `page` will get called again.
+          // If there are no more records, `done` will get called.
+          fetchNextPage();
+
+      }, function done(err) {
+          if (err) {
+              console.error(err);
+              document.getElementById("game_controls_content").innerHTML = "Something went wrong :-(  Refresh to try again.)";
+              return;
+            }
+
+          start();
+      });
+    }
+
+function start(){
+      console.log("Ready to Begin")
+      //console.log(all_records[5].title);
+      //console.log(all_records[5].image_url);
+
+      //start game by showing the first question
+
+      display_question(1);
+      update_controls();
+
+
+    }
+
+function give_up(){
+      if (confirm("Give up game but keep your score?")==true) {
+        current_question_answered=0
+        game_over=1
+        render_guess_array()
+      }
+    }
+
+
+function update_controls(optional_finish){
+      display_content=""
+      //display_content="<div class=\"container\"><h2>"
+      button_options = "<div>New Game:</div>"
+      button_options += "<button onclick=\"read_database('Trivia')\">All</button>"
+      button_options += "<button onclick=\"read_database('Trivia_Americas')\">Americas</button>"
+      button_options += "<button onclick=\"read_database('Trivia_Europe')\">Europe</button>"
+      button_options += "<button onclick=\"read_database('Trivia_ROW')\">World</button>"
+      button_options += "<button onclick=\"read_database('Trivia_USA')\">USA</button>"
+      button_options += "<button onclick=\"read_database('Trivia_Cartoon')\">Cartoons</button>"
+      button_options += "<button onclick=\"read_database('Trivia_Live')\">Movie/TV</button>"
+      button_options += "<button onclick=\"read_database('Trivia_Diorama')\">Diorama</button>"
+      button_options += "<button onclick=\"read_database('Trivia_Fact')\">Fact</button>"
+      button_options += "<button onclick=\"read_database('Trivia_Fiction')\">Fiction</button>"
+      // find the current high score, if any, for this game name - if none found, assign defaults
+
+      get_this_games_high_scores()
+
+      if (show_instructions == 1) {
+        document.getElementById("keyboard_area").style.display="none"
+        display_content +="<div align='center'>"
+        display_content += "<h3>Select a category to begin.</h3>"
+        display_content += button_options;
+        display_content += "</div>";
+      }
+
+      if (current_question_answered==0 && game_over==0 && show_instructions==0) {
+            document.getElementById("keyboard_area").style.display="flex"
+            display_content += "<div align=\"center\"><h3><span style=\"float:left;cursor:pointer;text-decoration:underline;\" onclick=\"give_up()\">Give Up</span><span style=\"float:right;\">Guess the secret word and press return</h3></span></div>"
+            display_content += "<p>&nbsp;</p><div align=\"center\">"
+            display_content += button_options;
+            display_content += "</div>";
+
+      }
+
+        if (current_question_answered==1 && game_over==1 && show_instructions==0 && optional_finish != 1) {
+            document.getElementById("keyboard_area").style.display="none"
+            display_content += "<table width=100%><tr><td align=\"left\" width=33%>"
+
+            display_content += "<h3>Great Job! That\'s "
+            display_content += target_word.length + " letters!"
+            if (score_multiplier > 1 ) {display_content += " "+score_multiplier+"X Points! "}
+
+            display_content += "</h3></td><td align=\"center\" width=33%><h3>"
+            display_content += "Your Total: "+score
+
+            display_content += "</h3></td><td align=\"right\" width=33%><h3>"
+            if (current_high_score > 0) {
+              display_content += "Best:"+current_high_score+"<br> ("+current_high_score_initials+")"
+            } else {
+              display_content += "No Best Score Yet"
+            }
+
+            display_content += "</h3></td></tr></table>"
+            display_content +="<div align='center'>"
+            // display_content += "<h3>Keep Going:</h3>"
+            display_content += "<button onclick=\"display_question(1)\">New Word</button>"
+            // display_content += "<button onclick=\"display_question(2)\">Long Word</button>"
+            display_content += "<br><button onclick=\"update_controls(1)\">Finish</button>"
+            display_content += "</div>"
+
+
+
+
+
+
+          }
+
+      if ( (current_question_answered==0 && game_over==1) || optional_finish==1) {
+
+          display_content +="<div align='center'>"
+          if (optional_finish==1) {
+            display_content += "<h3>Great Game!</h3>"
+          } else {
+          display_content += "<h3>The Word Was <i>"+toTitleCase(target_word)+"</i></h3>"
+          }
+          display_content += "<h3>Final Score: "+score+"</h3>"
+          display_content += button_options;
+          display_content += "</div>";
+
+          // make the title click to the database
+          current_inner_html=document.getElementById("title_area").innerHTML;
+          current_inner_html=current_inner_html.replace("<h2>","");
+          current_inner_html=current_inner_html.replace("</h2>","");
+          current_inner_html="<h2><a href='./index.html?go="+current_inner_html+"'><u>"+current_inner_html+"</u></a></h2>"
+          document.getElementById("title_area").innerHTML=current_inner_html;
+
+
+
+          if (score > current_high_score && show_instructions==0) {
+            setTimeout(function(){
+              new_score_initials=prompt("High Score! Enter Your Initials:", "ABC")
+
+                new_score_initials=new_score_initials.substring(0,20)
+                update_highscore(current_high_score_id, score, new_score_initials)
+
+            }, 500);
+
+          }
+
+          document.getElementById("keyboard_area").style.display="none"
+        }
+
+      document.getElementById("game_controls_content").innerHTML = display_content;
+
+    }
+
+
+function display_question(difficulty){
+
+  current_attempt_counter=0;
+  show_instructions=0;
+  game_over=0;
+  current_question_answered=0;
+  bad_letters = [];
+  number_of_attempts_allowed=initial_number_of_attempts_allowed // in case they increased it with a hint it needs to be reset
+
+  document.getElementById("picture_area").style="display:flex;"
+
+// pick a random reel from the set
+
+  limit=0;
+
+  do {
+    option_1 = Math.floor(Math.random()*all_records.length); // pick any random entry from the list, not already used
+    limit++
+
+    if (limit>10) {break;}
+  } while (correct_answer_history.includes(option_1))
+
+  // console.log("Selected random reel" + option_1)
+
+        current_question_answered=0;
+
+        current_question_title = all_records[option_1].title;
+        current_question_description = all_records[option_1].image_description;
+
+// if description is missing or too short use the title; if it's the first question and the title's long enough, use the title to make the first question easier
+
+        if (current_question_description =="" || current_question_description == null || current_question_description.length<25 || (correct_answer_history.length==0 && current_question_title.length>24)) {current_question_description=current_question_title}
+
+        current_question_pictures=[];
+        current_question_pictures.push(all_records[option_1].image1_url)
+        current_question_pictures.push(all_records[option_1].image2_url)
+        current_question_pictures.push(all_records[option_1].image3_url)
+        current_question_pictures.push(all_records[option_1].image4_url)
+        current_question_pictures.push(all_records[option_1].image5_url)
+        current_question_pictures.push(all_records[option_1].image6_url)
+        current_question_pictures.push(all_records[option_1].image7_url)
+
+
+        // console.log(current_question_title)
+        // console.log(current_question_description)
+        // console.log(current_question_pictures)
+
+        // remove punctuation
+        current_question_description = current_question_description.toLowerCase().replace(/[^a-zA-Z]+/g, " ")
+
+        // split into an array
+        current_question_wordarray = current_question_description.split(' ');
+
+        // sort descending by length
+
+        current_question_wordarray = current_question_wordarray.sort((a,b) => b.length - a.length);
+
+        // remove all words < 5
+
+        current_question_wordarray = current_question_wordarray.filter(function(value, index, arr){
+            return value.length > 4;
+          });
+
+        // based on difficulty remove top or bottom half
+        // not using this for now
+
+        score_multiplier=1
+
+        // median_length=Math.floor((current_question_wordarray[0].length + current_question_wordarray[current_question_wordarray.length-1].length) / 2)
+        //
+        // if (difficulty > 1) {
+        //   //score_multiplier=difficulty
+        //   score_multiplier=1
+        //
+        //   current_question_wordarray = current_question_wordarray.filter(function(value, index, arr){
+        //       return value.length > median_length;
+        //     });
+        // } else {
+        //   score_multiplier=1
+        //   current_question_wordarray = current_question_wordarray.filter(function(value, index, arr){
+        //       return value.length <= median_length;
+        //     });
+        // }
+
+        current_question_longest_word = current_question_wordarray[0]
+        current_question_random_word = current_question_wordarray[Math.floor(Math.random()*current_question_wordarray.length)]
+
+
+// fix this to be based on options?
+        target_word=current_question_random_word
+
+// first go always gets shortest word
+
+        if (correct_answer_history.length==0) {
+          console.log(current_question_wordarray)
+          target_word=current_question_wordarray[current_question_wordarray.length-1]
+        }
+
+        console.log(target_word)
+        //display question parts
+
+        document.getElementById("title_area").innerHTML="<h2>"+toTitleCase(current_question_title)+"</h2>"
+
+        current_question_pictures.forEach(function(element, index) {
+          // console.log(element)
+          document.getElementById("picture_"+index).innerHTML="<img src=\""+element+"\">"
+        })
+
+        // empty the guess array
+
+        character_guess_array = Array.from(Array(number_of_attempts_allowed), () => new Array(target_word.length))
+        // console.log(character_guess_array)
+
+        for (i=0;i<number_of_attempts_allowed;i++) {
+
+          for (j=0;j<target_word.length;j++) {
+
+            character_guess_array[i][j]=empty_cell_value
+          }
+        }
+
+        // console.log(character_guess_array)
+
+        document.body.scrollTop = 0; // For Safari
+        document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+
+        // draw the array on the screen
+
+        render_guess_array()
+
+        // log the right answer for tracking so they dont repeat
+        correct_answer_history.push(option_1)
+        //update_controls();
+
+}
+
+function hint_buy_letter(){
+  if (confirm("Buy the next letter for "+hint_cost+" points? You have "+score)==true) {
+    console.log("buy a letter")
+
+    for (i=0;i<target_word.length;++i) {
+
+      if (character_guess_array[current_attempt_counter][i] == empty_cell_value) {
+
+        character_guess_array[current_attempt_counter][i] = target_word.charAt(i).toUpperCase()
+
+        score=score-hint_cost
+        if (score<0) {score=0}
+        render_guess_array()
+        break
+      }
+    }
+
+  }
+}
+
+function hint_add_row(){
+  if (confirm("Add a turn for "+hint_cost+" points? You have "+score)==true) {
+    console.log("add a row")
+
+    number_of_attempts_allowed++
+
+  character_guess_array.push(new Array(target_word.length))
+
+    for (i=0;i<target_word.length;i++){
+      character_guess_array[current_attempt_counter+1][i]=empty_cell_value
+    }
+
+    score=score-hint_cost
+    if (score<0) {score=0}
+    render_guess_array()
+
+  }
+}
+
+function render_guess_array(){
+
+  html_output=""
+
+
+  html_output += "<div>" //details needed
+
+//row
+  for (i=0;i<number_of_attempts_allowed;i++){
+    number_of_green_letters=0
+    html_output += "<div class=\"flex-container_vmm_options\" id=\"Guess_Array_Row_"+i+"\">"
+//cols
+    for (j=0;j<character_guess_array[i].length;j++){
+
+      if (score >= hint_cost && i==number_of_attempts_allowed-1 && j==0 && current_attempt_counter==number_of_attempts_allowed-1) {
+          html_output += "<div onclick=\"hint_buy_letter()\"><img src=\"./q_icon.png\">&nbsp;&nbsp;&nbsp;</div>"
+      }
+
+
+      show_this_letter = character_guess_array[i][j]
+
+      // if this row is not the last row (current guess counter row) then it's a committed row and should be color coded
+
+      cell_color="White"
+
+      if (i<current_attempt_counter) {
+        cell_color="White"
+
+        // red if this letter is not in the word at all
+        if (!target_word.includes(show_this_letter.toLowerCase())) {
+          cell_color="Tomato"
+        }
+        // override with yellow if the letter is in the word
+
+        if (target_word.includes(show_this_letter.toLowerCase())) {
+          cell_color="LightYellow"
+        }
+
+        // override with green if the letter is in the word and in the right place
+
+        if (target_word.substring(j,j+1) == show_this_letter.toLowerCase()) {
+          cell_color="PaleGreen"
+          ++number_of_green_letters
+
+          if (number_of_green_letters == target_word.length) {
+            console.log("WIN")
+            game_over=1
+            current_question_answered=1
+            score += target_word.length * score_multiplier
+
+          }
+        }
+      }
+
+      character_width=Math.floor(80/target_word.length)
+
+      html_output += "<div style=\"background-color:"+cell_color+"\" class=\"vmm_letter\" id=\"Cell_"+i+"_"+j+"\">"
+      html_output += show_this_letter
+      html_output += "</div>"
+
+      if (cell_color == "Tomato") {
+        bad_letters.push(show_this_letter.toUpperCase())
+      }
+
+      // end of rows last column - hint
+
+      if (score >= hint_cost && i==number_of_attempts_allowed-1 && j==character_guess_array[i].length-1 && current_attempt_counter==number_of_attempts_allowed-1) {
+        html_output += "<div onclick=\"hint_add_row()\">&nbsp;&nbsp;&nbsp;<img src=\"./plus_icon.png\"></div>"
+      }
+
+    }
+
+    html_output += "</div>"
+    if (game_over==1 && current_question_answered==1) {break}
+  }
+
+  html_output += "</div>"
+
+  document.getElementById("main_play_area").innerHTML=html_output
+
+  if (current_attempt_counter >= number_of_attempts_allowed && game_over==0) {
+    game_over=1
+    current_question_answered=0
+  }
+
+  update_controls();
+  render_keyboard();
+
+}
+
+function render_keyboard(){
+
+  html_output=""
+// console.log(bad_letters)
+  var key_array = [];
+
+  key_array.push(["Q", 81]);
+  key_array.push(["W", 87]);
+  key_array.push(["E", 69]);
+  key_array.push(["R", 82]);
+  key_array.push(["T", 84]);
+  key_array.push(["Y", 89]);
+  key_array.push(["U", 85]);
+  key_array.push(["I", 73]);
+  key_array.push(["O", 79]);
+  key_array.push(["P", 80]);
+
+
+  for (i=0;i<key_array.length;i++){
+
+    if (bad_letters.includes(key_array[i][0])){
+      cell_color="Tomato"
+    } else {
+      cell_color="White"
+    }
+
+    html_output += "<div style=\"background-color:"+cell_color+"\" class=\"vmm_key\" id=\"keyboard_"+key_array[i][0]+"\" onclick=\"fake_keypress("+key_array[i][1]+")\">"+key_array[i][0]+"</div>"
+  }
+
+    html_output += "<div class=\"vmm_break\"></div>"
+
+    var key_array = [];
+
+    key_array.push(["A", 65]);
+    key_array.push(["S", 83]);
+    key_array.push(["D", 68]);
+    key_array.push(["F", 70]);
+    key_array.push(["G", 71]);
+    key_array.push(["H", 72]);
+    key_array.push(["J", 74]);
+    key_array.push(["K", 75]);
+    key_array.push(["L", 76]);
+
+    for (i=0;i<key_array.length;i++){
+
+      if (bad_letters.includes(key_array[i][0])){
+        cell_color="Tomato"
+      } else {
+        cell_color="White"
+      }
+
+      html_output += "<div  style=\"background-color:"+cell_color+"\" class=\"vmm_key\" id=\"keyboard_"+key_array[i][0]+"\" onclick=\"fake_keypress("+key_array[i][1]+")\">"+key_array[i][0]+"</div>"
+    }
+
+
+
+    html_output += "<div class=\"vmm_break\"></div>"
+
+    html_output += "<div class=\"vmm_key\" id=\"keyboard_Return\" onclick=\"fake_keypress(13)\">Return</div>"
+
+    var key_array = [];
+
+    key_array.push(["Z", 90]);
+    key_array.push(["X", 88]);
+    key_array.push(["C", 67]);
+    key_array.push(["V", 86]);
+    key_array.push(["B", 66]);
+    key_array.push(["N", 78]);
+    key_array.push(["M", 77]);
+
+    for (i=0;i<key_array.length;i++){
+
+      if (bad_letters.includes(key_array[i][0])){
+        cell_color="Tomato"
+      } else {
+        cell_color="White"
+      }
+
+      html_output += "<div  style=\"background-color:"+cell_color+"\" class=\"vmm_key\" id=\"keyboard_"+key_array[i][0]+"\" onclick=\"fake_keypress("+key_array[i][1]+")\">"+key_array[i][0]+"</div>"
+    }
+
+      html_output += "<div class=\"vmm_key\" id=\"keyboard_Back\" onclick=\"fake_keypress(8)\">Delete</div>"
+  document.getElementById("keyboard_area").innerHTML=html_output
+  // document.getElementById("keyboard_area").style="display:flex;"
+}
+
+function fake_keypress(key){
+  document.dispatchEvent(new KeyboardEvent('keydown', {
+        keyCode: key
+  }));
+}
+
+function handle_a_keypress(event) {
+    // Number 13 is the "Enter" key on the keyboard
+    // console.log(event.keyCode)
+    if (show_instructions==1 || game_over==1) {return}
+    event.preventDefault();
+
+    if (event.keyCode ==  13) {
+      // handle pressing enter here
+
+      // row must be full, if so, increment attempt counter
+
+      if (character_guess_array[current_attempt_counter][character_guess_array[current_attempt_counter].length-1] != empty_cell_value) {
+
+        ++current_attempt_counter
+
+      }
+    }
+
+    if (event.keyCode == 8) {
+      // handle delete key (are all keyboards the same?)
+
+      // start and end of the row, find first non empty cell and make it empty
+
+      for (i=character_guess_array[current_attempt_counter].length-1;i>=0;i--) {
+
+        if (character_guess_array[current_attempt_counter][i] != empty_cell_value) {
+          character_guess_array[current_attempt_counter][i] = empty_cell_value
+          break
+        }
+      }
+
+    }
+
+    if (event.keyCode >= 65 && event.keyCode <= 90) {
+      // handle alpha here
+
+      // find next empty cell in the current attempt ROW
+
+      for (i=0;i<character_guess_array[current_attempt_counter].length;i++) {
+
+        if (character_guess_array[current_attempt_counter][i] == empty_cell_value) {
+          character_guess_array[current_attempt_counter][i] = String.fromCharCode(event.keyCode)
+          break
+        }
+      }
+    }
+
+
+    render_guess_array()
+
+}
+
+
+
+    </script>
+    </head>
+
+    <body>
+
+
+      <div id="main_div" class="flex-container_vmm">
+          <div>&nbsp;</div>
+          <div id="title_area" class="trivia_option" align="center">
+            <h2>View-MasterMIND</h2>
+          </div>
+
+          <div id="picture_area" class="flex-container_vmm_images" style="display:none;">
+            <div id="picture_0" class="box-shadow_small" >
+            </div>
+            <div id="picture_1" class="box-shadow_small" >
+            </div>
+            <div id="picture_2" class="box-shadow_small" >
+            </div>
+            <div id="picture_3" class="box-shadow_small" >
+            </div>
+            <div id="picture_4" class="box-shadow_small" >
+            </div>
+            <div id="picture_5" class="box-shadow_small" >
+            </div>
+            <div id="picture_6" class="box-shadow_small" >
+            </div>
+          </div>
+
+          <div id="main_play_area" class="flex-container_vmm_images">
+            <h3 align="center">Instructions</h3>
+              <div style="display:flex;flex-direction: row;">
+                <div align="center" id="starting_instruction_text">
+                  <div style="float:right;" id="starting_instructions_high_scores">
+                  </div>
+                    <p>
+                      The game will select a View-Master reel and show you the title and the pictures from the reel.
+                    It will select a secret word from the image descriptions and it's your job to guess that word.  Type your guess to fill the columns and press return to submit your guess.
+                    The letters will change colors as follows:
+                    </p>
+                    <table>
+                      <tr>
+                        <td>
+                          <img src="./example_red.png">
+                        </td>
+                        <td>
+                          Letter is not in the word at all.
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <img src="./example_yellow.png">
+                        </td>
+                        <td>
+                          Letter is correct, but in the wrong place.
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <img src="./example_green.png">
+                        </td>
+                        <td>
+                          Letter is correct and in the right place.
+                        </td>
+                      </tr>
+                    </table>
+                    <p>Use these clues to try and guess the word!</p>
+                </div>
+
+              </div>
+            </div>
+      </div>
+      <div id="keyboard_area" class="flex-container_vmm_images">
+      </div>
+
+      <div id="game_controls" class="card" style="width:90vw;">
+          <div id="game_controls_content"></div>
+      </div>
+
+
+      <div class="center" id="footer"></div>
+
+    </body>
+</html>

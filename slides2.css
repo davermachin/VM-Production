@@ -1,0 +1,265 @@
+* {box-sizing:border-box}
+
+.flex-container_vmm {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /*height:100vh;*/
+  max-width: 100%;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0px 10px 0px 10px;
+}
+
+
+.flex-container_vmm_images {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  /*height:100vh;*/
+  max-width: 100%;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 25px;
+
+}
+
+.flex-container_vmm_options {
+  display: flex;
+  flex-direction: row; /* row better for portrait? */
+  flex-wrap: wrap;
+  /*justify-content: space-around;*/
+  justify-content: center;
+  align-items: center;
+}
+
+.flex-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /*height:100vh;*/
+  max-width: 100%;
+  flex-wrap: wrap;
+  align-items: center;
+  /*margin: 0px 10px 0px 10px;*/
+}
+
+.flex-container_options {
+  display: flex;
+  flex-direction: row; /* row better for portrait? */
+  flex-wrap: wrap;
+  /*justify-content: space-around;*/
+  justify-content: center;
+  align-items: center;
+}
+
+@media screen and (orientation:landscape) {
+  .flex-container {
+    flex-direction: row;
+  }
+ }
+
+ @media screen and (orientation:landscape) {
+   .flex-container_options {
+     flex-direction: column;
+   }
+  }
+
+  .flex-container_images {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /*height:100vh;*/
+    max-width: 100%;
+    flex-wrap: wrap;
+    align-items: center;
+    /*margin: 0px 10px 0px 10px;*/
+  }
+
+.flex-container_options_images {
+    display: flex;
+    flex-direction: row; /* row better for portrait? */
+    flex-wrap: wrap;
+    /*justify-content: space-around;*/
+    justify-content: center;
+    align-items: center;
+  }
+
+.vmm_letter {
+    /* Add shadows to create the "card" effect */
+    box-shadow: 0 2px 4px 2px rgba(0,0,0,0.4);
+    /*padding-top: 1vw;*/
+    margin: 2px 2px 2px 2px;
+    border-radius: 5px;
+    /*
+    width: 90px;
+    height: 90px;
+    */
+    width: 7vw;
+    height: 7vw;
+    font-size: 5vw;
+    text-align: center;
+    touch-action: manipulation;
+
+  }
+
+  .vmm_break {
+    flex-basis: 100%;
+    height: 0;
+  }
+
+  .bog_letter {
+      text-align: center;
+      border-bottom: 5px solid lightgrey;
+      /* padding: 1vw 3.5vw 1vw 3.5vw; */
+      /* padding: 1vw; */
+      margin: 2px 2px 2px 2px;
+      touch-action: manipulation;
+      font-size: 5vw;
+      text-align: center;
+      font-weight: bold;
+      min-width: 7vw;
+      height: 7vw;
+    }
+
+  .bog_button {
+      text-align: center;
+      border: 1px solid lightgrey;
+      /* padding: 1vw 3.5vw 1vw 3.5vw; */
+      padding: 1vw;
+      margin: 2px 2px 2px 2px;
+      touch-action: manipulation;
+      font-size: 2.5vw;
+      font-weight: bold;
+      min-width: 7vw;
+      height: 7vw;
+    }
+
+  .vmm_key {
+      text-align: center;
+      border: 1px solid lightgrey;
+      padding: 1vw 3.5vw 1vw 3.5vw;
+      margin: 2px 2px 2px 2px;
+      touch-action: manipulation;
+      font-size: 2.5vw;
+      font-weight: bold;
+    }
+
+@media screen and (max-device-width: 450px) {
+      .vmm_key {
+        padding: 5vw 3vw 5vw 3vw;
+      }
+    }
+
+/* Slideshow container */
+.slideshow-container {
+  max-height: 90vh;
+  height: 90%;
+  max-width: 90vw;
+
+}
+
+/* Hide the images by default */
+.mySlides {
+  display: none;
+}
+
+/* Next & previous buttons */
+.prev, .next {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  width: auto;
+  margin-top: -22px;
+  padding: 16px;
+  color: white;
+  font-weight: bold;
+  font-size: 24px;
+  transition: 0.6s ease;
+  border-radius: 0 3px 3px 0;
+  user-select: none;
+}
+
+.close_slideshow {
+  cursor: pointer;
+  /*position: absolute;*/
+  bottom: 5px;
+  /*right: 0;*/
+  /*width: auto;*/
+  margin:auto;
+  /*margin-top: -22px;*/
+  /*padding: 16px;*/
+  color: white;
+
+
+}
+
+/* Position the "next button" to the right */
+.next {
+  right: 0;
+  border-radius: 3px 0 0 3px;
+}
+
+.prev {
+  left: 0;
+  border-radius: 3px 0 0 3px;
+}
+
+/* On hover, add a black background color with a little bit see-through */
+.prev:hover, .next:hover {
+  background-color: rgba(0,0,0,0.8);
+}
+
+/* Caption text */
+.text {
+  color: #f2f2f2;
+  font-size: 15px;
+  padding: 8px 12px;
+  position: absolute;
+  bottom: 8px;
+  width: 100%;
+  text-align: center;
+}
+
+/* Number text (1/3 etc) */
+.numbertext {
+  color: #f2f2f2;
+  font-size: 12px;
+  padding: 8px 12px;
+  position: absolute;
+  top: 0;
+}
+
+/* The dots/bullets/indicators */
+.dot {
+  cursor: pointer;
+  height: 15px;
+  width: 15px;
+  margin: 0 2px;
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+  transition: background-color 0.6s ease;
+}
+
+.active, .dot:hover {
+  background-color: #717171;
+}
+
+/* Fading animation */
+.fade {
+  -webkit-animation-name: fade;
+  -webkit-animation-duration: 0.5s;
+  animation-name: fade;
+  animation-duration: 0.5s;
+}
+
+@-webkit-keyframes fade {
+  from {opacity: .4}
+  to {opacity: 1}
+}
+
+@keyframes fade {
+  from {opacity: .4}
+  to {opacity: 1}
+}
