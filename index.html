@@ -1,17 +1,5 @@
 <head>
 
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HBL0VL09HC"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-HBL0VL09HC');
-  </script>
-
-
-
 <title>View Master Database - Dave Machin's searchable collection of vintage images and descriptions.</title>
 <meta name="description" content="Dave Machin has scanned thousands of View Master images and made them available online at the VMDatabase.com site.  Probably the world's largest online collection of digitized View Master images.">
 <meta name="robots" content="index, archive">
@@ -53,41 +41,222 @@
 
 <script language="javascript">
 
-var page_list=[""];
-var current_page=0;
-var slideIndex = 1;
+var global_data=null; // hoping this is global and stores each airtable lookup
+
+function createSlideshow(dataIndex, startIndex = 0) {
+
+console.log("Global Data is ",global_data);
+console.log("DataIndex is ",dataIndex);
+console.log("Start index is ", startIndex);
 
 
-function highlightOccurrences(target, text) {
-    if (!target || !text) return text; // Return original text if inputs are empty
-
-    // Escape special characters in target string to use in regex
-    const escapedTarget = target.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
-
-    // Create a regex to find all occurrences of target
-    const regex = new RegExp(escapedTarget, 'gi'); // Case insensitive global search
-
-    // Replace occurrences with wrapped HTML tag
-    return text.replace(regex, `<mark>$&</mark>`);
-}
 
 
-function isValidURL(url) {
-    try {
-        new URL(url);
-        return true;
-    } catch (error) {
-        return false;
+
+
+  let currentIndex = startIndex;
+
+
+  // Create container
+  const container = document.createElement("div");
+  container.style.position = "fixed";
+  container.style.top = 0;
+  container.style.left = 0;
+  container.style.width = "100vw";
+  container.style.height = "100vh";
+  container.style.background = "black";
+  container.style.display = "flex";
+  container.style.alignItems = "center";
+  container.style.justifyContent = "center";
+  container.style.zIndex = 9999;
+  container.style.overflow = "hidden";
+
+  // Image element
+  const img = document.createElement("img");
+  img.style.maxWidth = "100%";
+  img.style.maxHeight = "100%";
+  img.style.objectFit = "contain";
+  img.style.transition = "opacity 0.3s ease";
+
+
+  // close button
+const closeBtn = document.createElement("button");
+
+closeBtn.textContent = "X"; // fancy X
+closeBtn.style.position = "absolute";
+closeBtn.style.top = "2px";
+closeBtn.style.right = "2px";
+closeBtn.style.fontSize = "24px";
+closeBtn.style.color = "white";
+closeBtn.style.background = "rgba(0,0,0,0.5)";
+closeBtn.style.border = "none";
+closeBtn.style.borderRadius = "4px";
+closeBtn.style.cursor = "pointer";
+closeBtn.style.zIndex = 10000; // make sure it's above the image
+
+closeBtn.style.display = "inline-block"; // shrink to fit content
+closeBtn.style.width = "auto";           // override min-width
+closeBtn.style.minWidth = "0";           // override default min-width
+closeBtn.style.padding = "0 4px";        // optional small padding
+
+closeBtn.addEventListener("click", () => {
+  container.remove(); // removes the slideshow div from DOM
+});
+
+
+  container.appendChild(img);
+  container.appendChild(closeBtn);
+  document.body.appendChild(container);
+
+  function showImage(index) {
+    currentIndex = (index + imageArray.length) % imageArray.length;
+    img.style.opacity = 0;
+    setTimeout(() => {
+      img.src = imageArray[currentIndex].url;
+      img.style.opacity = 1;
+    }, 150);
+  }
+
+  function next() {
+    showImage(currentIndex + 1);
+  }
+
+  function prev() {
+    showImage(currentIndex - 1);
+  }
+
+  // Click navigation (left/right zones)
+  container.addEventListener("click", (e) => {
+    const x = e.clientX;
+    const width = window.innerWidth;
+
+    if (x < width * 0.3) {
+      prev();
+    } else if (x > width * 0.7) {
+      next();
     }
+  });
+
+  // Touch swipe support
+  let touchStartX = 0;
+
+  container.addEventListener("touchstart", (e) => {
+    touchStartX = e.touches[0].clientX;
+  });
+
+  container.addEventListener("touchend", (e) => {
+    const touchEndX = e.changedTouches[0].clientX;
+    const deltaX = touchEndX - touchStartX;
+
+    if (Math.abs(deltaX) > 50) {
+      if (deltaX > 0) {
+        prev(); // swipe right
+      } else {
+        next(); // swipe left
+      }
+    }
+  });
+
+  // Keyboard navigation (optional bonus)
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight") next();
+    if (e.key === "ArrowLeft") prev();
+    if (e.key === "Escape") container.remove();
+  });
+
+  // Initialize
+
+  if (dataIndex<0)
+  {
+    imageArray = global_data.records.flatMap(
+      record => record.fields["Image Preview"] || []
+    );
+  } else {
+    imageArray=global_data.records[dataIndex].fields["Image Preview"];
+  }
+    console.log("Image array is ",imageArray);  
+
+  showImage(currentIndex);
 }
 
-function getYouTubeThumbnail(url) {
-    var videoId = url.match(/[?&]v=([^&]+)/) || url.match(/youtu\.be\/([^?]+)/);
-    if (videoId && videoId[1]) {
-        return `https://img.youtube.com/vi/${videoId[1]}/maxresdefault.jpg`;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    var page_list=[""];
+    var current_page=0;
+    var slideIndex = 1;
+
+    
+
+
+    function highlightOccurrences(target, text) {
+        if (!target || !text) return text; // Return original text if inputs are empty
+
+        // Escape special characters in target string to use in regex
+        const escapedTarget = target.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
+
+        // Create a regex to find all occurrences of target
+        const regex = new RegExp(escapedTarget, 'gi'); // Case insensitive global search
+
+        // Replace occurrences with wrapped HTML tag
+        return text.replace(regex, `<mark>$&</mark>`);
     }
-    return null;
-}
+
+
+    function isValidURL(url) {
+        try {
+            new URL(url);
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    function getYouTubeThumbnail(url) {
+        var videoId = url.match(/[?&]v=([^&]+)/) || url.match(/youtu\.be\/([^?]+)/);
+        if (videoId && videoId[1]) {
+            return `https://img.youtube.com/vi/${videoId[1]}/maxresdefault.jpg`;
+        }
+        return null;
+    }
 
     function toTitleCase(str) {
         return str.replace(/\w\S*/g, function(txt){
@@ -95,53 +264,15 @@ function getYouTubeThumbnail(url) {
         });
     }
 
-    function show_image(show_me){
-        console.log(show_me);
-        document.getElementById("picture_frame").innerHTML="<img  class=\"popup_image fade\" src= \" "+show_me+" \" ><p style=\"color: white;\">[Click to Close]</p>"
-        document.getElementById("picture_frame").style.display = 'block';
-		document.getElementById("picture_frame_overlay").style.display = 'flex';
-
-
-
-    }
 
     function clear_picture(){
       document.getElementById("picture_frame").innerHTML=""
       document.getElementById("picture_frame").style.display = 'none';
-	  document.getElementById("picture_frame_overlay").style.display = 'none';
-
+	    document.getElementById("picture_frame_overlay").style.display = 'none';
     }
 
 
 
-
-	// Next/previous controls
-	function plusSlides(n) {
-	  showSlides(slideIndex += n);
-	}
-
-	// Thumbnail image controls
-	function currentSlide(n) {
-	  showSlides(slideIndex = n);
-	}
-
-	function showSlides(n) {
-	  var i;
-	  var slides = document.getElementsByClassName("mySlides");
-	  var dots = document.getElementsByClassName("dot");
-	  if (n > slides.length) {slideIndex = 1}
-	  if (n < 1) {slideIndex = slides.length}
-	  for (i = 0; i < slides.length; i++) {
-		  slides[i].style.display = "none";
-	  }
-	  slides[slideIndex-1].style.display = "block";
-
-	}
-
-
-	function close_slideshow(){
-		document.getElementById("slide_show_overlay").style.display = 'none';
-	}
 
 
 	function slide_show(search_for){
@@ -161,40 +292,11 @@ function getYouTubeThumbnail(url) {
 
 		$.get("https://api.airtable.com/v0/app5Q6OlJ3iMkJ8cd/Reels?view=API&pageSize=&sort%5B0%5D%5Bfield%5D=Name&offset="+offset+"&filterByFormula=OR(SEARCH(%22"+search_for_url+"%22%2C+LOWER(%7Bstate%7D))%2CSEARCH(%22"+search_for_url+"%22%2C+LOWER(%7Bimage+description%7D))%2CSEARCH(%22"+search_for_url+"%22%2C+LOWER(%7Bname%7D))%2CSEARCH(%22"+search_for_url+"%22%2C+LOWER(%7BReel+ID+Number%7D)))", function(data, status){
 
+        global_data=data; // even if data is empty overwrite any prior data
+
 				if (data.records[0]){
 
-					document.getElementById("slide_show_overlay").style.display = 'flex';
-
-					output_content += "<div class=\"slideshow-container\">"
-
-					$.each(data.records, function(index){
-
-						image_preview=data.records[index].fields["Image Preview"];
-
-						$.each(image_preview, function(index2){
-								output_content += "<div class=\"mySlides fade\">"
-								output_content += "<img class=\"popup_image\" src= \" "+image_preview[index2].url+" \"   >"
-								output_content += "</div>"
-							  })
-
-
-					})
-					output_content += "<a class=\"prev\" onclick=\"plusSlides(-1)\">&#10094;</a>"
-					output_content += "<a class=\"next\" onclick=\"plusSlides(1)\">&#10095;</a>"
-					output_content += "<a class=\"close_slideshow\" onclick=\"close_slideshow()\">[Click to Close]</a>"
-					output_content += "</div>"
-
-
-
-					//console.log (output_content);
-
-			        document.getElementById("slide_show").innerHTML=output_content;
-					document.getElementById("slide_show").style.display = 'block';
-
-					slideIndex=1;
-					showSlides(slideIndex);
-
-
+          createSlideshow(-1,0);
 
 				}
 
@@ -241,7 +343,7 @@ function share_page(search_for){
          }
       });
 
-      $.get("https://api.airtable.com/v0/app5Q6OlJ3iMkJ8cd/Reels?view=API&pageSize=5&sort%5B0%5D%5Bfield%5D=Name&offset="+offset+"&filterByFormula=OR(SEARCH(%22"+search_for_url+"%22%2C+LOWER(%7Bstate%7D))%2CSEARCH(%22"+search_for_url+"%22%2C+LOWER(%7Bimage+description%7D))%2CSEARCH(%22"+search_for_url+"%22%2C+LOWER(%7Bname%7D))%2CSEARCH(%22"+search_for_url+"%22%2C+LOWER(%7BReel+ID+Number%7D)))", function(data, status){
+      $.get("https://api.airtable.com/v0/app5Q6OlJ3iMkJ8cd/Reels?view=API&pageSize=20&sort%5B0%5D%5Bfield%5D=Name&offset="+offset+"&filterByFormula=OR(SEARCH(%22"+search_for_url+"%22%2C+LOWER(%7Bstate%7D))%2CSEARCH(%22"+search_for_url+"%22%2C+LOWER(%7Bimage+description%7D))%2CSEARCH(%22"+search_for_url+"%22%2C+LOWER(%7Bname%7D))%2CSEARCH(%22"+search_for_url+"%22%2C+LOWER(%7BReel+ID+Number%7D)))", function(data, status){
 
 //        var js = JSON.stringify(data);
   //      console.log(js);
@@ -249,6 +351,8 @@ function share_page(search_for){
         //console.log(data.records[0].id);
         document.getElementById("search_results").innerHTML="";
         output_content="";
+        global_data=data; // even if data is empty overwrite any prior data
+
 
         if (data.records[0])
           {
@@ -286,16 +390,14 @@ function share_page(search_for){
                       output_content += "</h2>"
                       output_content += "</div>" //container
 
-                      //output_content += "aaa </a> bbb </div>";
-                      //document.getElementById("search_results").innerHTML += data.records[index].fields["Reel ID Number"]+" - ";
-                      //document.getElementById("search_results").innerHTML += toTitleCase(data.records[index].fields.Name) + "<br>";
 
                       image_preview=data.records[index].fields["Image Preview"];
 
-                    //  output_content += "<div style=\"display:flex\" >"
+
                       output_content += "<div class=\"image_group\">"
                       $.each(image_preview, function(index2){
-                        output_content += "<div class=\"box-shadow\" onclick=\"show_image('"+image_preview[index2].url+"')\">"
+                        //output_content += "<div class=\"box-shadow\" onclick=\"show_image('"+image_preview[index2].url+"')\">"
+                        output_content += "<div class=\"box-shadow\" onclick=\"createSlideshow("+index+","+index2+")\">"
                         output_content += "<img  src= \" "+image_preview[index2].url+" \"  >"
                         output_content += "</div>"
                       })
