@@ -33,8 +33,8 @@ h3 {
   position: absolute;
   top: 0;      /* top-right corner of container */
   right: 0;
-  width: 32px;
-  height: 32px;
+  width: 8vw;
+  height: 8vw;
   cursor: pointer;
   z-index: 10;  /* ensures it sits above the table */
 }
@@ -79,10 +79,23 @@ blockquote {
 }
 
 button {
-  border-radius: 5px;
-  margin: 2vw 2vw 2vw 2vw;
+  background-color: #ffffff;         /* white background */
+  color: #333333;                   /* dark text for contrast */
+  border: 2px solid #555555;        /* dark grey border */
+  border-radius: 12px;              /* smooth curved corners */
+  padding: 0.8em 1.5em;             /* vertical & horizontal padding */
+  font-size: 3vw;                   /* responsive font size */
   min-width: 40%;
-  font-size: 3vw;
+   margin: 0.5em; 
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* subtle shadow */
+  transition: all 0.2s ease-in-out;  /* smooth hover effect */
+}
+
+button:hover {
+  background-color: #f0f0f0;        /* light grey on hover */
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15); /* slightly bigger shadow */
+  transform: translateY(-1px);       /* subtle lift effect */
 }
 
 @media only screen and (max-device-width: 450px) {
