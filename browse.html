@@ -399,7 +399,7 @@
             title = getRandomTitleText();
             
 
-            document.getElementById("spinResults").innerHTML = "<h2><a href='./index.html?go="+toTitleCase(title)+"'>"+toTitleCase(title)+"</a></h2>";
+            document.getElementById("spinResults").innerHTML = "<h2><a href='./index.html?go="+encodeURIComponent(toTitleCase(title))+"'>"+toTitleCase(title)+"</a></h2>";
             
                 all_images=[];
 console.log("Looking for ", title);
