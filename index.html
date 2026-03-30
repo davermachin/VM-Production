@@ -276,7 +276,7 @@ function share_page(search_for){
                       if (data.records[index].fields["Image Description"]) {
                         //output_content += "<p>"+data.records[index].fields["Image Description"].replaceAll(search_for,"<mark>"+search_for+"</mark>");+"</p>"
                         output_content += "<p>"+highlightOccurrences(search_for, data.records[index].fields["Image Description"])+"</p>"
-                        output_content += "<font size='-1'>(order of images may not match order of description)</font>"
+                        output_content += "<p>(order of images may not match order of description)</p>"
                       }
 
                       if (data.records[index].fields["Contributor"]) {

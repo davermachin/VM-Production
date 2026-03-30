@@ -48,385 +48,6 @@
           const max_records_to_load=10000;
 
 
-          $('document').ready(function(){
-              $("#footer").load("footer.html");
-              
-              read_database("Trivia_Fact");
-
-          img = document.getElementById('spinImage');
-
-          // Mouse
-          img.addEventListener('mousedown', onPressStart);
-          document.addEventListener('mouseup', onPressEnd);
-
-          // Touch
-          img.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            onPressStart();
-          });
-
-          document.addEventListener('touchend', onPressEnd);
-
-
-
-            });
-
-            let img = null;
-
-          let startTime = 0;
-          let isHolding = false;
-
-          let angle = 0;
-          let velocity = 0;
-          let animationFrame = null;
-
-          // ----------------------
-          // INPUT HANDLERS
-          // ----------------------
-
-          function onPressStart() {
-            isHolding = true;
-            startTime = Date.now();
-
-            // Stop any existing spin
-            if (animationFrame) cancelAnimationFrame(animationFrame);
-
-            img.style.transform = `rotate(-33deg)`;
-          }
-
-          function onPressEnd() {
-            if (!isHolding) return;
-            isHolding = false;
-
-            const duration = Date.now() - startTime;
-
-            // Convert duration → velocity (tweak multiplier as needed)
-            velocity = Math.min(duration * 0.02, 20); // cap max speed
-
-            startSpin();
-          }
-
-          // ----------------------
-          // SPIN LOGIC
-          // ----------------------
-
-          function startSpin() {
-            const friction = 0.97; // lower = more friction
-
-            function animate() {
-              angle += velocity;
-              velocity *= friction;
-
-              img.style.transform = `rotate(${angle}deg)`;
-
-              if (velocity > 0.1) {
-                animationFrame = requestAnimationFrame(animate);
-              } else {
-                velocity = 0;
-                cancelAnimationFrame(animationFrame);
-                animationFrame = null;
-
-                onSpinComplete();
-              }
-            }
-
-            animate();
-          }
-
-          // ----------------------
-          // COMPLETION CALLBACK
-          // ----------------------
-
-
-          function onSpinComplete() {
-
-
-            const finalAngle = angle % 360;
-            
-            console.log("Spin complete at angle:", finalAngle);
-            title = getRandomTitleText();
-            
-
-            document.getElementById("spinResults").innerHTML = "<h2><a href='./index.html?go="+toTitleCase(title)+"'>"+toTitleCase(title)+"</a></h2>";
-            
-                all_images=[];
-
-                record_I_want = original_records.filter(item => item.fields?.Name?.toLowerCase() === title.toLowerCase());                
-                
-                all_images=record_I_want.flatMap(item => item.fields["Image Preview"]?.map(img => img.url) || [] );
-
-                        // Loop through the array and create <img> elements
-                        all_images.forEach(url => {
-                          const img = document.createElement("img");
-                          img.src = url;               // set the image URL
-                          img.alt = "Image";           // optional alt text
-                          img.style.maxWidth = "100px"; // optional styling
-                          
-                          img.style.margin = "5px";     // optional spacing
-                          img.style.borderRadius = "12px"; // optional border radius
-
-                          document.getElementById("spinResults").appendChild(img);  // add the image to the page
-                        });
-            
-
-            
-          }
-
-
-          function show_wheel_spinner() {
-            document.getElementById("spinResults").innerHTML = ""; // Clear previous results
-            document.getElementById('container').style.display = 'block';
-          }
-
-          function toTitleCase(str) {
-            return str.replace(
-              /\w\S*/g,
-              function(txt) {
-                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-              }
-            );
-          }
-
-
-              function read_database(view_name){
-
-                var Airtable = require('airtable');
-                var base = new Airtable({apiKey: 'patD5dYFBjdTtIAY8.20d135bce39d21c1b5ca51607082cd53bc1e64158373e0aa0065df8d54c79b0e'}).base('app5Q6OlJ3iMkJ8cd');
-
-                all_records=[];
-                original_records=[];
-
-
-                if (view_name==null){
-                  view_name="Trivia_USA";
-                }
-
-                current_game_name=view_name;
-
-                base('Reels').select({
-
-                    maxRecords: max_records_to_load,
-                    view: view_name
-                }).eachPage(function page(records, fetchNextPage) {
-                    // This function (`page`) will get called for each page of records.
-
-                    records.forEach(function(record) {
-                        console.log('Retrieved', record);
-                        
-                        original_records.push(record); // for reference for things othat than just the files being extracted below
-
-                        all_records_single = {};
-
-                        all_records_single.id_num=record.get('Reel ID Number');
-                        all_records_single.title=record.get('Name');
-                        all_records_single.country=record.get('Country');
-                        all_records_single.state=record.get('State');
-
-
-
-                        all_records.push(all_records_single);
-
-                        document.getElementById("game_controls_content").innerHTML = "<div align='center'>Getting reels from database... ("+all_records.length+")</div>"
-
-                    });
-
-                    // To fetch the next page of records, call `fetchNextPage`.
-                    // If there are more records, `page` will get called again.
-                    // If there are no more records, `done` will get called.
-                    fetchNextPage();
-
-                }, function done(err) {
-
-                    
-
-                    if (err) {
-                        console.error(err);
-                        document.getElementById("game_controls_content").innerHTML = "Something went wrong :-(  Refresh to try again.)";
-                        return;
-                      }
-
-
-
-
-                    
-                    start();
-                });
-              }
-
-
-          function sortData(data) {
-            return data.slice().sort((a, b) => {
-              if (a.country !== b.country) {
-                return a.country.localeCompare(b.country);
-              }
-              if (a.state !== b.state) {
-                return a.state.localeCompare(b.state);
-              }
-              return a.title.localeCompare(b.title);
-            });
-          }    
-
-          function groupData(data) {
-            const grouped = {};
-
-            data.forEach(item => {
-              const { country, state, title } = item;
-
-              if (!grouped[country]) {
-                grouped[country] = {};
-              }
-
-              if (!grouped[country][state]) {
-                grouped[country][state] = new Set();
-              }
-
-              grouped[country][state].add(title);
-            });
-
-            return grouped;
-          }
-
-          function addToggleHandlers() {
-            // Toggle countries → show/hide states
-            document.querySelectorAll('.country-row').forEach(row => {
-              row.addEventListener('click', () => {
-                const target = row.dataset.target;
-
-
-                const isExpanding = [...document.querySelectorAll(`.${target}`)]
-                  .some(el => el.style.display === 'none');
-
-
-                document.querySelectorAll(`.${target}`).forEach(el => {
-                  el.style.display = isExpanding ? '' : 'none';
-                });
-
-                if (!isExpanding) {
-                  document.querySelectorAll(`[class*="${target}-state-"]`).forEach(stateEl => {
-                    
-                    stateEl.style.display = 'none';
-
-                  });
-                }
-                
-
-
-
-              });
-            });
-
-            // Toggle states → show/hide titles
-            document.querySelectorAll('.state-row').forEach(row => {
-              row.addEventListener('click', (e) => {
-                e.stopPropagation(); // prevent triggering country toggle
-                const target = row.dataset.target;
-                document.querySelectorAll(`.${target}`).forEach(el => {
-                  el.style.display = el.style.display === 'none' ? '' : 'none';
-                });
-              });
-            });
-          }
-
-
-          function filterCountries(grouped, allowedCountries) {
-            return Object.fromEntries(
-              Object.entries(grouped).filter(([country, states]) =>
-                allowedCountries.includes(country)
-              )
-            );
-          }
-
-
-          function getRandomTitleText() {
-            // Select all <tr> elements whose class includes "title-row country-"
-            const rows = document.querySelectorAll('tr[class*="title-row country-"]');
-
-            if (rows.length === 0) {
-              return null; // no eligible rows found
-            }
-
-            // Pick a random row
-            const randomRow = rows[Math.floor(Math.random() * rows.length)];
-
-            // Get the third column (index 2)
-            const thirdCell = randomRow.querySelector('td:nth-child(3)');
-
-            // Return the text, or null if the cell doesn't exist
-            return thirdCell ? thirdCell.textContent.trim() : null;
-          }
-
-
-          function buildTable(data, containerId, filter_countries = null) {
-            
-            data=sortData(data);
-            grouped = groupData(data);
-            display_text="display: none;";
-
-            if (filter_countries) {
-              grouped=filterCountries(grouped, filter_countries); 
-              display_text="";
-            }
-
-
-            const container = document.getElementById(containerId);
-
-            if (Object.keys(grouped).length > 0)
-              {
-
-                      let html = `
-                      <div class="table-container">
-                      <table class="rounded-table" width="100%">`;
-
-                      Object.keys(grouped).forEach(country => {
-                        const countryId = `country-${country.replace(/\s+/g, '-')}`;
-
-                        // Country row
-                        html += `
-                          <tr class="country-row" data-target="${countryId}" style="cursor:pointer; background:#ddd;">
-                            <td colspan="3"><strong>${country}</strong></td>
-                          </tr>
-                        `;
-
-                        Object.keys(grouped[country]).forEach(state => {
-                          const stateId = `${countryId}-state-${state.replace(/\s+/g, '-')}`;
-
-                          // State row (initially hidden)
-                          html += `
-                            <tr class="state-row ${countryId}" data-target="${stateId}" style="${display_text} cursor:pointer; background:#eee;">
-                              <td width="2%"></td>
-                              <td colspan="2"><strong>${(!state || state === "undefined") ? "All" : state}</strong></td>
-                              
-                            </tr>
-                          `;
-
-                          // Titles (initially hidden)
-                          grouped[country][state].forEach(title => {
-                            html += `
-                              <tr class="title-row ${stateId}" style="${display_text} ">
-                                <td></td>
-                                <td></td>
-                                <td><a href="./index.html?go=${toTitleCase(title)}">${toTitleCase(title)}</a></td>
-                              </tr>
-                            `;
-                          });
-                        });
-                      });
-
-                      html += `</table>
-                      <img onclick="show_wheel_spinner();" src="./spin_wheel_button.png" class="table-icon" alt="icon"  />
-                      </div>`;
-                      container.innerHTML = html;
-
-                      addToggleHandlers();
-            } else {
-              container.innerHTML = "<div align='center'>No reels found for "+filter_countries+".</div>";
-            }
-          }
-
-
-            function onCountryClick(name, expanded=null) {
-              console.log('Clicked country:', name);
-
           const countryCodeMap = {
             AF: "Afghanistan",
             AX: "Åland Islands",
@@ -679,6 +300,447 @@
             ZW: "Zimbabwe"
           };
 
+          $('document').ready(function(){
+              $("#footer").load("footer.html");
+              
+              read_database("Trivia_Fact");
+
+          img = document.getElementById('spinImage');
+
+          // Mouse
+          img.addEventListener('mousedown', onPressStart);
+          document.addEventListener('mouseup', onPressEnd);
+
+          // Touch
+          img.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            onPressStart();
+          });
+
+          document.addEventListener('touchend', onPressEnd);
+
+
+
+            });
+
+            let img = null;
+
+          let startTime = 0;
+          let isHolding = false;
+
+          let angle = 0;
+          let velocity = 0;
+          let animationFrame = null;
+
+          // ----------------------
+          // INPUT HANDLERS
+          // ----------------------
+
+          function onPressStart() {
+            isHolding = true;
+            startTime = Date.now();
+
+            // Stop any existing spin
+            if (animationFrame) cancelAnimationFrame(animationFrame);
+
+            img.style.transform = `rotate(-33deg)`;
+          }
+
+          function onPressEnd() {
+            if (!isHolding) return;
+            isHolding = false;
+
+            const duration = Date.now() - startTime;
+
+            // Convert duration → velocity (tweak multiplier as needed)
+            velocity = Math.min(duration * 0.02, 20); // cap max speed
+
+            startSpin();
+          }
+
+          // ----------------------
+          // SPIN LOGIC
+          // ----------------------
+
+          function startSpin() {
+            const friction = 0.97; // lower = more friction
+
+            function animate() {
+              angle += velocity;
+              velocity *= friction;
+
+              img.style.transform = `rotate(${angle}deg)`;
+
+              if (velocity > 0.1) {
+                animationFrame = requestAnimationFrame(animate);
+              } else {
+                velocity = 0;
+                cancelAnimationFrame(animationFrame);
+                animationFrame = null;
+
+                onSpinComplete();
+              }
+            }
+
+            animate();
+          }
+
+          // ----------------------
+          // COMPLETION CALLBACK
+          // ----------------------
+
+
+          function onSpinComplete() {
+
+
+            const finalAngle = angle % 360;
+            
+            console.log("Spin complete at angle:", finalAngle);
+            title = getRandomTitleText();
+            
+
+            document.getElementById("spinResults").innerHTML = "<h2><a href='./index.html?go="+toTitleCase(title)+"'>"+toTitleCase(title)+"</a></h2>";
+            
+                all_images=[];
+console.log("Looking for ", title);
+                record_I_want = original_records.filter(item => item.fields?.Name?.toLowerCase() === title.toLowerCase());                
+console.log("Record I want is ", record_I_want);                
+                all_images=record_I_want.flatMap(item => item.fields["Image Preview"]?.map(img => img.url) || [] );
+
+                        // Loop through the array and create <img> elements
+                        all_images.forEach(url => {
+                          const img = document.createElement("img");
+                          img.src = url;               // set the image URL
+                          img.alt = "Image";           // optional alt text
+                          img.style.maxWidth = "100px"; // optional styling
+                          
+                          img.style.margin = "5px";     // optional spacing
+                          img.style.borderRadius = "12px"; // optional border radius
+
+                          document.getElementById("spinResults").appendChild(img);  // add the image to the page
+                        });
+            
+
+            
+          }
+
+
+          function show_wheel_spinner() {
+            document.getElementById("spinResults").innerHTML = ""; // Clear previous results
+            document.getElementById('container').style.display = 'block';
+          }
+
+          function toTitleCase(str) {
+            return str.replace(
+              /\w\S*/g,
+              function(txt) {
+                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+              }
+            );
+          }
+
+
+              function read_database(view_name){
+
+                var Airtable = require('airtable');
+                var base = new Airtable({apiKey: 'patD5dYFBjdTtIAY8.20d135bce39d21c1b5ca51607082cd53bc1e64158373e0aa0065df8d54c79b0e'}).base('app5Q6OlJ3iMkJ8cd');
+
+                all_records=[];
+                original_records=[];
+
+
+                if (view_name==null){
+                  view_name="Trivia_USA";
+                }
+
+                current_game_name=view_name;
+
+                base('Reels').select({
+
+                    maxRecords: max_records_to_load,
+                    view: view_name
+                }).eachPage(function page(records, fetchNextPage) {
+                    // This function (`page`) will get called for each page of records.
+
+                    records.forEach(function(record) {
+                        console.log('Retrieved', record);
+                        
+                        original_records.push(record); // for reference for things othat than just the files being extracted below
+
+                        all_records_single = {};
+
+                        all_records_single.id_num=record.get('Reel ID Number');
+                        all_records_single.title=record.get('Name');
+                        all_records_single.country=record.get('Country');
+                        all_records_single.state=record.get('State');
+
+
+
+                        all_records.push(all_records_single);
+
+                        document.getElementById("game_controls_content").innerHTML = "<div align='center'>Getting reels from database... ("+all_records.length+")</div>"
+
+                    });
+
+                    // To fetch the next page of records, call `fetchNextPage`.
+                    // If there are more records, `page` will get called again.
+                    // If there are no more records, `done` will get called.
+                    fetchNextPage();
+
+                }, function done(err) {
+
+                    
+
+                    if (err) {
+                        console.error(err);
+                        document.getElementById("game_controls_content").innerHTML = "Something went wrong :-(  Refresh to try again.)";
+                        return;
+                      }
+
+
+
+
+                    
+                    start();
+                });
+              }
+
+
+          function sortData(data) {
+            return data.slice().sort((a, b) => {
+              if (a.country !== b.country) {
+                return a.country.localeCompare(b.country);
+              }
+              if (a.state !== b.state) {
+                return a.state.localeCompare(b.state);
+              }
+              return a.title.localeCompare(b.title);
+            });
+          }    
+
+          function groupData(data) {
+            const grouped = {};
+
+            data.forEach(item => {
+              const { country, state, title } = item;
+
+              if (!grouped[country]) {
+                grouped[country] = {};
+              }
+
+              if (!grouped[country][state]) {
+                grouped[country][state] = new Set();
+              }
+
+              grouped[country][state].add(title);
+            });
+
+            return grouped;
+          }
+
+          function addToggleHandlers() {
+            // Toggle countries → show/hide states
+            document.querySelectorAll('.country-row').forEach(row => {
+              row.addEventListener('click', () => {
+                const target = row.dataset.target;
+
+
+                const isExpanding = [...document.querySelectorAll(`.${target}`)]
+                  .some(el => el.style.display === 'none');
+
+                    // Clear all map selections
+                  document.querySelectorAll('svg g, svg path').forEach(el => {
+                    el.classList.remove('selected');
+                  });                  
+
+                document.querySelectorAll(`.${target}`).forEach(el => {
+                  el.style.display = isExpanding ? '' : 'none';
+                });
+
+                document.querySelectorAll(`.${target}-state-undefined`).forEach(el => {
+                  el.style.display = isExpanding ? '' : 'none';
+                });
+
+                if (!isExpanding) {
+                  document.querySelectorAll(`[class*="${target}-state-"]`).forEach(stateEl => {
+                    
+                    stateEl.style.display = 'none';
+
+                  });
+                }
+
+                if (isExpanding) {
+
+                  // find the two letter code for the country, or keep the full name if not found
+
+                  const codeEntry = Object.entries(countryCodeMap).find(
+                        ([code, name]) => name === target.replace("country-", "")
+                  );
+
+                  const code = codeEntry ? codeEntry[0].toLowerCase() : target.replace("country-", "");
+
+
+                  console.log("Mapped code is ", code);
+
+                  // Select the corresponding element
+                  const el = document.getElementById(code);
+
+                  if (el) {
+
+                      if (el && el.tagName === 'g') {
+
+
+                        // Find the child <path> with ID "mainland" and add "selected"
+                         mainlandPath = el.querySelector('path.mainland');
+
+                         console.log("Mainland path is ", mainlandPath);
+                        if (mainlandPath) {
+                          mainlandPath.classList.add('selected');
+                        }
+                      } else {
+                        el.classList.add('selected');
+                      }
+
+                  }
+
+
+                    
+                
+                }
+                
+
+
+
+              });
+            });
+
+            // Toggle states → show/hide titles
+            document.querySelectorAll('.state-row').forEach(row => {
+              row.addEventListener('click', (e) => {
+                e.stopPropagation(); // prevent triggering country toggle
+                const target = row.dataset.target;
+                document.querySelectorAll(`.${target}`).forEach(el => {
+                  el.style.display = el.style.display === 'none' ? '' : 'none';
+                });
+              });
+            });
+          }
+
+
+          function filterCountries(grouped, allowedCountries) {
+            return Object.fromEntries(
+              Object.entries(grouped).filter(([country, states]) =>
+                allowedCountries.includes(country)
+              )
+            );
+          }
+
+
+          function getRandomTitleText() {
+            // Select all <tr> elements whose class includes "title-row country-"
+            const rows = document.querySelectorAll('tr[class*="title-row country-"]');
+
+            if (rows.length === 0) {
+              return null; // no eligible rows found
+            }
+
+            // Pick a random row
+            const randomRow = rows[Math.floor(Math.random() * rows.length)];
+
+            // Get the third column (index 2)
+            const thirdCell = randomRow.querySelector('td:nth-child(3)');
+
+            // Return the text, or null if the cell doesn't exist
+            return thirdCell ? thirdCell.textContent.trim() : null;
+          }
+
+
+          function buildTable(data, containerId, filter_countries = null) {
+            
+            data=sortData(data);
+            grouped = groupData(data);
+            display_text="display: none;";
+
+
+            if (filter_countries) {
+console.log("Filter is ",filter_countries);
+              grouped=filterCountries(grouped, filter_countries); 
+              
+              if (!Array.isArray(filter_countries) && filter_countries!="USA")
+                  {
+                      display_text="";
+                  }
+            }
+
+
+            const container = document.getElementById(containerId);
+
+            if (Object.keys(grouped).length > 0)
+              {
+
+                      let html = `
+                      <div style="width: 90vw;">
+                        <p>Click on a country to see reels. Click spin the reel to get a random reel from the current list!</p>                        
+                      </div>                      
+                      <div class="table-container">
+                        <img onclick="show_wheel_spinner();" src="./spin_wheel_button.png" class="table-icon" alt="Spin the Reel"  />
+
+                      <table class="rounded-table" width="100%">`;
+
+                      Object.keys(grouped).forEach(country => {
+                        const countryId = `country-${country.replace(/\s+/g, '-')}`;
+
+                        // Country row
+                        html += `
+                          <tr class="country-row" data-target="${countryId}" style="cursor:pointer; background:#ddd;">
+                            <td colspan="3"><strong>${country}</strong></td>
+                          </tr>
+                        `;
+
+                        Object.keys(grouped[country]).forEach(state => {
+                          const stateId = `${countryId}-state-${state.replace(/\s+/g, '-')}`;
+
+                          // State row (initially hidden)
+                          display_text_usa_exception = display_text;
+
+                          if (filter_countries=="USA"){display_text_usa_exception=""}
+
+                                html += `
+                                  <tr class="state-row ${countryId}" data-target="${stateId}" style="${display_text_usa_exception} cursor:pointer; background:#eee;">
+                                    <td width="2%"></td>
+                                    <td colspan="2"><strong>${(!state || state === "undefined") ? "All" : state}</strong></td>
+                                    
+                                  </tr>
+                                `;
+                            
+                          // Titles (initially hidden)
+                          grouped[country][state].forEach(title => {
+                            html += `
+                              <tr class="title-row ${stateId}" style="${display_text} ">
+                                <td></td>
+                                <td></td>
+                                <td><a href="./index.html?go=${encodeURIComponent(toTitleCase(title))}">${toTitleCase(title)}</a></td>
+                              </tr>
+                            `;
+                          });
+                        });
+                      });
+
+                      html += `</table>
+                      
+                      </div>`;
+                      container.innerHTML = html;
+
+                      addToggleHandlers();
+            } else {
+              container.innerHTML = "<div align='center'>No reels found for "+filter_countries+".</div>";
+            }
+          }
+
+
+  function onCountryClick(name, expanded=null) {
+              console.log('Clicked country:', name);
+
                 const countryName = countryCodeMap[name.toUpperCase()] || name;
 
           console.log('Mapped country name:', countryName);
@@ -718,6 +780,14 @@
               const countryName = countryGroup.id;
 
               // Remove highlight from previous selection
+
+
+                  document.querySelectorAll('svg g, svg path').forEach(el => {
+                    el.classList.remove('selected');
+                  });
+
+
+
               if (selectedCountry) {
                 if (selectedCountry.tagName === 'g') {
                   selectedCountry.querySelectorAll('path').forEach(p => p.classList.remove('selected'));
@@ -743,13 +813,12 @@
                 const countryName = path.id || 'UNKNOWN';
 
                 // Remove highlight from previous selection
-                if (selectedCountry) {
-                  if (selectedCountry.tagName === 'g') {
-                    selectedCountry.querySelectorAll('path').forEach(p => p.classList.remove('selected'));
-                  } else {
-                    selectedCountry.classList.remove('selected');
-                  }
-                }
+
+                    // Clear all map selections
+                  document.querySelectorAll('svg g, svg path').forEach(el => {
+                    el.classList.remove('selected');
+                  });    
+                  
 
                 selectedCountry = path;
                 selectedCountry.classList.add('selected');
@@ -1024,7 +1093,7 @@
         <path d="M584.506,526.595l-0.925,0.925l1.056,0.925l1.313-0.925L584.506,526.595L584.506,526.595z"/>
     </g>
     <path id="mw" d="M487.968,567.074l2.689,2.81l-0.053,3.597l0.52,1.514l3.57-3.855l-0.414-4.899l-1.912-1.46l-1.701-8.603l-2.949-0.104l1.34,6.196L487.968,567.074L487.968,567.074z"/>
-    <path id="Mexico" d="M133.847,433.982l4.175,13.146l-1.945,1.089l0.216,2.61l3.674,2.827v5.229l4.538,4.356l-1.945-12.847l-2.593-8.497l0.648-5.877l2.161,0.217l0.865,1.962l-0.865,5.005l11.237,21.99v7.841l9.077,10.666l9.94,4.573l4.106-2.396l5.835,4.789l3.458-3.483l-1.513-3.925l4.97-1.521l1.513,0.873l1.513-1.521h2.377l4.322-7.624l-2.161-1.962l-8.428,1.962l-1.945,5.662L182.106,480l-5.834-2.396l-2.593-8.271l1.962-10.434l-4.011-2.498l-1.91-10.02l-1.599-0.683l-2.922,2.965l-3.354-1.789l-1.313-6.682l-13.286-1.393l-6.863-5.16L133.847,433.982L133.847,433.982z"/>
+    <path id="mx" d="M133.847,433.982l4.175,13.146l-1.945,1.089l0.216,2.61l3.674,2.827v5.229l4.538,4.356l-1.945-12.847l-2.593-8.497l0.648-5.877l2.161,0.217l0.865,1.962l-0.865,5.005l11.237,21.99v7.841l9.077,10.666l9.94,4.573l4.106-2.396l5.835,4.789l3.458-3.483l-1.513-3.925l4.97-1.521l1.513,0.873l1.513-1.521h2.377l4.322-7.624l-2.161-1.962l-8.428,1.962l-1.945,5.662L182.106,480l-5.834-2.396l-2.593-8.271l1.962-10.434l-4.011-2.498l-1.91-10.02l-1.599-0.683l-2.922,2.965l-3.354-1.789l-1.313-6.682l-13.286-1.393l-6.863-5.16L133.847,433.982L133.847,433.982z"/>
     <g id="my">
         <path class="mainland" d="M648.359,511.796l1.736,3.898l0.391,5.064l2.324,3.604l5.096,3.083l1-0.791l1.464-0.288l-0.212-1.91l-1.841-4.478l-2.697-5.731l-0.227,1.003l-3.25-0.146l-2.334-3.354L648.359,511.796L648.359,511.796z"/>
         <path d="M675.527,526.896l2.61,3.018l10.012-3.467l1.979-7.643l4.46-0.319l4.08-2.956l-5.29-3.854l-1.211-2.119l-2.61,4.815l0.959,2.766l-1.591,2.31l-2.999-0.771l-7.27,5.333l0.188,3.086L675.527,526.896L675.527,526.896z"/>
@@ -1189,7 +1258,7 @@
 
         <div id="container" class="floating-panel" style="display: none;">
           <div id="closeButton" style="position:absolute;top:2vw;right:2vw;  cursor: pointer; font-size: 5vw; padding: 1vw;" onclick="document.getElementById('container').style.display = 'none';">X</div>
-          <h1>Spin The Reel!</h1>
+          <h1>Spin The Reel!</h1><p>(click the reel for a random reel)</p>
           <img id="spinImage" height="40%" src="spin_wheel.png" />
           <div style="margin-top: 12px;"id="spinResults"></div>
         </div>

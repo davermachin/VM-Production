@@ -31,7 +31,7 @@ h3 {
 
 .table-icon {
   position: absolute;
-  top: 0;      /* top-right corner of container */
+  top: 0px;      /* top-right corner of container */
   right: 0;
   width: 8vw;
   height: 8vw;
