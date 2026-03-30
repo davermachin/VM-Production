@@ -39,6 +39,20 @@ h3 {
   z-index: 10;  /* ensures it sits above the table */
 }
 
+.rounded-table {
+  border-collapse: separate;
+  border-spacing: 0;        /* removes gaps between cells */
+  border: 1px solid #444;
+  border-radius: 12px;
+  overflow: hidden;         /* clips inner corners */
+  margin-top: 12px;
+}
+
+.rounded-table th,
+.rounded-table td {
+  border: none;
+  padding: 8px;
+}
 
 img.animated-gif{
   width: 50%;

@@ -47,6 +47,7 @@
 
           const max_records_to_load=10000;
 
+
           $('document').ready(function(){
               $("#footer").load("footer.html");
               
@@ -212,7 +213,8 @@
                     records.forEach(function(record) {
                         console.log('Retrieved', record);
                         
-                        original_records.push(record);
+                        original_records.push(record); // for reference for things othat than just the files being extracted below
+
                         all_records_single = {};
 
                         all_records_single.id_num=record.get('Reel ID Number');
@@ -242,6 +244,7 @@
                         document.getElementById("game_controls_content").innerHTML = "Something went wrong :-(  Refresh to try again.)";
                         return;
                       }
+
 
 
 
@@ -372,7 +375,7 @@
 
                       let html = `
                       <div class="table-container">
-                      <table border="0" cellpadding="6" cellspacing="0" width="100%">`;
+                      <table class="rounded-table" width="100%">`;
 
                       Object.keys(grouped).forEach(country => {
                         const countryId = `country-${country.replace(/\s+/g, '-')}`;
@@ -696,7 +699,7 @@
 
           function start(){
                 
-                
+
               
                 
                 buildTable(all_records, "game_controls_content");
@@ -1186,12 +1189,12 @@
 
         <div id="container" class="floating-panel" style="display: none;">
           <div id="closeButton" style="position:absolute;top:2vw;right:2vw;  cursor: pointer; font-size: 5vw; padding: 1vw;" onclick="document.getElementById('container').style.display = 'none';">X</div>
-          <h1>Spin The Wheel!</h1>
+          <h1>Spin The Reel!</h1>
           <img id="spinImage" height="40%" src="spin_wheel.png" />
-          <div id="spinResults"></div>
+          <div style="margin-top: 12px;"id="spinResults"></div>
         </div>
 
-        <div id="game_controls_content"></div>
+        <div id="game_controls_content">Loading Reels ...</div>
         <div class="center" id="footer"></div>
       </div>
     </body>
