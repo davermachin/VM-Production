@@ -178,13 +178,13 @@ function read_highscores(){
             return b.high_score - a.high_score;
             });
 
-            output_html= "<br><table style='border:1px solid lightgrey;margin: 2px 5px 2px 5px;' cellspacing=0><tr align='center' ><td colspan=3 nowrap bgcolor='AliceBlue'>Current High Scores</td></tr>"
+            output_html= "<br><table style='border:1px solid lightgrey;margin: 2px 5px 2px 5px;' cellspacing=0><tr align='center' ><td colspan=3 nowrap bgcolor='AliceBlue'  style='font-size: 12px; '>Current High Scores</td></tr>"
 
             for (let i=0;i<all_high_scores.length;i++){
 
               bg_color="white"
               if (i%2 == 1) {bg_color="WhiteSmoke"}
-              output_html += "<tr bgcolor='"+bg_color+"'><td nowrap>"+all_high_scores[i].trivia_view.replace("Trivia_","").replace("Trivia","All").replace("ROW","World")+"</td><td nowrap>"+all_high_scores[i].high_score+"</td><td nowrap>"+all_high_scores[i].initials+"</td></tr>"
+              output_html += "<tr bgcolor='"+bg_color+"'><td nowrap style='font-size: 12px; '>"+all_high_scores[i].trivia_view.replace("Trivia_","").replace("Trivia","All").replace("ROW","World")+"</td><td nowrap style='font-size: 12px; '>"+all_high_scores[i].high_score+"</td><td nowrap style='font-size: 12px; '>"+all_high_scores[i].initials+"</td></tr>"
             }
 
             output_html += "</table>"
@@ -405,7 +405,7 @@ function update_controls(optional_finish){
           current_inner_html=document.getElementById("title_area").innerHTML;
           current_inner_html=current_inner_html.replace("<h2>","");
           current_inner_html=current_inner_html.replace("</h2>","");
-          current_inner_html="<h2><a href='./index.html?go="+current_inner_html+"'><u>"+current_inner_html+"</u></a></h2>"
+          current_inner_html="<h2><a href='./index.html?go="+encodeURIComponent(current_inner_html)+"'><u>"+current_inner_html+"</u></a></h2>"
           document.getElementById("title_area").innerHTML=current_inner_html;
 
 

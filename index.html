@@ -27,11 +27,12 @@
       console.log(go_to_this);
 
       if (go_to_this!=null){
-        document.getElementById("seach_for_text").value=go_to_this;
+        document.getElementById("search_for_text").value=go_to_this;
+        
         SearchReel(go_to_this.trim(),"");
       }
 
-      document.getElementById("seach_for_text").focus();
+      document.getElementById("search_for_text").focus();
 
     });
 
@@ -146,7 +147,10 @@ function createSlideshow(dataIndex, startIndex = 0) {
 
 	function slide_show(search_for){
 
-		search_for_url=encodeURI(search_for.toLowerCase());
+
+      search_for_escaped=search_for.replace(/"/g, '\\"').toLowerCase(); // need to escape double quotes for airtable api query
+
+		search_for_url=encodeURI(search_for_escaped.toLowerCase());
 		offset="";
 		output_content="";
 
@@ -182,7 +186,7 @@ function createSlideshow(dataIndex, startIndex = 0) {
 
 
 function share_page(search_for){
-
+console.log("Sharing: "+search_for);
       navigator.clipboard.writeText("https://vm.vmdatabase.com/index.html?go="+encodeURI(search_for)).then(() => {
             console.log('Search copied to clipboard');
             alert("Search copied to clipboard - paste away!")
@@ -197,13 +201,11 @@ function share_page(search_for){
       document.getElementById("search_results").innerHTML = "<img class=\"animated-gif\" src=\"./load.gif\">"
 
 
-      search_for_url=encodeURI(search_for.toLowerCase());
+      search_for_escaped=search_for.replace(/"/g, '\\"').toLowerCase(); // need to escape double quotes for airtable api query
+
+      search_for_url=encodeURI(search_for_escaped);
 
       page_list[current_page]=offset;
-
-      console.log(search_for);
-      console.log(current_page);
-      console.log(page_list[current_page]);
 
       $.ajaxSetup({
          headers:{
@@ -229,18 +231,16 @@ function share_page(search_for){
               window.scrollTo(0, 0);
 
 				if (current_page==0) {
-					//output_content += "<img style=\"cursor:pointer\" src=\"./slide.png\" width=32px onclick=\"slide_show(document.getElementById('seach_for_text').value.trim())\">"
-          output_content += "<button type=\"button\" onclick=\"slide_show(document.getElementById('seach_for_text').value.trim())\">Slideshow</button>"
+					//output_content += "<img style=\"cursor:pointer\" src=\"./slide.png\" width=32px onclick=\"slide_show(document.getElementById('search_for_text').value.trim())\">"
+          output_content += "<button type=\"button\" onclick=\"slide_show(document.getElementById('search_for_text').value.trim())\">Slideshow</button>"
 
               if (navigator.share) {
-                  output_content += "<button type=\"button\" onclick=\"share_page('"+search_for+"')\">Copy Search</button>"
+                  output_content += "<button type=\"button\" onclick=\"share_page('"+search_for.replace(/"/g, '&quot;').toLowerCase()+"')\">Copy Search</button>"
               } else {
                   // Fallback
               }
 
 				}
-
-
 
                 $.each(data.records, function(index){
 
@@ -330,7 +330,7 @@ function share_page(search_for){
         } else {
             output_content ="<p>None Found - Need To Buy More View-Masters!</p>"
         }
-
+document.getElementById("search_button").style.display="none";
         document.getElementById("search_results").innerHTML = output_content;
       });
 
@@ -347,7 +347,7 @@ function share_page(search_for){
 <body>
   <div class="center">
         <h1>View-Master Database</h1>
-        <input type="text" id="seach_for_text" autofocus placeholder="Type search text and press enter." onfocus="document.getElementById('search_button').style.display='block';">
+        <input type="text" id="search_for_text" autofocus placeholder="Type search text and press enter." onfocus="document.getElementById('search_button').style.display='block';">
 
         <div id="search_button"><button onclick="newsearch();">Search</button></div>
 
@@ -371,6 +371,10 @@ function share_page(search_for){
 
 
   <script language="javascript">
+
+document.getElementById("search_for_text").addEventListener("input", (e) => {
+  document.getElementById("search_button").style.display='block';
+});
 
 
   // Click navigation (left/right zones)
@@ -429,20 +433,20 @@ function share_page(search_for){
         page_list=[""];
         current_page=0;
 
-    		$("#seach_for_text").blur();
+    		$("#search_for_text").blur();
             document.getElementById("search_button").style.display="none";
-            SearchReel(document.getElementById('seach_for_text').value.trim(), '')
+            SearchReel(document.getElementById('search_for_text').value.trim(), '')
         }
 
 
 
         // Get the input field
-        var input = document.getElementById("seach_for_text");
+        var input = document.getElementById("search_for_text");
 
         // Execute a function when the user releases a key on the keyboard
         input.addEventListener("keyup", function(event) {
           // Number 13 is the "Enter" key on the keyboard
-          if (event.keyCode === 13 && document.getElementById("seach_for_text").value.length > 0) {
+          if (event.keyCode === 13 && document.getElementById("search_for_text").value.length > 0) {
             event.preventDefault();
             newsearch();
           }
