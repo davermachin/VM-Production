@@ -507,15 +507,26 @@ console.log("Record I want is ", record_I_want);
 
 
           function sortData(data) {
+
             return data.slice().sort((a, b) => {
-              if (a.country !== b.country) {
-                return a.country.localeCompare(b.country);
+              const countryA = a.country || "";
+              const countryB = b.country || "";
+              if (countryA !== countryB) {
+                return countryA.localeCompare(countryB);
               }
-              if (a.state !== b.state) {
-                return a.state.localeCompare(b.state);
+
+              const stateA = a.state || "";
+              const stateB = b.state || "";
+              if (stateA !== stateB) {
+                return stateA.localeCompare(stateB);
               }
-              return a.title.localeCompare(b.title);
+
+              const titleA = a.title || "";
+              const titleB = b.title || "";
+              return titleA.localeCompare(titleB);
             });
+
+
           }    
 
           function groupData(data) {
@@ -656,8 +667,10 @@ console.log("Record I want is ", record_I_want);
 
 
           function buildTable(data, containerId, filter_countries = null) {
-            
+
             data=sortData(data);
+
+
             grouped = groupData(data);
             display_text="display: none;";
 
