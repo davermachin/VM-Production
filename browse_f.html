@@ -1,0 +1,812 @@
+<html>
+    <head>
+
+      <!-- Google tag (gtag.js) -->
+
+        <script src="https://code.jquery.com/jquery-1.12.2.min.js"></script>
+        <script src="https://vm.vmdatabase.com/airtable.browser.js"></script>
+        <link href='https://fonts.googleapis.com/css?family=Arsenal' rel='stylesheet'>
+        <link rel="stylesheet" href="./vm2.css">
+        <link rel="stylesheet" href="./slides2.css">
+
+        <meta property="og:url"                content="https://vm.vmdatabase.com/browse_f.html" />
+        <meta property="og:title"              content="View-Master Fiction Browser" />
+        <meta property="og:description"        content="See View Master Fairy Tales, TV Shows, Movies, and more!" />
+        <meta property="og:image"              content="https://vm.vmdatabase.com/spin_wheel_button.png" />
+
+        <script>
+
+          var all_records = [];
+          var original_records = [];
+
+          const max_records_to_load=10000;
+
+
+
+          $('document').ready(function(){
+              $("#footer").load("footer.html");
+              
+              read_database("Trivia_Fiction");
+
+          img = document.getElementById('spinImage');
+
+          // Mouse
+          img.addEventListener('mousedown', onPressStart);
+          document.addEventListener('mouseup', onPressEnd);
+
+          // Touch
+          img.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            onPressStart();
+          });
+
+          document.addEventListener('touchend', onPressEnd);
+
+
+
+            });
+
+            let img = null;
+
+          let startTime = 0;
+          let isHolding = false;
+
+          let angle = 0;
+          let velocity = 0;
+          let animationFrame = null;
+
+          // ----------------------
+          // INPUT HANDLERS
+          // ----------------------
+
+          function onPressStart() {
+            isHolding = true;
+            startTime = Date.now();
+
+            // Stop any existing spin
+            if (animationFrame) cancelAnimationFrame(animationFrame);
+
+            img.style.transform = `rotate(-33deg)`;
+          }
+
+          function onPressEnd() {
+            if (!isHolding) return;
+            isHolding = false;
+
+            const duration = Date.now() - startTime;
+
+            // Convert duration → velocity (tweak multiplier as needed)
+            velocity = Math.min(duration * 0.02, 20); // cap max speed
+
+            startSpin();
+          }
+
+          // ----------------------
+          // SPIN LOGIC
+          // ----------------------
+
+          function startSpin() {
+            const friction = 0.97; // lower = more friction
+
+            function animate() {
+              angle += velocity;
+              velocity *= friction;
+
+              img.style.transform = `rotate(${angle}deg)`;
+
+              if (velocity > 0.1) {
+                animationFrame = requestAnimationFrame(animate);
+              } else {
+                velocity = 0;
+                cancelAnimationFrame(animationFrame);
+                animationFrame = null;
+
+                onSpinComplete();
+              }
+            }
+
+            animate();
+          }
+
+          // ----------------------
+          // COMPLETION CALLBACK
+          // ----------------------
+
+
+          function onSpinComplete() {
+
+
+            const finalAngle = angle % 360;
+            
+            console.log("Spin complete at angle:", finalAngle);
+            title = getRandomTitleText();
+            
+
+            document.getElementById("spinResults").innerHTML = "<h2><a href='./index.html?go="+encodeURIComponent(toTitleCase(title))+"'>"+toTitleCase(title)+"</a></h2>";
+            
+                all_images=[];
+console.log("Looking for ", title);
+                record_I_want = original_records.filter(item => item.fields?.Name?.toLowerCase() === title.toLowerCase());                
+console.log("Record I want is ", record_I_want);                
+                all_images=record_I_want.flatMap(item => item.fields["Image Preview"]?.map(img => img.url) || [] );
+
+                        // Loop through the array and create <img> elements
+                        all_images.forEach(url => {
+                          const img = document.createElement("img");
+                          img.src = url;               // set the image URL
+                          img.alt = "Image";           // optional alt text
+                          img.style.maxWidth = "100px"; // optional styling
+                          
+                          img.style.margin = "5px";     // optional spacing
+                          img.style.borderRadius = "12px"; // optional border radius
+
+                          document.getElementById("spinResults").appendChild(img);  // add the image to the page
+                        });
+            
+
+            
+          }
+
+
+          function show_wheel_spinner() {
+            document.getElementById("spinResults").innerHTML = ""; // Clear previous results
+            document.getElementById('container').style.display = 'block';
+          }
+
+          function toTitleCase(str) {
+            return str.replace(
+              /\w\S*/g,
+              function(txt) {
+                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+              }
+            );
+          }
+
+
+
+// new function to draw and update the main buttons based on genres and media types in the loaded records, with size scaled by count
+
+function getSelectedButtonData(div) {
+  // Allow either a div element or an ID string
+  if (typeof div === "string") {
+    div = document.getElementById(div);
+  }
+
+  if (!div) return []; // no div found
+
+  // Select all buttons whose id starts with "btn_"
+  const buttons = div.querySelectorAll('button[id^="btn_"]');
+
+  // Filter selected buttons and map to {name, value}
+  const result = [...buttons]  // convert NodeList to array
+    .filter(btn => btn.dataset.selected === "true")
+    .map(btn => ({
+      name: btn.dataset.field1,
+      value: btn.dataset.field2
+    }));
+
+  return result;
+}
+
+
+
+          function stringToColor(str, intensity) {
+            if (!str || typeof str !== "string") return "#cccccc";
+
+            // 1. Normalize first letter
+            const firstChar = str.trim().charAt(0).toLowerCase();
+            const charCode = firstChar.charCodeAt(0);
+
+            // a–z → 0–25 (fallback if not a letter)
+            let index = charCode >= 97 && charCode <= 122
+              ? charCode - 97
+              : charCode % 26;
+
+            // 2. Map to hue (0–360)
+            const hue = Math.floor((index / 26) * 360);
+
+            // 3. Clamp intensity (0–255) → saturation (0–100%)
+            const clamped = Math.max(0, Math.min(125, intensity));
+            const saturation = Math.round((clamped / 125) * 100);
+
+            // 4. Fixed lightness (adjust if you want lighter/darker buttons)
+            const lightness = 55;
+
+            // 5. Return CSS color
+            return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+          }
+
+          function update_main_buttons() {
+
+            const button_scale_factor=0.03; // adjust this to make size differences more or less pronounced
+            const container = document.getElementById("main_button_container");
+
+            if (!container || !Array.isArray(all_records)) return;
+
+            // 1. Count values
+            const counts = {};
+
+            all_records.forEach(rec => {
+              ["genre", "media_type"].forEach(field => {
+                const value = rec[field];
+                if (!value) return;
+
+                const key = field + "::" + value;
+
+                if (!counts[key]) {
+                  counts[key] = {
+                    field: field,
+                    value: value,
+                    count: 0
+                  };
+                }
+
+                counts[key].count++;
+              });
+            });
+
+            // 2. Create or update buttons
+            Object.values(counts).forEach(item => {
+              const btnId = `btn_${item.field}_${item.value.replace(/\s+/g, "_")}`;
+
+              let btn = document.getElementById(btnId);
+
+              if (!btn) {
+                // Create new button
+                btn = document.createElement("button");
+                btn.id = btnId;
+
+
+                
+                btn.style.color = "#333";
+                btn.style.border = "1px solid #ccc";
+                btn.dataset.selected = "false";
+                btn.dataset.field1 = item.field;
+                btn.dataset.field2 = item.value;
+
+                btn.addEventListener("click", () => {
+
+                    container.querySelectorAll('button[id^="btn_"]').forEach(btn => {
+                      btn.dataset.selected = "false";
+                      btn.style.borderWidth = "0px";
+                      btn.style.borderColor = "gray";
+                    });
+
+
+                    btn.dataset.selected = btn.dataset.selected === "true" ? "false" : "true";
+
+                    if (btn.dataset.selected === "true") {
+                     // Mark as selected
+                        btn.style.borderWidth = "3px";
+                        btn.style.borderStyle = "solid";
+                        btn.style.borderColor = "red";
+
+                    } else {
+
+                        // Unselect
+                        btn.style.borderWidth = "0px";
+                        btn.style.borderColor = "gray";
+                    }
+
+                    buildTable(all_records, "game_controls_content");
+
+                });
+
+                container.appendChild(btn);
+              }
+
+              // 3. Update label
+              btn.textContent = `${item.value} (${item.count})`;
+
+              // 4. Scale size (adjust multiplier as needed)
+              const scale = item.count*button_scale_factor;
+
+              btn.style.backgroundColor = stringToColor(item.value, item.count);
+            
+              btn.style.fontSize = (1 + scale * 0.3) + "em";
+              btn.style.padding = (8 + scale * 4) + "px " + (12 + scale * 6) + "px";
+            });
+
+            // Optional: handle buttons that no longer exist in data
+            const validIds = new Set(
+              Object.values(counts).map(item =>
+                `btn_${item.field}_${item.value.replace(/\s+/g, "_")}`
+              )
+            );
+
+            Array.from(container.children).forEach(child => {
+              if (!validIds.has(child.id)) {
+                container.removeChild(child);
+              }
+            });
+          }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+              function read_database(view_name){
+
+                var Airtable = require('airtable');
+                var base = new Airtable({apiKey: 'patD5dYFBjdTtIAY8.20d135bce39d21c1b5ca51607082cd53bc1e64158373e0aa0065df8d54c79b0e'}).base('app5Q6OlJ3iMkJ8cd');
+
+                all_records=[];
+                original_records=[];
+
+
+                if (view_name==null){
+                  view_name="Trivia_Fiction";
+                }
+
+                current_game_name=view_name;
+
+                base('Reels').select({
+
+                    maxRecords: max_records_to_load,
+                    view: view_name
+                }).eachPage(function page(records, fetchNextPage) {
+                    // This function (`page`) will get called for each page of records.
+
+                    records.forEach(function(record) {
+                        //console.log('Retrieved', record);
+                        
+                        original_records.push(record); // for reference for things othat than just the files being extracted below
+
+                        all_records_single = {};
+
+                        all_records_single.id_num=record.get('Reel ID Number');
+                        all_records_single.title=record.get('Name');
+                        all_records_single.genre=record.get('Genre');
+                        all_records_single.media_type=record.get('Media_Type');
+                        all_records_single.year=record.get('Year');
+
+
+
+                        all_records.push(all_records_single);
+                        update_main_buttons();
+
+                        document.getElementById("game_controls_content").innerHTML = "<div align='center'>Getting reels from database... ("+all_records.length+")</div>"
+
+                    });
+
+                    // To fetch the next page of records, call `fetchNextPage`.
+                    // If there are more records, `page` will get called again.
+                    // If there are no more records, `done` will get called.
+                    fetchNextPage();
+
+                }, function done(err) {
+
+console.log("Records loaded: ", all_records);
+
+                    if (err) {
+                        console.error(err);
+                        document.getElementById("game_controls_content").innerHTML = "Something went wrong :-(  Refresh to try again.)";
+                        return;
+                      }
+
+
+
+
+                    
+                    start();
+                });
+              }
+
+// fixes here
+          function sortData(data) {
+            return data.slice().sort((a, b) => {
+              // 1. Sort by genre
+              if (a.genre !== b.genre) {
+                return a.genre.localeCompare(b.genre);
+              }
+
+              // 2. Then by media_type
+              if (a.media_type !== b.media_type) {
+                return a.media_type.localeCompare(b.media_type);
+              }
+
+              // 3. now by year
+              if (a.year !== b.year){
+                return a.year - b.year;
+              }
+
+              // 3. finally by title
+              return a.title.localeCompare(b.title);
+              
+            });
+          }
+
+
+          function groupData(data) {
+            const grouped = {};
+
+            data.forEach(item => {
+              const { genre, media_type, year, title } = item;
+
+              if (!grouped[genre]) {
+                grouped[genre] = {};
+              }
+
+              if (!grouped[genre][media_type]) {
+                grouped[genre][media_type] = {};
+              }
+
+              if (!grouped[genre][media_type][year]) {
+                grouped[genre][media_type][year] = new Set();
+              }
+
+              grouped[genre][media_type][year].add(title);
+            });
+
+            return grouped;
+          }
+// fixes here
+          function addToggleHandlers() {
+            
+            // Toggle genre, show or hide everything under a genre
+            document.querySelectorAll('.genre-row').forEach(row => {
+              row.addEventListener('click', () => {
+                const target = row.dataset.target;
+console.log("Target is ", target);
+
+document.querySelectorAll(`[data-target^="${target}-"]`).forEach(el => {
+
+
+                  // only expand the next level down, not all the way to the titles
+
+                  if (el.dataset.target.split('-').length - 1 === 3 ) {
+                    el.style.display = el.style.display === 'none' ? '' : 'none';
+                  } else {
+                    el.style.display = 'none';
+                  }
+                });
+
+              }); // end genre event listener
+            }); // end genre rows loop
+
+
+            // Toggle media_type row, show or hide everything under a media type
+            document.querySelectorAll('.media_type-row').forEach(row => {
+              row.addEventListener('click', () => {
+                const target = row.dataset.target;
+
+                const isExpanding = [...document.querySelectorAll(`[data-target^="${target}-"]`)]
+                  .some(el => el.style.display === 'none');
+
+                document.querySelectorAll(`[data-target^="${target}-"]`).forEach(el => {
+
+                  el.style.display = isExpanding ? '' : 'none';
+                });
+
+                if (!isExpanding) {
+                  document.querySelectorAll(`[class*="${target}-year-"]`).forEach(stateEl => {
+                    
+                    stateEl.style.display = 'none';
+
+                  });
+                }
+
+              }); // end  event listener
+            }); // end  rows loop
+
+
+
+            // Toggle years - show or hide titles
+
+            document.querySelectorAll('.year-row').forEach(row => {
+              row.addEventListener('click', (e) => {
+                e.stopPropagation(); // prevent triggering country toggle
+                const target = row.dataset.target;            
+
+                document.querySelectorAll(`[data-target="${target}-title"]`).forEach(el => {
+                  el.style.display = el.style.display === 'none' ? '' : 'none';
+                });
+              });
+            });
+
+
+
+
+
+
+
+
+
+
+
+
+          }
+
+// fixes here
+          function filterCountries(grouped, allowedCountries) {
+            return Object.fromEntries(
+              Object.entries(grouped).filter(([country, states]) =>
+                allowedCountries.includes(country)
+              )
+            );
+          }
+
+// fixes here
+          function getRandomTitleText() {
+            // Select all <tr> elements whose class includes "title-row country-"
+            const rows = document.querySelectorAll('tr[class*="title-row country-"]');
+
+            if (rows.length === 0) {
+              return null; // no eligible rows found
+            }
+
+            // Pick a random row
+            const randomRow = rows[Math.floor(Math.random() * rows.length)];
+
+            // Get the third column (index 2)
+            const thirdCell = randomRow.querySelector('td:nth-child(3)');
+
+            // Return the text, or null if the cell doesn't exist
+            return thirdCell ? thirdCell.textContent.trim() : null;
+          }
+
+// fixes here - changed filter_countries to filter
+
+
+function filterGroupedData(grouped, filters) {
+  if (!grouped || typeof grouped !== 'object') return {};
+
+  let result = {};
+
+  for (const [key, sub] of Object.entries(grouped)) {
+    // Check if key matches any filter value
+    const matches = filters.some(f => f.value === key);
+
+    if (matches) {
+      result[key] = sub;
+    } else if (sub && typeof sub === 'object') {
+      // Recursively filter nested objects
+      const filteredSub = filterGroupedData(sub, filters);
+      if (Object.keys(filteredSub).length > 0) {
+        result[key] = filteredSub;
+      }
+    }
+  }
+
+  return result;
+}
+
+          function buildTable(data, containerId) {
+
+            data=sortData(data);
+
+
+            grouped = groupData(data);
+
+
+            filter_table_by = getSelectedButtonData("main_button_container"); // call this to get current selection, or do something else here based on the new selection state
+            console.log("Selected filters: ", filter_table_by);
+
+            const filterValues = new Set(filter_table_by.map(f => f.value));
+
+            if (filter_table_by.length > 0) {
+              grouped = filterGroupedData(grouped, filter_table_by);
+              display_text="display: block;";
+            } else {
+              display_text="display: none;";
+            }
+
+
+            const container = document.getElementById(containerId);
+
+            if (Object.keys(grouped).length > 0)
+              {
+
+                      let html = `
+                      <div style="width: 90vw;">
+                        <p>Instructions go here!</p>                        
+                      </div>                      
+                      <div class="table-container">
+                        <img onclick="show_wheel_spinner();" src="./spin_wheel_button.png" class="table-icon" alt="Spin the Reel"  />
+
+                      <table class="rounded-table" width="100%">`;
+
+                      Object.keys(grouped).forEach(genre => {
+                        const genreId = `genre-${genre.replace(/\s+/g, '_')}`;
+
+                        // genre row
+                        html += `
+                          <tr class="genre-row" data-target="${genreId}" style="cursor:pointer; background:#ddd;">
+                            <td colspan="4"><strong>${genre}</strong></td>
+                          </tr>
+                        `;
+
+                            Object.keys(grouped[genre]).forEach(media_type => {
+                              const media_typeId = `${genreId}-media-${media_type.replace(/\s+/g, '_')}`;
+
+                              // Media Type row 
+                          
+                                    html += `
+                                      <tr class="media_type-row ${media_typeId}" data-target="${media_typeId}" style="${display_text} cursor:pointer; background:#eee;">
+                                        <td width="2%"></td>
+                                        <td colspan="3"><strong>${media_type}</strong></td>
+                                        
+                                      </tr>
+                                    `;
+                                
+                                        // year row
+                                        Object.keys(grouped[genre][media_type]).forEach(year => {
+                                          const yearId = `${media_typeId}-year-${year}`;
+
+                                          // Year row 
+                                      
+
+                                          html += `
+                                            <tr class="year-row ${yearId}" data-target="${yearId}" style="${display_text}  cursor:pointer; background:#eee;">
+                                              <td></td>
+                                              <td></td>
+                                              <td colspan="2"><strong>${year}</strong></td>
+                                              
+                                            </tr>
+                                          `;
+
+                                          // Titles (initially hidden)
+                                              grouped[genre][media_type][year].forEach(title => {
+                                                html += `
+                                                  <tr class="title-row ${yearId}" data-target="${yearId}-title" style="${display_text}">
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td><a href="./index.html?go=${encodeURIComponent(toTitleCase(title))}">${toTitleCase(title)}</a></td>
+                                                  </tr>
+                                                `;
+                                              }); // end titles
+
+                                        }); // end year row
+
+                            }); // end media type row
+
+                      }); // end genre row
+
+
+
+                      html += `</table>
+                      
+                      </div>`;
+                      container.innerHTML = html;
+
+                      addToggleHandlers();
+            } else {
+              container.innerHTML = "<div align='center'>No reels match those selections.</div>";
+            }
+          }
+
+// fixes here
+  function onCountryClick(name, expanded=null) {
+              console.log('Clicked country:', name);
+
+                const countryName = countryCodeMap[name.toUpperCase()] || name;
+
+          console.log('Mapped country name:', countryName);
+
+            if (countryName === "England"){
+              buildTable(all_records, "game_controls_content", ["England", "Scotland", "Wales", "Northern Ireland"]);
+            } else {
+              buildTable(all_records, "game_controls_content", countryName);
+            }
+
+              
+            }
+
+
+
+
+
+
+          function start(){
+                
+
+              
+                
+                buildTable(all_records, "game_controls_content");
+
+
+
+
+          let selectedCountry = null;
+
+          // Handle grouped countries
+          document.querySelectorAll('#worldMap g').forEach(countryGroup => {
+            if (!countryGroup.id) return;
+
+            countryGroup.style.cursor = 'pointer';
+            countryGroup.addEventListener('click', () => {
+              const countryName = countryGroup.id;
+
+              // Remove highlight from previous selection
+
+
+                  document.querySelectorAll('svg g, svg path').forEach(el => {
+                    el.classList.remove('selected');
+                  });
+
+
+
+              if (selectedCountry) {
+                if (selectedCountry.tagName === 'g') {
+                  selectedCountry.querySelectorAll('path').forEach(p => p.classList.remove('selected'));
+                } else {
+                  selectedCountry.classList.remove('selected');
+                }
+              }
+
+              selectedCountry = countryGroup;
+
+              // Highlight new selection
+              selectedCountry.querySelectorAll('path').forEach(p => p.classList.add('selected'));
+
+              onCountryClick(countryName);
+            });
+          });
+
+          // Handle single-path countries
+          document.querySelectorAll('#worldMap path').forEach(path => {
+            if (!path.closest('g[id]')) { 
+              path.style.cursor = 'pointer';
+              path.addEventListener('click', () => {
+                const countryName = path.id || 'UNKNOWN';
+
+                // Remove highlight from previous selection
+
+                    // Clear all map selections
+                  document.querySelectorAll('svg g, svg path').forEach(el => {
+                    el.classList.remove('selected');
+                  });    
+                  
+
+                selectedCountry = path;
+                selectedCountry.classList.add('selected');
+
+                onCountryClick(countryName);
+              });
+            }
+          });
+
+                
+              }
+
+    </script>
+    </head>
+
+    <body>
+
+
+      <div id="main_div" class="center">
+        <h1>View-Master Fiction Browser</h1>
+
+        <div id="main_button_container">
+
+
+        </div>
+
+        <div id="container" class="floating-panel" style="display: none;">
+          <div id="closeButton" style="position:absolute;top:2vw;right:2vw;  cursor: pointer; font-size: 5vw; padding: 1vw;" onclick="document.getElementById('container').style.display = 'none';">X</div>
+          <h1>Spin The Reel!</h1><p>(click the reel for a random reel)</p>
+          <img id="spinImage" height="40%" src="spin_wheel.png" />
+          <div style="margin-top: 12px;"id="spinResults"></div>
+        </div>
+
+        <div id="game_controls_content">Loading Reels ...</div>
+        <div class="center" id="footer"></div>
+      </div>
+    </body>
+</html>
