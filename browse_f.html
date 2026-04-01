@@ -120,7 +120,7 @@
             
             console.log("Spin complete at angle:", finalAngle);
             title = getRandomTitleText();
-            
+     console.log("Looking for ", title);       
 
             document.getElementById("spinResults").innerHTML = "<h2><a href='./index.html?go="+encodeURIComponent(toTitleCase(title))+"'>"+toTitleCase(title)+"</a></h2>";
             
@@ -206,11 +206,11 @@ function getSelectedButtonData(div) {
             const hue = Math.floor((index / 26) * 360);
 
             // 3. Clamp intensity (0–255) → saturation (0–100%)
-            const clamped = Math.max(0, Math.min(125, intensity));
+            const clamped = Math.max(0, Math.min(100, intensity));
             const saturation = Math.round((clamped / 125) * 100);
 
             // 4. Fixed lightness (adjust if you want lighter/darker buttons)
-            const lightness = 55;
+            const lightness = 75;
 
             // 5. Return CSS color
             return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
@@ -218,7 +218,7 @@ function getSelectedButtonData(div) {
 
           function update_main_buttons() {
 
-            const button_scale_factor=0.03; // adjust this to make size differences more or less pronounced
+            const button_scale_factor=0.035; // adjust this to make size differences more or less pronounced
             const container = document.getElementById("main_button_container");
 
             if (!container || !Array.isArray(all_records)) return;
@@ -260,11 +260,18 @@ function getSelectedButtonData(div) {
                 
                 btn.style.color = "#333";
                 btn.style.border = "1px solid #ccc";
+                btn.style.margin = "1px";
+                
                 btn.dataset.selected = "false";
                 btn.dataset.field1 = item.field;
                 btn.dataset.field2 = item.value;
+                btn.dataset.count=item.count;
 
                 btn.addEventListener("click", () => {
+
+                  this_buttons_current_state = btn.dataset.selected;
+
+                  //deselect all buttons
 
                     container.querySelectorAll('button[id^="btn_"]').forEach(btn => {
                       btn.dataset.selected = "false";
@@ -272,21 +279,24 @@ function getSelectedButtonData(div) {
                       btn.style.borderColor = "gray";
                     });
 
+                    // if the button was previously unselected, select it. If it was already selected, leave all buttons unselected (i.e. toggle off)
+                    if (this_buttons_current_state == "false") {
 
-                    btn.dataset.selected = btn.dataset.selected === "true" ? "false" : "true";
+                          btn.dataset.selected = btn.dataset.selected === "true" ? "false" : "true";
 
-                    if (btn.dataset.selected === "true") {
-                     // Mark as selected
-                        btn.style.borderWidth = "3px";
-                        btn.style.borderStyle = "solid";
-                        btn.style.borderColor = "red";
+                          if (btn.dataset.selected === "true") {
+                          // Mark as selected
+                              btn.style.borderWidth = "3px";
+                              btn.style.borderStyle = "solid";
+                              btn.style.borderColor = "red";
 
-                    } else {
+                          } else {
 
-                        // Unselect
-                        btn.style.borderWidth = "0px";
-                        btn.style.borderColor = "gray";
-                    }
+                              // Unselect
+                              btn.style.borderWidth = "0px";
+                              btn.style.borderColor = "gray";
+                          }
+                        }
 
                     buildTable(all_records, "game_controls_content");
 
@@ -296,15 +306,23 @@ function getSelectedButtonData(div) {
               }
 
               // 3. Update label
-              btn.textContent = `${item.value} (${item.count})`;
+              //btn.textContent = `${item.value} (${item.count})`;
+              btn.textContent = `${item.value}`;
+              btn.dataset.count=item.count;
 
               // 4. Scale size (adjust multiplier as needed)
               const scale = item.count*button_scale_factor;
+
+              //btn.style.order = -1*item.count;
 
               btn.style.backgroundColor = stringToColor(item.value, item.count);
             
               btn.style.fontSize = (1 + scale * 0.3) + "em";
               btn.style.padding = (8 + scale * 4) + "px " + (12 + scale * 6) + "px";
+
+
+
+
             });
 
             // Optional: handle buttons that no longer exist in data
@@ -320,23 +338,6 @@ function getSelectedButtonData(div) {
               }
             });
           }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
               function read_database(view_name){
@@ -357,6 +358,7 @@ function getSelectedButtonData(div) {
                 base('Reels').select({
 
                     maxRecords: max_records_to_load,
+                    pageSize: 25,
                     view: view_name
                 }).eachPage(function page(records, fetchNextPage) {
                     // This function (`page`) will get called for each page of records.
@@ -543,7 +545,7 @@ document.querySelectorAll(`[data-target^="${target}-"]`).forEach(el => {
 // fixes here
           function getRandomTitleText() {
             // Select all <tr> elements whose class includes "title-row country-"
-            const rows = document.querySelectorAll('tr[class*="title-row country-"]');
+            const rows = document.querySelectorAll('tr[class*="title-row"]');
 
             if (rows.length === 0) {
               return null; // no eligible rows found
@@ -553,10 +555,10 @@ document.querySelectorAll(`[data-target^="${target}-"]`).forEach(el => {
             const randomRow = rows[Math.floor(Math.random() * rows.length)];
 
             // Get the third column (index 2)
-            const thirdCell = randomRow.querySelector('td:nth-child(3)');
+            const fourthcell = randomRow.querySelector('td:nth-child(4)');
 
             // Return the text, or null if the cell doesn't exist
-            return thirdCell ? thirdCell.textContent.trim() : null;
+            return fourthcell ? fourthcell.textContent.trim() : null;
           }
 
 // fixes here - changed filter_countries to filter
@@ -600,7 +602,7 @@ function filterGroupedData(grouped, filters) {
 
             if (filter_table_by.length > 0) {
               grouped = filterGroupedData(grouped, filter_table_by);
-              display_text="display: block;";
+              display_text="";
             } else {
               display_text="display: none;";
             }
@@ -613,7 +615,7 @@ function filterGroupedData(grouped, filters) {
 
                       let html = `
                       <div style="width: 90vw;">
-                        <p>Instructions go here!</p>                        
+                        <p>Browse fiction reels by category - spin the wheel for a random selection!</p>                        
                       </div>                      
                       <div class="table-container">
                         <img onclick="show_wheel_spinner();" src="./spin_wheel_button.png" class="table-icon" alt="Spin the Reel"  />
@@ -792,6 +794,7 @@ function filterGroupedData(grouped, filters) {
 
       <div id="main_div" class="center">
         <h1>View-Master Fiction Browser</h1>
+        <p><a href="./browse.html">Go to the World Map</a></p>
 
         <div id="main_button_container">
 
