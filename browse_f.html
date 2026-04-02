@@ -125,9 +125,9 @@
             document.getElementById("spinResults").innerHTML = "<h2><a href='./index.html?go="+encodeURIComponent(toTitleCase(title))+"'>"+toTitleCase(title)+"</a></h2>";
             
                 all_images=[];
-console.log("Looking for ", title);
+
                 record_I_want = original_records.filter(item => item.fields?.Name?.toLowerCase() === title.toLowerCase());                
-console.log("Record I want is ", record_I_want);                
+
                 all_images=record_I_want.flatMap(item => item.fields["Image Preview"]?.map(img => img.url) || [] );
 
                         // Loop through the array and create <img> elements
@@ -165,6 +165,40 @@ console.log("Record I want is ", record_I_want);
 
 
 // new function to draw and update the main buttons based on genres and media types in the loaded records, with size scaled by count
+
+
+function getEra(year) {
+  if (year < 1800) {
+    return "Pre-1800";
+  } else if (year < 1900) {
+    return "1800s";
+  } else if (year < 1910) {
+    return "1900s";
+  } else if (year < 1920) {
+    return "1910s";
+  } else if (year < 1930) {
+    return "1920s";
+  } else if (year < 1940) {
+    return "1930s";
+  } else if (year < 1950) {
+    return "1940s";
+  } else if (year < 1960) {
+    return "1950s";
+  } else if (year < 1970) {
+    return "1960s";
+  } else if (year < 1980) {
+    return "1970s";
+  } else if (year < 1990) {
+    return "1980s";
+  } else if (year < 2000) {
+    return "1990s";
+  } else {
+    return "2000+";
+  }
+}
+
+
+
 
 function getSelectedButtonData(div) {
   // Allow either a div element or an ID string
@@ -218,7 +252,7 @@ function getSelectedButtonData(div) {
 
           function update_main_buttons() {
 
-            const button_scale_factor=0.035; // adjust this to make size differences more or less pronounced
+            const button_scale_factor=0.025; // adjust this to make size differences more or less pronounced
             const container = document.getElementById("main_button_container");
 
             if (!container || !Array.isArray(all_records)) return;
@@ -227,7 +261,7 @@ function getSelectedButtonData(div) {
             const counts = {};
 
             all_records.forEach(rec => {
-              ["genre", "media_type"].forEach(field => {
+              ["genre", "media_type", "era"].forEach(field => {
                 const value = rec[field];
                 if (!value) return;
 
@@ -261,6 +295,7 @@ function getSelectedButtonData(div) {
                 btn.style.color = "#333";
                 btn.style.border = "1px solid #ccc";
                 btn.style.margin = "1px";
+                btn.style.minWidth = "0";
                 
                 btn.dataset.selected = "false";
                 btn.dataset.field1 = item.field;
@@ -358,7 +393,7 @@ function getSelectedButtonData(div) {
                 base('Reels').select({
 
                     maxRecords: max_records_to_load,
-                    pageSize: 25,
+                    pageSize: 10,
                     view: view_name
                 }).eachPage(function page(records, fetchNextPage) {
                     // This function (`page`) will get called for each page of records.
@@ -374,7 +409,8 @@ function getSelectedButtonData(div) {
                         all_records_single.title=record.get('Name');
                         all_records_single.genre=record.get('Genre');
                         all_records_single.media_type=record.get('Media_Type');
-                        all_records_single.year=record.get('Year');
+                        all_records_single.era=getEra(record.get('Year') ?? 0);
+                        all_records_single.year=record.get('Year') ?? 0;
 
 
 
@@ -437,7 +473,7 @@ console.log("Records loaded: ", all_records);
             const grouped = {};
 
             data.forEach(item => {
-              const { genre, media_type, year, title } = item;
+              const { genre, media_type, era, year, title } = item;
 
               if (!grouped[genre]) {
                 grouped[genre] = {};
@@ -447,11 +483,15 @@ console.log("Records loaded: ", all_records);
                 grouped[genre][media_type] = {};
               }
 
-              if (!grouped[genre][media_type][year]) {
-                grouped[genre][media_type][year] = new Set();
+              if (!grouped[genre][media_type][era]) {
+                grouped[genre][media_type][era] = {};
+              }              
+
+              if (!grouped[genre][media_type][era][year]) {
+                grouped[genre][media_type][era][year] = new Set();
               }
 
-              grouped[genre][media_type][year].add(title);
+              grouped[genre][media_type][era][year].add(title);
             });
 
             return grouped;
@@ -594,7 +634,7 @@ function filterGroupedData(grouped, filters) {
 
             grouped = groupData(data);
 
-
+console.log("Grouped data: ", grouped);
             filter_table_by = getSelectedButtonData("main_button_container"); // call this to get current selection, or do something else here based on the new selection state
             console.log("Selected filters: ", filter_table_by);
 
@@ -624,7 +664,7 @@ function filterGroupedData(grouped, filters) {
 
                       Object.keys(grouped).forEach(genre => {
                         const genreId = `genre-${genre.replace(/\s+/g, '_')}`;
-
+console.log("Processing genre: ", genre);
                         // genre row
                         html += `
                           <tr class="genre-row" data-target="${genreId}" style="cursor:pointer; background:#ddd;">
@@ -634,7 +674,7 @@ function filterGroupedData(grouped, filters) {
 
                             Object.keys(grouped[genre]).forEach(media_type => {
                               const media_typeId = `${genreId}-media-${media_type.replace(/\s+/g, '_')}`;
-
+console.log("Processing media type: ", media_type);
                               // Media Type row 
                           
                                     html += `
@@ -644,9 +684,18 @@ function filterGroupedData(grouped, filters) {
                                         
                                       </tr>
                                     `;
-                                
+
+                                                              
                                         // year row
-                                        Object.keys(grouped[genre][media_type]).forEach(year => {
+// ORIGINAL LINE                                        Object.keys(grouped[genre][media_type]).forEach(year => {
+
+
+                                        Object.values(grouped[genre][media_type]).forEach(eraObj => {
+                                            console.log("Processing era object: ", eraObj);
+                                        
+                                              Object.keys(eraObj).forEach(year => {
+console.log("Processing year: ", year);
+
                                           const yearId = `${media_typeId}-year-${year}`;
 
                                           // Year row 
@@ -662,7 +711,7 @@ function filterGroupedData(grouped, filters) {
                                           `;
 
                                           // Titles (initially hidden)
-                                              grouped[genre][media_type][year].forEach(title => {
+                                              eraObj[year].forEach(title => {
                                                 html += `
                                                   <tr class="title-row ${yearId}" data-target="${yearId}-title" style="${display_text}">
                                                     <td></td>
@@ -673,7 +722,10 @@ function filterGroupedData(grouped, filters) {
                                                 `;
                                               }); // end titles
 
-                                        }); // end year row
+
+                                        });
+                                      }); // end year row
+                      
 
                             }); // end media type row
 
@@ -796,7 +848,7 @@ function filterGroupedData(grouped, filters) {
         <h1>View-Master Fiction Browser</h1>
         <p><a href="./browse.html">Go to the World Map</a></p>
 
-        <div id="main_button_container">
+        <div id="main_button_container" style="">
 
 
         </div>
