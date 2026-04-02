@@ -353,11 +353,14 @@ function getSelectedButtonData(div) {
               //btn.style.order = -1*item.count;
 
               btn.style.backgroundColor = stringToColor(item.value, item.count);
+
+              btn.style.transform = `scale(${1 + scale * 0.2})`;
             
               //btn.style.fontSize = (1 + scale * 0.3) + "em";
-              btn.style.padding = (8 + scale * 4) + "px " + (12 + scale * 6) + "px";
+              //btn.style.padding = (8 + scale * 4) + "px " + (12 + scale * 6) + "px";
               //btn.style.lineHeight = (1 + scale * 0.3) * 1.2 + "em";
-
+btn.style.height = (40 + scale * 10) + "px";
+btn.style.minWidth = (80 + scale * 20) + "px";
 
 
 
@@ -846,7 +849,7 @@ console.log("Grouped data: ", grouped);
 
 
       <div id="main_div" class="center">
-        <h1>View-Master Fiction Browser v0.4</h1>
+        <h1>View-Master Fiction Browser v0.5</h1>
         <p><a href="./browse.html">Go to the World Map</a></p>
 
         <div id="main_button_container">
