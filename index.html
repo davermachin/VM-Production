@@ -196,7 +196,10 @@ console.log("Sharing: "+search_for);
 
 
   function SearchReel(search_for, offset){
-
+console.log("Search length is ", search_for.length);
+    if (search_for.length==0){
+      return;
+    }
 
       document.getElementById("search_results").innerHTML = "<img class=\"animated-gif\" src=\"./load.gif\">"
 

@@ -296,6 +296,9 @@ function getSelectedButtonData(div) {
                 btn.style.border = "1px solid #ccc";
                 btn.style.margin = "1px";
                 btn.style.minWidth = "0";
+                btn.style.boxSizing = "border-box";
+                btn.style.webkitAppearance = "none";
+                btn.style.appearance = "none";
                 
                 btn.dataset.selected = "false";
                 btn.dataset.field1 = item.field;
@@ -354,6 +357,7 @@ function getSelectedButtonData(div) {
             
               btn.style.fontSize = (1 + scale * 0.3) + "em";
               btn.style.padding = (8 + scale * 4) + "px " + (12 + scale * 6) + "px";
+              //btn.style.lineHeight = (1 + scale * 0.3) * 1.2 + "em";
 
 
 
@@ -664,7 +668,7 @@ console.log("Grouped data: ", grouped);
 
                       Object.keys(grouped).forEach(genre => {
                         const genreId = `genre-${genre.replace(/\s+/g, '_')}`;
-console.log("Processing genre: ", genre);
+
                         // genre row
                         html += `
                           <tr class="genre-row" data-target="${genreId}" style="cursor:pointer; background:#ddd;">
@@ -674,7 +678,7 @@ console.log("Processing genre: ", genre);
 
                             Object.keys(grouped[genre]).forEach(media_type => {
                               const media_typeId = `${genreId}-media-${media_type.replace(/\s+/g, '_')}`;
-console.log("Processing media type: ", media_type);
+
                               // Media Type row 
                           
                                     html += `
@@ -687,14 +691,12 @@ console.log("Processing media type: ", media_type);
 
                                                               
                                         // year row
-// ORIGINAL LINE                                        Object.keys(grouped[genre][media_type]).forEach(year => {
-
 
                                         Object.values(grouped[genre][media_type]).forEach(eraObj => {
                                             console.log("Processing era object: ", eraObj);
                                         
                                               Object.keys(eraObj).forEach(year => {
-console.log("Processing year: ", year);
+
 
                                           const yearId = `${media_typeId}-year-${year}`;
 
@@ -845,10 +847,10 @@ console.log("Processing year: ", year);
 
 
       <div id="main_div" class="center">
-        <h1>View-Master Fiction Browser</h1>
+        <h1>View-Master Fiction Browser v0.1</h1>
         <p><a href="./browse.html">Go to the World Map</a></p>
 
-        <div id="main_button_container" style="">
+        <div id="main_button_container">
 
 
         </div>
