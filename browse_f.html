@@ -240,11 +240,11 @@ function getSelectedButtonData(div) {
             const hue = Math.floor((index / 26) * 360);
 
             // 3. Clamp intensity (0–255) → saturation (0–100%)
-            const clamped = Math.max(0, Math.min(100, intensity));
+            const clamped = Math.max(0, Math.min(125, intensity));
             const saturation = Math.round((clamped / 125) * 100);
 
             // 4. Fixed lightness (adjust if you want lighter/darker buttons)
-            const lightness = 75;
+            const lightness = 90;
 
             // 5. Return CSS color
             return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
@@ -889,13 +889,13 @@ console.log("Grouped data: ", grouped);
 
       <div id="main_div" class="center">
         <h1>View-Master Fiction Browser</h1>
-        <p><a href="./browse.html">Go to the World Map</a></p>
+        
 
         <div id="main_button_container">
 
 
         </div>
-
+      <div><p><a href="./browse.html">Go to the World Map</a></p></div>
         <div id="container" class="floating-panel" style="display: none;">
           <div id="closeButton" style="position:absolute;top:2vw;right:2vw;  cursor: pointer; font-size: 5vw; padding: 1vw;" onclick="document.getElementById('container').style.display = 'none';">X</div>
           <h1>Spin The Reel!</h1><p>(click the reel for a random reel)</p>
