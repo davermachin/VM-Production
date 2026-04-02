@@ -299,6 +299,28 @@ function getSelectedButtonData(div) {
                 btn.style.boxSizing = "border-box";
                 btn.style.padding="";
                 
+// Font and text
+
+btn.style.lineHeight = "1.2";                    // ensure proper line spacing
+btn.style.textAlign = "center";                  // center text horizontally
+
+// Padding & sizing
+
+btn.style.minHeight = "2em";                     // prevent vertical collapse
+btn.style.boxSizing = "border-box";             // include padding in size
+
+// Remove iOS default button styles
+btn.style.webkitAppearance = "none";
+btn.style.appearance = "none";
+
+btn.style.borderRadius = "6px";                 // optional, round corners
+
+
+// Optional: prevent shrinking if in a flex container
+btn.style.flexShrink = "0";
+
+
+
                 btn.dataset.selected = "false";
                 btn.dataset.field1 = item.field;
                 btn.dataset.field2 = item.value;
@@ -354,13 +376,17 @@ function getSelectedButtonData(div) {
 
               btn.style.backgroundColor = stringToColor(item.value, item.count);
 
+// Font and text
+btn.style.fontSize = (1 + scale * 0.2) + "em";  // small font scaling
 
+// Padding & sizing
+btn.style.padding = (8 + scale * 4) + "px " + (12 + scale * 6) + "px";
             
               //btn.style.fontSize = (1 + scale * 0.3) + "em";
               //btn.style.padding = (8 + scale * 4) + "px " + (12 + scale * 6) + "px";
               //btn.style.lineHeight = (1 + scale * 0.3) * 1.2 + "em";
-btn.style.height = (20 + scale * 10) + "px";
-btn.style.minWidth = (80 + scale * 20) + "px";
+              //btn.style.height = (20 + scale * 10) + "px";
+              //btn.style.minWidth = (80 + scale * 20) + "px";
 
 
 
@@ -849,7 +875,7 @@ console.log("Grouped data: ", grouped);
 
 
       <div id="main_div" class="center">
-        <h1>View-Master Fiction Browser v0.7</h1>
+        <h1>View-Master Fiction Browser v0.8</h1>
         <p><a href="./browse.html">Go to the World Map</a></p>
 
         <div id="main_button_container">
