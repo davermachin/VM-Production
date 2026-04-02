@@ -97,7 +97,7 @@ button {
   color: #333333;                   /* dark text for contrast */
   border: 2px solid #555555;        /* dark grey border */
   border-radius: 12px;              /* smooth curved corners */
-  /* padding: 0.8em 1.5em;             /* vertical & horizontal padding */
+  padding: 0.8em 1.5em;             /* vertical & horizontal padding */
   font-size: 3vw;                   /* responsive font size */
   min-width: 40%;
    margin: 0.5em; 
