@@ -1,23 +1,19 @@
 <html>
     <head>
 
-      <!-- Google tag (gtag.js) -->
-      <script async src="https://www.googletagmanager.com/gtag/js?id=G-HBL0VL09HC"></script>
-      <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
 
-        gtag('config', 'G-HBL0VL09HC');
-      </script>
 
         <script src="https://code.jquery.com/jquery-1.12.2.min.js"></script>
         <script src="https://vm.vmdatabase.com/airtable.browser.js"></script>
+        <script src="shared.js"></script>
+
         <link href='https://fonts.googleapis.com/css?family=Arsenal' rel='stylesheet'>
+        
         <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
         <link rel="stylesheet" href="./vm2.css">
         <link rel="stylesheet" href="./slides2.css">
 
+        <meta charset="UTF-8">   
         <meta property="og:url"                content="https://vm.vmdatabase.com/bog.html" />
         <meta property="og:title"              content="Word-Snake" />
         <meta property="og:description"        content="Find the secret word!" />
@@ -25,7 +21,7 @@
 
         <script>
           $('document').ready(function(){
-              $("#footer").load("footer.html");
+              displayPagePicker("page_picker_nav");
 
 
               read_highscores();
@@ -1036,9 +1032,10 @@ function delete_option(){
 
 
       <div id="main_div" class="flex-container_vmm">
-          <div>&nbsp;</div>
-          <div id="title_area" class="trivia_option" align="center">
-            <h2>Word-Snake</h2>
+          <div><h1>Word-Snake</h1></div>
+        <div style=" display: flex; justify-content: center;" id="page_picker_nav"></div>  
+          <div id="title_area" class="trivia_option" align="center" style="display:none;">
+
           </div>
 
           <div id="picture_area" class="flex-container_vmm_images" style="display:none;">

@@ -5,10 +5,12 @@
 
         <script src="https://code.jquery.com/jquery-1.12.2.min.js"></script>
         <script src="https://vm.vmdatabase.com/airtable.browser.js"></script>
+        <script src="shared.js"></script>
         <link href='https://fonts.googleapis.com/css?family=Arsenal' rel='stylesheet'>
         <link rel="stylesheet" href="./vm2.css">
         <link rel="stylesheet" href="./slides2.css">
 
+        <meta charset="UTF-8">
         <meta property="og:url"                content="https://vm.vmdatabase.com/browse.html" />
         <meta property="og:title"              content="View-Master World Browser" />
         <meta property="og:description"        content="See View Masters From Around The World" />
@@ -301,7 +303,8 @@
           };
 
           $('document').ready(function(){
-              $("#footer").load("footer.html");
+              
+              displayPagePicker("page_picker_nav");
               
               read_database("Trivia_Fact");
 
@@ -402,9 +405,9 @@
             document.getElementById("spinResults").innerHTML = "<h2><a href='./index.html?go="+encodeURIComponent(toTitleCase(title))+"'>"+toTitleCase(title)+"</a></h2>";
             
                 all_images=[];
-console.log("Looking for ", title);
+
                 record_I_want = original_records.filter(item => item.fields?.Name?.toLowerCase() === title.toLowerCase());                
-console.log("Record I want is ", record_I_want);                
+
                 all_images=record_I_want.flatMap(item => item.fields["Image Preview"]?.map(img => img.url) || [] );
 
                         // Loop through the array and create <img> elements
@@ -429,6 +432,7 @@ console.log("Record I want is ", record_I_want);
             document.getElementById("spinResults").innerHTML = ""; // Clear previous results
             document.getElementById('container').style.display = 'block';
           }
+
 
           function toTitleCase(str) {
             return str.replace(
@@ -463,7 +467,7 @@ console.log("Record I want is ", record_I_want);
                     // This function (`page`) will get called for each page of records.
 
                     records.forEach(function(record) {
-                        console.log('Retrieved', record);
+                        
                         
                         original_records.push(record); // for reference for things othat than just the files being extracted below
 
@@ -851,11 +855,9 @@ console.log("Filter is ",filter_countries);
 
 
       <div id="main_div" class="center">
-        <h1>View-Master World Browser</h1>
-        
-        <span style="font-size: 3vw; color:blue; text-decoration:underline; cursor:pointer;" onclick="buildTable(all_records, 'game_controls_content');">All</span>
-        <span style="font-size: 3vw; color:blue; text-decoration:underline; cursor:pointer; margin-left: 10px;" onclick="buildTable(all_records, 'game_controls_content', ['USA', 'Canada', 'Mexico']);">North America</span>
-        <span style="font-size: 3vw; color:blue; text-decoration:underline; cursor:pointer; margin-left: 10px;" onclick="buildTable(all_records, 'game_controls_content', ['Austria', 'Belgium', 'Denmark', 'Finland', 'France', 'Germany', 'Greece', 'Italy', 'Jersey', 'Liechtenstein', 'Luxembourg', 'Monaco', 'Netherlands', 'Portugal', 'Spain', 'Sweden', 'Switzerland', 'England', 'Scotland', 'Wales', 'Ireland']);">Europe</span>
+       
+        <h1>View-Master World Map</h1>
+        <div style=" display: flex; justify-content: center;" id="page_picker_nav"></div>
 
         <div id="map_content">
 
@@ -1276,9 +1278,15 @@ console.log("Filter is ",filter_countries);
           <img id="spinImage" height="40%" src="spin_wheel.png" />
           <div style="margin-top: 12px;"id="spinResults"></div>
         </div>
-        <div><p><a href="./browse_f.html">Go to the Fiction Browser</a></p></div>
+        <div>
+          <p>
+            <span style="font-size: 2vw; color:blue; text-decoration:underline; cursor:pointer;" onclick="buildTable(all_records, 'game_controls_content');">All</span>
+            <span style="font-size: 2vw; color:blue; text-decoration:underline; cursor:pointer; margin-left: 10px;" onclick="buildTable(all_records, 'game_controls_content', ['USA', 'Canada', 'Mexico']);">North America</span>
+            <span style="font-size: 2vw; color:blue; text-decoration:underline; cursor:pointer; margin-left: 10px;" onclick="buildTable(all_records, 'game_controls_content', ['Austria', 'Belgium', 'Denmark', 'Finland', 'France', 'Germany', 'Greece', 'Italy', 'Jersey', 'Liechtenstein', 'Luxembourg', 'Monaco', 'Netherlands', 'Portugal', 'Spain', 'Sweden', 'Switzerland', 'England', 'Scotland', 'Wales', 'Ireland']);">Europe</span>
+          </p>     
+
+        </div>
         <div id="game_controls_content">Loading Reels ...</div>
-        <div class="center" id="footer"></div>
       </div>
     </body>
 </html>

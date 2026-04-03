@@ -1,19 +1,12 @@
 <head>
 
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HBL0VL09HC"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-HBL0VL09HC');
-  </script>
+  <script src="shared.js"></script>
 
   <title>View Master Database - Searchable collection of vintage View-Masters.</title>
   <meta name="description" content="The world's largest online collection of digitized View Master images.  Includes Wordle, Quiz and Word-Snake games!">
   <meta name="robots" content="index, archive">
 
+<meta charset="UTF-8">    
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0,user-scalable=0">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <link href='https://fonts.googleapis.com/css?family=Arsenal' rel='stylesheet'>
@@ -22,7 +15,7 @@
 
 <script>
   $('document').ready(function(){
-      $("#footer").load("footer.html");
+              displayPagePicker("page_picker_nav");
     });
 </script>
 
@@ -32,10 +25,7 @@
 <body>
   <div class="center">
         <h1>About the View-Master Database</h1>
-        <div class="center">
-          <button type="button" onclick="window.location.href = './index.html'">Search the Database</button>
-          <p><a href="https://airtable.com/app5Q6OlJ3iMkJ8cd/shrAX8erJY6tr0t3s" target="_blank">See Reels With Alternate Images</a></p>
-        </div>
+        <div style=" display: flex; justify-content: center;" id="page_picker_nav"></div>  
         <div class="justify">
                   <p><img style="float:right;margin:10px;border-radius: 25px;" src="./digitize.jpg" width="50%"></img>
                     <b>CONTACT</b> - You can reach Dave here: DaveR<!-- abc@def -->Machin@gmail.com.

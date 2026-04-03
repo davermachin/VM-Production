@@ -1,23 +1,18 @@
 <html>
     <head>
 
-      <!-- Google tag (gtag.js) -->
-      <script async src="https://www.googletagmanager.com/gtag/js?id=G-HBL0VL09HC"></script>
-      <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
 
-        gtag('config', 'G-HBL0VL09HC');
-      </script>
 
 
         <script src="https://code.jquery.com/jquery-1.12.2.min.js"></script>
         <script src="https://vm.vmdatabase.com/airtable.browser.js"></script>
+        <script src="shared.js"></script>
+
         <link href='https://fonts.googleapis.com/css?family=Arsenal' rel='stylesheet'>
         <link rel="stylesheet" href="./vm2.css">
         <link rel="stylesheet" href="./slides2.css">
 
+        <meta charset="UTF-8">           
         <meta property="og:url"                content="https://vm.vmdatabase.com/vmm.html" />
         <meta property="og:title"              content="View-MasterMIND" />
         <meta property="og:description"        content="Like wordle but with Vintage View-Master reels!" />
@@ -25,7 +20,7 @@
 
         <script>
           $('document').ready(function(){
-              $("#footer").load("footer.html");
+              displayPagePicker("page_picker_nav");
 
               document.addEventListener('keydown', handle_a_keypress)
 
@@ -847,9 +842,10 @@ function handle_a_keypress(event) {
 
 
       <div id="main_div" class="flex-container_vmm">
-          <div>&nbsp;</div>
-          <div id="title_area" class="trivia_option" align="center">
-            <h2>View-MasterMIND</h2>
+          <div><h1>View-MasterMIND</h1></div>
+        <div style=" display: flex; justify-content: center;" id="page_picker_nav"></div>          
+          <div id="title_area" class="trivia_option" align="center" style="display:none;">
+            
           </div>
 
           <div id="picture_area" class="flex-container_vmm_images" style="display:none;">

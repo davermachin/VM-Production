@@ -1,14 +1,16 @@
 <html>
     <head>
 
-      <!-- Google tag (gtag.js) -->
 
         <script src="https://code.jquery.com/jquery-1.12.2.min.js"></script>
         <script src="https://vm.vmdatabase.com/airtable.browser.js"></script>
+        <script src="shared.js"></script>
+
         <link href='https://fonts.googleapis.com/css?family=Arsenal' rel='stylesheet'>
         <link rel="stylesheet" href="./vm2.css">
         <link rel="stylesheet" href="./slides2.css">
 
+        <meta charset="UTF-8">        
         <meta property="og:url"                content="https://vm.vmdatabase.com/browse_f.html" />
         <meta property="og:title"              content="View-Master Fiction Browser" />
         <meta property="og:description"        content="See View Master Fairy Tales, TV Shows, Movies, and more!" />
@@ -24,8 +26,8 @@
 
 
           $('document').ready(function(){
-              $("#footer").load("footer.html");
               
+              displayPagePicker("page_picker_nav");
               read_database("Trivia_Fiction");
 
           img = document.getElementById('spinImage');
@@ -161,6 +163,8 @@
               }
             );
           }
+
+
 
 
 
@@ -889,14 +893,15 @@ console.log("Grouped data: ", grouped);
 
 
       <div id="main_div" class="center">
-        <h1>View-Master Fiction Browser</h1>
         
+        <h1>View-Master Fiction Titles</h1>
+        <div style=" display: flex; justify-content: center;" id="page_picker_nav"></div>
 
         <div id="main_button_container">
 
 
         </div>
-      <div><p><a href="./browse.html">Go to the World Map</a></p></div>
+
         <div id="container" class="floating-panel" style="display: none;">
           <div id="closeButton" style="position:absolute;top:2vw;right:2vw;  cursor: pointer; font-size: 5vw; padding: 1vw;" onclick="document.getElementById('container').style.display = 'none';">X</div>
           <h1>Spin The Reel!</h1><p>(click the reel for a random reel)</p>
@@ -905,7 +910,7 @@ console.log("Grouped data: ", grouped);
         </div>
 
         <div id="game_controls_content">Loading Reels ...</div>
-        <div class="center" id="footer"></div>
+
       </div>
     </body>
 </html>

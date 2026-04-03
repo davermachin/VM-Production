@@ -1,15 +1,8 @@
 <head>
 
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HBL0VL09HC"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
+  <script src="shared.js"></script>
 
-    gtag('config', 'G-HBL0VL09HC');
-  </script>
-
+  <meta charset="UTF-8">   
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0,user-scalable=0">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <link href='https://fonts.googleapis.com/css?family=Arsenal' rel='stylesheet'>
@@ -18,7 +11,7 @@
 
 <script>
   $('document').ready(function(){
-      $("#footer").load("footer.html");
+              displayPagePicker("page_picker_nav");
     });
 </script>
 
@@ -28,18 +21,8 @@
   <div class="center">
         <h1>View-Master Resources</h1>
   </div>
-  <div class="center">
-    <button type="button" onclick="window.location.href = './index.html'">Search the Database</button>
-  </div>
-  <div class="card">
-          <a href="http://vmdatabase.com" style="text-decoration: none;">
-              <p align="center">Dave Machin's View-Master Database</p>
-              <p>
-                  My personal view-master collection database.  Searcheable, with digitized images of every individual picture on each reel.  Over 1000 reels available!  Includes slide show viewer for all the pictures.
-                  Powered by Air-Table and includes access to the entire database.
-              </p>
-          </a>
-  </div>
+        <div style=" display: flex; justify-content: center;" id="page_picker_nav"></div>  
+
   <div class="card">
           <a href="http://viewmastertravels.com" target="_blank" style="text-decoration: none;">
               <p align="center">View Master Travels</p>

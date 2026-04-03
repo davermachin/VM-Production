@@ -23,6 +23,83 @@ h3 {
     font-size: 48px;
   }
 }
+.page-picker {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  flex-wrap: nowrap;        /* force one row */
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+/* Base pill */
+.page-item {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  background: #fff;
+  color: #444;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.page-item:hover {
+  background: #f2f2f2;
+}
+
+/* Selected */
+.page-item.selected {
+  background: #333;
+  color: #fff;
+  border-color: #333;
+}
+
+/* Group wrapper */
+.page-group {
+  position: relative;
+}
+
+/* Dropdown (overlay, doesn't affect height) */
+.page-dropdown {
+  display: none;
+  position: absolute;
+  top: 110%;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+  padding: 6px;
+  min-width: 140px;
+  z-index: 1000;
+}
+
+/* Show on hover */
+.page-group:hover .page-dropdown {
+  display: block;
+}
+
+/* Dropdown items */
+.dropdown-item {
+  display: block;
+  padding: 6px 10px;
+  border-radius: 6px;
+  text-decoration: none;
+  color: #333;
+  font-size: 13px;
+}
+
+.dropdown-item:hover {
+  background: #f2f2f2;
+}
+
+.dropdown-item.selected {
+  background: #333;
+  color: #fff;
+}
 
 .table-container {
   position: relative;   /* makes absolute positioning relative to this div */

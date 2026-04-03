@@ -6,10 +6,13 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0,user-scalable=0">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="shared.js"></script>
+
 <link href='https://fonts.googleapis.com/css?family=Arsenal' rel='stylesheet'>
 <link rel="stylesheet" href="./vm2.css">
 <link rel="stylesheet" href="./slides2.css">
 
+<meta charset="UTF-8">  
 <meta property="og:url"                content="https://vm.vmdatabase.com/index.html" />
 <meta property="og:title"              content="View-Master Database" />
 <meta property="og:description"        content="Dave Machin's Searcheable Database of View-Master Reels" />
@@ -19,8 +22,8 @@
 
 <script>
   $('document').ready(function(){
-      $("#footer").load("footer.html");
-
+      
+      displayPagePicker("page_picker_nav");
       const queryString = window.location.search;
       const urlParams = new URLSearchParams(queryString);
       const go_to_this = urlParams.get('go')
@@ -196,7 +199,7 @@ console.log("Sharing: "+search_for);
 
 
   function SearchReel(search_for, offset){
-console.log("Search length is ", search_for.length);
+
     if (search_for.length==0){
       return;
     }
@@ -235,14 +238,17 @@ console.log("Search length is ", search_for.length);
 
 				if (current_page==0) {
 					//output_content += "<img style=\"cursor:pointer\" src=\"./slide.png\" width=32px onclick=\"slide_show(document.getElementById('search_for_text').value.trim())\">"
-          output_content += "<button type=\"button\" onclick=\"slide_show(document.getElementById('search_for_text').value.trim())\">Slideshow</button>"
+          if (search_for.length>0)
 
-              if (navigator.share) {
-                  output_content += "<button type=\"button\" onclick=\"share_page('"+search_for.replace(/"/g, '&quot;').toLowerCase()+"')\">Copy Search</button>"
-              } else {
-                  // Fallback
-              }
+            {
+                output_content += "<button type=\"button\" onclick=\"slide_show('"+search_for+"')\">Slideshow</button>"
 
+                    if (navigator.share) {
+                        output_content += "<button type=\"button\" onclick=\"share_page('"+search_for.replace(/"/g, '&quot;').toLowerCase()+"')\">Copy Search</button>"
+                    } else {
+                        // Fallback
+                    }
+            }
 				}
 
                 $.each(data.records, function(index){
@@ -350,6 +356,7 @@ document.getElementById("search_button").style.display="none";
 <body>
   <div class="center">
         <h1>View-Master Database</h1>
+        <div style=" display: flex; justify-content: center;" id="page_picker_nav"></div>
         <input type="text" id="search_for_text" autofocus placeholder="Type search text and press enter." onfocus="document.getElementById('search_button').style.display='block';">
 
         <div id="search_button"><button onclick="newsearch();">Search</button></div>

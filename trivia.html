@@ -2,21 +2,17 @@
     <head>
 
       <!-- Google tag (gtag.js) -->
-      <script async src="https://www.googletagmanager.com/gtag/js?id=G-HBL0VL09HC"></script>
-      <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
 
-        gtag('config', 'G-HBL0VL09HC');
-      </script>
 
         <script src="https://code.jquery.com/jquery-1.12.2.min.js"></script>
         <script src="https://vm.vmdatabase.com/airtable.browser.js"></script>
+        <script src="shared.js"></script>
+
         <link href='https://fonts.googleapis.com/css?family=Arsenal' rel='stylesheet'>
         <link rel="stylesheet" href="./vm2.css">
         <link rel="stylesheet" href="./slides2.css">
 
+        <meta charset="UTF-8">  
         <meta property="og:url"                content="https://vm.vmdatabase.com/trivia.html" />
         <meta property="og:title"              content="View-Master Quiz" />
         <meta property="og:description"        content="How many of these vintage view-master pictures can you identify?" />
@@ -24,7 +20,8 @@
 
         <script>
           $('document').ready(function(){
-              $("#footer").load("footer.html");
+              
+              displayPagePicker("page_picker_nav");
               read_highscores();
               update_controls();
 
@@ -651,17 +648,18 @@ console.log("HARD")
 
 
       <div id="main_div" class="flex-container">
-        <div>&nbsp;</div>
+        <div><h1>View Master Quiz</h1></div>
+        <div style=" display: flex; justify-content: center;" id="page_picker_nav"></div>        
         <div id="picture_area">
-          <div id="picture_area_content" class="box-shadow_larger" style="margin:auto;">
+          <div id="picture_area_content" class="box-shadow_larger">
 
-
+            
             <div style="display:flex;flex-direction: row; align-items: center; margin: 25px">
               <div  id="starting_instruction_text">
                 <div style="float:right;" id="starting_instructions_high_scores">
                 </div>
-                <h2>View-Master Quiz</h2>
-                  <p>Test your view-master knowledge!</p>
+               
+                  <h3>Test your view-master knowledge!</h3>
                   <p>See how many view-master reels you can name based on just one single image.</p>
                   <p>When you see a view-master picture or title at the top of the screen - try and guess which reel it is by selecting from the four options.  If you're right, you'll get a new reel to guess.  If you're wrong, it's <i>game over</i>.</p>
                   <p>Select a topic below to begin.</p>
@@ -687,7 +685,7 @@ console.log("HARD")
       </div>
 
 
-      <div class="center" id="footer"></div>
+      
 
     </body>
 </html>
