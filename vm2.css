@@ -15,14 +15,10 @@ h2 {
 }
 
 h3 {
-  font-size: 24px;
+  font-size: 3vw;
 }
 
-@media screen and (max-device-width: 450px) {
-  h3 {
-    font-size: 48px;
-  }
-}
+
 .page-picker {
   display: flex;
   gap: 8px;

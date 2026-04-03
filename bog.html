@@ -13,6 +13,7 @@
         <link rel="stylesheet" href="./vm2.css">
         <link rel="stylesheet" href="./slides2.css">
 
+                        <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta charset="UTF-8">   
         <meta property="og:url"                content="https://vm.vmdatabase.com/bog.html" />
         <meta property="og:title"              content="Word-Snake" />
@@ -881,7 +882,7 @@ function render_guess_array(){
       html_output += "<br><div class=\"flex-container_vmm_options\">"
 
       if (score >= hint_cost && current_question_answered == 0) {
-          html_output += "<div onclick=\"hint_buy_letter()\"><img src=\"./q_icon.png\">&nbsp;&nbsp;&nbsp;</div>"
+          html_output += "<div onclick=\"hint_buy_letter()\"><img style=\"max-width: 50%;\"  src=\"./q_icon.png\"></div>"
       }
 
       for (i=0;i<current_guess.length;i++) {
@@ -898,7 +899,7 @@ function render_guess_array(){
       }
 
       if (score >= hint2_cost && anagram_of_word=="" && current_question_answered == 0) {
-          html_output += "<div onclick=\"hint_get_anagram()\">&nbsp;&nbsp;&nbsp;<img src=\"./a_icon.png\">&nbsp;&nbsp;&nbsp;</div>"
+          html_output += "<div onclick=\"hint_get_anagram()\">&nbsp;&nbsp;&nbsp;<img style=\"max-width: 50%;\" src=\"./a_icon.png\"></div>"
       }
 
       html_output += "</div>"
@@ -1065,11 +1066,11 @@ function delete_option(){
                       It will select a secret word from the image descriptions and it's your job to guess that word.  Try and spell your guess by selecting letters from the word grid.
                     </p>
                     <p>
-                      <img src="./bog_instruction.png">
+                      <img style="max-width: 25%;" src="./bog_instruction.png">
                     </p>
                     <p><h3>The secret word was <i>Passengers</i></h3></p>
                     <p>
-                        <img src="./progress_bar.png">
+                        <img  style="max-width: 25%;" src="./progress_bar.png">
                       </p>
                       <p><h3>This is your guess limit - if it runs out, you lose!</h3></p>
               </div>

@@ -1,25 +1,20 @@
 <head>
 
 
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HBL0VL09HC"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
 
-    gtag('config', 'G-HBL0VL09HC');
-  </script>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0,user-scalable=0">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta charset="UTF-8">  
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="shared.js"></script>
+
 <link href='https://fonts.googleapis.com/css?family=Arsenal' rel='stylesheet'>
 <link rel="stylesheet" href="./vm2.css">
 <link rel="stylesheet" href="./slides2.css">
 
 <script>
   $('document').ready(function(){
-      $("#footer").load("footer.html");
+              displayPagePicker("page_picker_nav");
     });
 </script>
 
@@ -29,9 +24,7 @@
   <div class="center">
         <h1>View-Master Resources</h1>
   </div>
-  <div class="center">
-    <button type="button" onclick="window.location.href = './index.html'">Search the Database</button>
-  </div>
+        <div style=" display: flex; justify-content: center;" id="page_picker_nav"></div>
   <div class="card">
               <p align="center"><b>What is My View Master Worth?</b></p>
               <p>
