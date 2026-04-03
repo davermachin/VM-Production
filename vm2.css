@@ -77,8 +77,13 @@ h3 {
   z-index: 1000;
 }
 
-/* Show on hover */
+/* show on hover (desktop) */
 .page-group:hover .page-dropdown {
+  display: block;
+}
+
+/* show when clicked (mobile) */
+.page-group.open .page-dropdown {
   display: block;
 }
 

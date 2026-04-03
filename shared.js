@@ -61,7 +61,7 @@ function displayPagePicker(divId) {
 
       html += `
         <div class="page-group">
-          <span class="page-item ${isSelected ? 'selected' : ''}">
+          <span class="page-item group-toggle ${isSelected ? 'selected' : ''}">
             ${item.group} ▾
           </span>
           <div class="page-dropdown">
@@ -85,4 +85,32 @@ function displayPagePicker(divId) {
   html += `</div>`;
 
   document.getElementById(divId).innerHTML = html;
+
+
+setTimeout(() => {
+  const groups = document.querySelectorAll(".page-group");
+
+  groups.forEach(group => {
+    const toggle = group.querySelector(".group-toggle");
+
+    toggle.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      // Close other open groups
+      groups.forEach(g => {
+        if (g !== group) g.classList.remove("open");
+      });
+
+      // Toggle this one
+      group.classList.toggle("open");
+    });
+  });
+
+  // Click anywhere else closes menus
+  document.addEventListener("click", () => {
+    groups.forEach(g => g.classList.remove("open"));
+  });
+
+}, 0);  
 }
