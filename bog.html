@@ -9,7 +9,7 @@
 
         <link href='https://fonts.googleapis.com/css?family=Arsenal' rel='stylesheet'>
         
-        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+        <link rel="stylesheet" href="./w3.css">
         <link rel="stylesheet" href="./vm2.css">
         <link rel="stylesheet" href="./slides2.css">
 
@@ -18,7 +18,7 @@
         <meta property="og:url"                content="https://vm.vmdatabase.com/bog.html" />
         <meta property="og:title"              content="Word-Snake" />
         <meta property="og:description"        content="Find the secret word!" />
-        <meta property="og:image"              content="https://vm.vmdatabase.com/bog_OG2.jpg" />
+        <meta property="og:image"              content="https://vm.vmdatabase.com/bog_OG5.jpg" />
 
         <script>
           $('document').ready(function(){
@@ -42,7 +42,7 @@ var correct_answer_history = [];
 var current_guess = ""
 
 var guess_array_size = 5;
-var limit_multipier = 3
+var limit_multipier = 2;
 var character_guess_array = [];
 var selected_cell_array = [];
 var actual_word_location_array = [];
@@ -395,7 +395,7 @@ function update_controls(optional_finish){
         if (current_question_answered==1 && game_over==1 && show_instructions==0 && optional_finish != 1) {
             document.getElementById("keyboard_area").style.display="none"
             display_content += "<table width=100%><tr><td align=\"left\" width=33%>"
-            display_content += "<h3>Great Job! That\'s "
+            display_content += "<h3>That\'s "
             display_content += target_word.length + " letters!"
             if (score_multiplier > 1 ) {display_content += " "+score_multiplier+"X Points! "}
 
@@ -498,7 +498,11 @@ function display_question(difficulty){
         current_question_title = all_records[option_1].title;
         current_question_description = all_records[option_1].image_description;
 // first question uses a word from the title (if the title is long enough) to make it easier, or if there is not enough description do the same
-        if (current_question_description =="" || current_question_description == null || current_question_description.length<25 || (correct_answer_history.length==0 && current_question_title.length>24)) {current_question_description=current_question_title}
+       // if (current_question_description =="" || current_question_description == null || current_question_description.length<25 || (correct_answer_history.length==0 && current_question_title.length>24)) {current_question_description=current_question_title}
+// dave thinks it's always too hard - so just going to easy mode and pulling words from the title.
+
+current_question_description=current_question_title
+
 
         current_question_pictures=[];
         current_question_pictures.push(all_records[option_1].image1_url)
@@ -556,6 +560,11 @@ function display_question(difficulty){
         //       return value.length <= median_length;
         //     });
         // }
+
+        if (current_question_wordarray.length==0) {
+          // if there are no words to choose from, just use the whole title with no spaces as the word - this is not ideal but should be rare and at least makes it possible to play every reel
+          current_question_wordarray.push(current_question_title.replace(/[^a-zA-Z]+/g, ""))
+        }
 
         current_question_longest_word = current_question_wordarray[0]
         current_question_random_word = current_question_wordarray[Math.floor(Math.random()*current_question_wordarray.length)]
@@ -1062,8 +1071,8 @@ function delete_option(){
                 <div align="center" id="starting_instruction_text">
                   <div style="float:right;" id="starting_instructions_high_scores"></div>
                     <p>
-                      The game will select a View-Master reel and show you the title and the pictures from the reel.
-                      It will select a secret word from the image descriptions and it's your job to guess that word.  Try and spell your guess by selecting letters from the word grid.
+                      The game will select a View-Master reel and show you the pictures from the reel.
+                      It will select a secret word from the reel title and it's your job to guess that word.  Try and spell your guess by selecting letters from the word grid.
                     </p>
                     <p>
                       <img style="max-width: 25%;" src="./bog_instruction.png">
