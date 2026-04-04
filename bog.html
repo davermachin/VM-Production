@@ -534,11 +534,12 @@ current_question_description=current_question_title
             return value.length > 4;
           });
 
-          // remove all words over 10 ??
-
+          // remove all words over 10, only if there are more than one word in the title
+          if (current_question_wordarray.length > 1) {
           current_question_wordarray = current_question_wordarray.filter(function(value, index, arr){
               return value.length < 11;
             });
+          }
 
         // based on difficulty remove top or bottom half
         // not using this for now
@@ -586,6 +587,13 @@ current_question_description=current_question_title
 
 
         console.log(target_word)
+
+// variable hint cost based on target word and current score - now that we know the target word, figure that out
+
+  hint_cost=Math.max(5,target_word.length, Math.ceil(score/2));
+  hint2_cost = hint_cost;
+  console.log("Variable hint cost ", hint_cost);
+
         //display question parts
 
         document.getElementById("title_area").innerHTML="<h2>"+toTitleCase(current_question_title)+"</h2>"
@@ -758,7 +766,7 @@ function put_target_in_guess_array(){
 function hint_buy_letter(){
 
   if (current_question_answered==1) {return}
-
+  
   if (confirm("Reveal the next letter for "+hint_cost+" points? You have "+score)==true) {
 
       var num_correct=current_guess.length // assume they're all corect
@@ -890,10 +898,6 @@ function render_guess_array(){
   if (game_over==0) {
       html_output += "<br><div class=\"flex-container_vmm_options\">"
 
-      if (score >= hint_cost && current_question_answered == 0) {
-          html_output += "<div onclick=\"hint_buy_letter()\"><img style=\"max-width: 50%;\"  src=\"./q_icon.png\"></div>"
-      }
-
       for (i=0;i<current_guess.length;i++) {
         html_output += "<div class=\"bog_letter\">"+current_guess[i]+"</div>"
       }
@@ -906,13 +910,21 @@ function render_guess_array(){
         html_output += "&nbsp;"
         html_output += "<div class=\"bog_button\" onclick=\"delete_option()\">Delete</div>"
       }
-
-      if (score >= hint2_cost && anagram_of_word=="" && current_question_answered == 0) {
-          html_output += "<div onclick=\"hint_get_anagram()\">&nbsp;&nbsp;&nbsp;<img style=\"max-width: 50%;\" src=\"./a_icon.png\"></div>"
-      }
-
       html_output += "</div>"
 
+      if (current_question_answered == 0)
+      {
+          html_output += "<div class=\"flex-container_vmm_options\">"
+
+          if (score >= hint_cost && current_question_answered == 0) {
+              html_output += "<div onclick=\"hint_buy_letter()\"><img  src=\"./q_icon.png\"></div>"
+          }
+          if (score >= hint2_cost && anagram_of_word=="" && current_question_answered == 0) {
+              html_output += "<div onclick=\"hint_get_anagram()\">&nbsp;&nbsp;&nbsp;<img src=\"./a_icon.png\"></div>"
+          }
+
+          html_output += "</div>"
+      }
 
       if (anagram_of_word.length>0){
 

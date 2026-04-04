@@ -409,9 +409,9 @@ button:hover {
     /*display: inline;*/
     height: 20vw; /*100px;*/
     width: 20vw; /*100px;*/
-    margin-top: 2vh;
-    margin-left: 1vw;
-    margin-right: 1vw;
+    margin-top: 0.5vh;
+    margin-left: 0vw;
+    margin-right: 0.1vw;
 
 
 

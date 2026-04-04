@@ -533,6 +533,13 @@ current_question_description=current_question_title
         }
 
         console.log(target_word)
+
+// variable hint cost based on target word and current score - now that we know the target word, figure that out
+
+  hint_cost=Math.max(5,target_word.length, Math.ceil(score/2));
+  hint2_cost = hint_cost;
+  console.log("Variable hint cost ", hint_cost);
+          
         //display question parts
 
         document.getElementById("title_area").innerHTML="<h2>"+toTitleCase(current_question_title)+"</h2>"
