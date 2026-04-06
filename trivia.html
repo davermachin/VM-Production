@@ -438,9 +438,10 @@ function read_highscores(){
 
             // make the title click to the database
             current_inner_html=document.getElementById("picture_area_content").innerHTML;
+
             current_inner_html=current_inner_html.replace("<h2 align=\"center\">","");
             current_inner_html=current_inner_html.replace("</h2>","");
-            current_inner_html="<a href='./index.html?go="+encodeURIComponent(current_inner_html)+"'><h2 align=\"center\"><u>"+current_inner_html+"</u></<h2></a>"
+            current_inner_html='<a href="./index.html?go='+encodeURIComponent(current_inner_html)+'"><h2 align=center><u>'+current_inner_html+'</u></h2></a>'
             document.getElementById("picture_area_content").innerHTML=current_inner_html;
 
           } else {
@@ -452,7 +453,8 @@ function read_highscores(){
             current_inner_html=document.getElementById(correct_group).innerHTML;
             current_inner_html=current_inner_html.replace("<h3 align=\"center\">","");
             current_inner_html=current_inner_html.replace("</h3>","");
-            current_inner_html="<a href='./index.html?go="+encodeURIComponent(current_inner_html)+"'><h3 align=\"center\"><u>"+current_inner_html+"</u></<h3></a>"
+
+            current_inner_html='<a href="./index.html?go='+encodeURIComponent(current_inner_html)+'"><h3 align="center"><u>'+current_inner_html+'</u></h3></a>'
             document.getElementById(correct_group).innerHTML=current_inner_html;
 
           }

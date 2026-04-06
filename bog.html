@@ -437,9 +437,10 @@ function update_controls(optional_finish){
 
           // make the title click to the database
           current_inner_html=document.getElementById("title_area").innerHTML;
+
           current_inner_html=current_inner_html.replace("<h2>","");
           current_inner_html=current_inner_html.replace("</h2>","");
-          current_inner_html="<h2><a href='./index.html?go="+encodeURIComponent(current_inner_html)+"'><u>"+current_inner_html+"</u></a></h2>"
+          current_inner_html='<h2><a href="./index.html?go='+encodeURIComponent(current_inner_html)+'"><u>'+current_inner_html+'</u></a></h2>'
           document.getElementById("title_area").innerHTML=current_inner_html;
 
 console.log(score)
