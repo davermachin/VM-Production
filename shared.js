@@ -22,7 +22,7 @@ function displayPagePicker(divId) {
     {
       group: "Info",
       pages: [
-        ["https://viewmastertravels.com", "View Master Travels"],
+        ["vmt.html", "View Master Travels"],
         ["about.html", "About Me"],
         ["resources.html", "Resources"]
       ]

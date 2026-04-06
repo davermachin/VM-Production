@@ -1,0 +1,302 @@
+<head>
+
+<title>View Master Travels</title>
+<meta name="description" content="Dave Machin has scanned thousands of View Master images and made them available online at the VMDatabase.com site.  Probably the world's largest online collection of digitized View Master images.">
+<meta name="robots" content="index, archive">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://vm.vmdatabase.com/airtable.browser.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<script src="shared.js"></script>
+
+<link href='https://fonts.googleapis.com/css?family=Arsenal' rel='stylesheet'>
+<link rel="stylesheet" href="./vm2.css">
+<link rel="stylesheet" href="./slides2.css">
+<link rel="stylesheet" href="./vmt.css">
+
+<meta charset="UTF-8">  
+<meta property="og:url"                content="https://vm.vmdatabase.com/index.html" />
+<meta property="og:title"              content="View-Master Database" />
+<meta property="og:description"        content="Dave Machin's Searcheable Database of View-Master Reels" />
+<meta property="og:image"              content="https://vm.vmdatabase.com/db_OB5.jpg" />
+
+
+
+<script>
+  $('document').ready(function(){
+      
+      document.addEventListener("click", (e) => {        
+
+      if (e.target.tagName === "A") return; // don't toggle if clicking a link
+      if (e.target.classList.contains("vmt-top-right-btn")) return;
+
+      const videoRow = e.target.closest(".vmt-video-row");
+      if (!videoRow) return;  // click was outside a video row
+
+      const desc = videoRow.querySelector(".vmt-video-description");
+      const btn = videoRow.querySelector(".vmt-toggle-btn");      
+
+      if (!desc) return;      
+
+      // Toggle expand/collapse
+      if (desc.style.maxHeight && desc.style.maxHeight !== "") {
+        // Collapse
+        desc.style.maxHeight = "";
+        desc.style.overflow = "hidden";
+        desc.style.display = "-webkit-box";
+        if (btn) btn.textContent = "More";
+      } else {
+        // Expand
+        desc.style.maxHeight = desc.scrollHeight + "px";
+        desc.style.overflow = "visible";
+        desc.style.display = "block";
+        desc.style.maxHeight = desc.scrollHeight + "px";  // animate to full height        
+        if (btn) btn.textContent = "Less";
+      }
+      
+      });
+
+
+
+      displayPagePicker("page_picker_nav");
+      read_database();
+
+    });
+
+
+var global_data=null; // hoping this is global and stores each airtable lookup
+
+    function isValidURL(url) {
+        try {
+            new URL(url);
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    function getYouTubeThumbnail(url) {
+        var videoId = url.match(/[?&]v=([^&]+)/) || url.match(/youtu\.be\/([^?]+)/);
+        if (videoId && videoId[1]) {
+            return `https://img.youtube.com/vi/${videoId[1]}/maxresdefault.jpg`;
+        }
+        return null;
+    }
+
+    function toTitleCase(str) {
+        return str.replace(/\w\S*/g, function(txt){
+            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        });
+    }
+
+
+async function lookupYoutube(videoId) {
+  const API_KEY = "AIzaSyCNh3zuiidSD63Bw3JF1q-IsVidB_mZNw4";
+
+  const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${API_KEY}`;
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (!data.items || data.items.length === 0) {
+      throw new Error("Video not found");
+    }
+
+    const snippet = data.items[0].snippet;
+
+    return {
+      videoId: videoId,
+      title: snippet.title,
+      description: snippet.description,
+      thumbnails: {
+        default: snippet.thumbnails.default?.url || null,
+        medium: snippet.thumbnails.medium?.url || null,
+        high: snippet.thumbnails.high?.url || null,
+        standard: snippet.thumbnails.standard?.url || null,
+        maxres: snippet.thumbnails.maxres?.url || null
+      }
+    };
+
+  } catch (error) {
+    console.error("lookupYoutube error:", error);
+    return null;
+  }
+}
+
+    function sortData(data) {
+
+            return data.slice().sort((a, b) => {
+              const main_groupA = a.main_group || "";
+              const main_groupB = b.main_group || "";
+              if (main_groupA !== main_groupB) {
+                return main_groupA.localeCompare(main_groupB);
+              }
+
+              const Sort_ByA = a.Sort_By || "";
+              const Sort_ByB = b.Sort_By || "";
+              if (Sort_ByA !== Sort_ByB) {
+                return Sort_ByA.localeCompare(Sort_ByB);
+              }
+
+            });
+
+
+          }    
+
+function read_database(){
+
+      //read_highscores();
+
+      var Airtable = require('airtable');
+      var base = new Airtable({apiKey: 'patD5dYFBjdTtIAY8.20d135bce39d21c1b5ca51607082cd53bc1e64158373e0aa0065df8d54c79b0e'}).base('app5Q6OlJ3iMkJ8cd');
+
+      all_records=[];
+
+
+      document.getElementById("search_results").innerHTML = "<div align='center'>...</div>"
+
+        view_name="YT_List";    
+
+      base('Youtube').select({
+
+          maxRecords: 2000,
+          view: view_name
+      }).eachPage(function page(records, fetchNextPage) {
+          // This function (`page`) will get called for each page of records.
+
+          records.forEach(function(record) {
+              console.log('Retrieved', record.get('YT_ID'));
+
+              all_records_single = {};
+
+              all_records_single.YT_ID=record.get('YT_ID');
+              all_records_single.main_group=record.get('Main_Group');
+              all_records_single.Sort_By=record.get('Sort_By');
+              all_records_single.Notes=record.get('Notes');
+
+              all_records.push(all_records_single);
+
+              document.getElementById("search_results").innerHTML = "<div align='center'>Getting reels from database... ("+all_records.length+")</div>"
+
+          });
+
+          // To fetch the next page of records, call `fetchNextPage`.
+          // If there are more records, `page` will get called again.
+          // If there are no more records, `done` will get called.
+          fetchNextPage();
+
+      }, function done(err) {
+          if (err) {
+              console.error(err);
+              document.getElementById("search_results").innerHTML = "Something went wrong :-(  Refresh to try again.)";
+              return;
+            }
+
+            all_records=sortData(all_records);
+
+            console.log(all_records);
+
+            render_list();
+
+          //start();
+      });
+    }
+
+function linkify(text) {
+  const urlPattern = /(\bhttps?:\/\/[^\s]+)/gi;
+  return text.replace(urlPattern, url => `<a href="${url}" target="_blank">${url}</a>`);
+}
+
+function formatText(text){
+
+  if (text === undefined || text === null){
+    text="";
+  }
+
+  text=marked.parse(text);
+
+  return text;
+}
+
+async function render_list(){
+
+      // for test
+      lookupYoutube("VGaIWJk6KiQ").then(console.log);
+
+      //loop through all videos loaded from airtable
+
+      container=document.getElementById("search_results");
+      container.innerHTML="";
+
+      // Step 1: create placeholders in correct order
+        const divs = all_records.map(() => {
+          const div = document.createElement("div");
+          div.textContent = "...";
+          container.appendChild(div);
+          return div;
+        });
+
+      // Step 2: fetch all in parallel
+        const results = await Promise.all(
+          all_records.map(async (item) => {
+            const ytData = await lookupYoutube(item.YT_ID); // get YouTube info
+            return {
+              ...item,     // original fields from all_records
+              ...ytData    // fields returned from lookupYoutube (title, description, thumbnails, etc.)
+            };
+          })
+        );
+
+console.log("consolidated ", results);
+
+        // Step 3: fill them in (still ordered)
+        results.forEach((data, index) => {
+          if (!data) return;
+
+          divs[index].innerHTML = `
+
+
+
+
+
+            <div class="vmt-video-row">
+              <img class="vmt-thumbnail" src="${data.thumbnails.default}" alt="Thumbnail">
+              
+              <div class="vmt-video-content">
+                <button class="vmt-top-right-btn" onclick="window.open('https://youtu.be/${data.YT_ID}')"></button>
+                <h3 class="vmt-video-title">${data.title}</h3>
+              
+              </div>
+              
+              <div class="vmt-video-description"><p>${formatText(data.Notes)}</p><p>${formatText(data.description)}</p></div>
+                
+              </div>
+
+              
+            </div>
+
+          `;
+        });
+      }
+
+</script>
+
+</head>
+
+<!-- <button class="vmt-toggle-btn">More</button> -->
+
+<body>
+  <div class="center">
+        <h1>View Master Travels</h1>
+        <div style=" display: flex; justify-content: center;" id="page_picker_nav"></div>
+        <h2>This is a page about my youtube channel.</h2>
+        <p>This is a paragraph talking about my youtube channel.  This is a paragraph talking about my youtube channel.  This is a paragraph talking about my youtube channel.  This is a paragraph talking about my youtube channel.</p>
+        <p>&nbsp;</p>
+
+      <div id="search_results">...</div>
+
+
+</body>

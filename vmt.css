@@ -1,0 +1,117 @@
+p {
+  margin: 0; /* Removes all default spacing */
+  margin-bottom: 10px; /* Adds back only what you actually want */
+}
+
+.vmt-video-row {
+  
+  padding: 8px 12px;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 25px;
+  width: 100%;   /* fills parent element */
+  max-width: 100%; /* optional to override previous max-width */
+  box-sizing: border-box;
+  cursor: pointer;
+ 
+}
+
+
+
+.vmt-thumbnail {
+  width: 120px;
+  height: 67px;              /* 16:9 aspect ratio */
+  /* flex-shrink: 0; */
+  float: left;
+  margin-right: 12px;
+  object-fit: cover;
+}
+
+.vmt-video-content {
+
+  min-width: 0;
+}
+
+.vmt-video-title {
+  text-align: left;
+ margin: 0; 
+  font-size: 1rem;
+  font-weight: bold;
+  
+}
+
+
+.vmt-video-description {
+    white-space: pre-line;
+    text-align: left;
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.2em;
+    max-height: 3.6em;         /* roughly 2 lines */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    transition: max-height 0.3s ease;  /* animate max-height */  
+    -webkit-line-clamp: 2;     /* limit lines in WebKit browsers */
+    -webkit-box-orient: vertical;
+}
+
+.vmt-toggle-btn {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    font-size: 0.8rem;
+    background: none;
+    border: none;
+    color: #007BFF;
+    cursor: pointer;
+    display: inline; 
+    padding: 0;
+    width: auto; 
+    min-width: 0;            
+}
+
+
+
+.vmt-top-right-btn {
+  float: right;
+  margin-left: 12px;   /* gap between text and button */
+  margin-bottom: 8px;  /* optional spacing */
+  padding: 0;
+  font-size: 0.8rem;
+  min-width: 0;     
+  width: 100px;
+  height: 50px;   
+  background-color: #FF0000; /* YouTube red */
+  border: none;
+  border-radius: 4px;      /* slightly rounded corners */
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+}
+
+/* white triangle "play" icon */
+.vmt-top-right-btn::after {
+  content: "";
+  width: 0;
+  height: 0;
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-40%, -50%);
+  border-style: solid;
+  border-width: 12px 0 12px 24px; /* triangle size */
+  border-color: transparent transparent transparent white;
+}
+
+/* hover effect */
+.vmt-top-right-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+/* optional: active/click effect */
+.vmt-top-right-btn:active {
+  transform: scale(0.98);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
