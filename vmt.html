@@ -34,6 +34,7 @@
 
       if (e.target.tagName === "A") return; // don't toggle if clicking a link
       if (e.target.classList.contains("vmt-top-right-btn")) return;
+      if (e.target.tagName === "IMG") return; // don't toggle if clicking an image
 
       const videoRow = e.target.closest(".vmt-video-row");
       if (!videoRow) return;  // click was outside a video row
@@ -321,13 +322,9 @@ async function render_list(){
 
 
             <div class="vmt-video-row">
-              <img class="vmt-thumbnail" src="${data.thumbnails.default}" alt="Thumbnail">
+              <div class="vmt-thumbnail-wrapper" ><a href='https://youtu.be/${data.YT_ID}' target='_blank'><img class="vmt-thumbnail"  src="${data.thumbnails.default}" alt="Thumbnail"></a></div>
               
-              <div class="vmt-video-content">
-                <button class="vmt-top-right-btn" onclick="window.open('https://youtu.be/${data.YT_ID}')"></button>
-                <h3 class="vmt-video-title">${data.title}</h3>
-              
-              </div>
+              <div class="vmt-video-content"><h3 class="vmt-video-title">${data.title}</h3></div>
               
               <div class="vmt-video-description"><p>${formatText(data.Notes)}</p><hr><p>${formatText(data.description)}</p></div>
                 

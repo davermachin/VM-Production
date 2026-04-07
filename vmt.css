@@ -23,15 +23,58 @@ hr {
 
 
 
-.vmt-thumbnail {
+.vmt-thumbnail-wrapper {
+  position: relative;
   width: 120px;
-  height: 67px;              /* 16:9 aspect ratio */
-  /* flex-shrink: 0; */
+  height: 67px;
   float: left;
   margin-right: 12px;
-  object-fit: cover;
-    border-radius: 8px;
 }
+
+.vmt-thumbnail-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  display: block;
+}
+
+.vmt-thumbnail-wrapper a {
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+
+/* Play triangle */
+.vmt-thumbnail-wrapper::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-40%, -50%);
+
+  width: 0;
+  height: 0;
+  border-left: 16px solid rgba(255, 255, 255, 0.9); 
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+
+   z-index: 2;             
+  pointer-events: none;    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 .vmt-video-content {
 
