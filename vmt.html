@@ -6,6 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://apis.google.com/js/platform.js"></script>
 <script src="https://vm.vmdatabase.com/airtable.browser.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
@@ -25,6 +26,9 @@
 
 
 <script>
+
+  const API_KEY = "AIzaSyCNh3zuiidSD63Bw3JF1q-IsVidB_mZNw4"; // READ ONLY KEY
+
   $('document').ready(function(){
       
       document.addEventListener("click", (e) => {        
@@ -61,6 +65,7 @@
 
 
       displayPagePicker("page_picker_nav");
+      getLatestVideoFromChannel("UCVt3zC1DNDOUihq4P-QPwkQ");
       read_database();
 
     });
@@ -91,9 +96,64 @@ var global_data=null; // hoping this is global and stores each airtable lookup
         });
     }
 
+async function getLatestVideoFromChannel(channelId) {
+  try {
+    // 1. Get uploads playlist ID
+    const channelRes = await fetch(
+      `https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${channelId}&key=${API_KEY}`
+    );
+    const channelData = await channelRes.json();
+
+    if (!channelData.items || channelData.items.length === 0) {
+      throw new Error("Channel not found");
+    }
+
+    const uploadsPlaylistId =
+      channelData.items[0].contentDetails.relatedPlaylists.uploads;
+
+    // 2. Get most recent video from uploads playlist
+    const playlistRes = await fetch(
+      `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${uploadsPlaylistId}&maxResults=1&key=${API_KEY}`
+    );
+    const playlistData = await playlistRes.json();
+
+    if (!playlistData.items || playlistData.items.length === 0) {
+      throw new Error("No videos found");
+    }
+
+    const video = playlistData.items[0].snippet;
+
+    const videoId = video.resourceId.videoId;
+
+    // 3. Return structured object
+    const channel_info = {
+      title: video.title,
+      thumbnail: video.thumbnails, // contains default, medium, high, etc.
+      url: `https://www.youtube.com/watch?v=${videoId}`
+    };
+
+    console.log("Latest video info ",channel_info);
+
+    document.getElementById("latest_video").innerHTML = `
+      <div class="yt-thumbnail" >
+        <a href="${channel_info.url}" >
+          <img src="${channel_info.thumbnail.maxres?.url}">
+        </a>
+      </div>
+      <div>
+        <p><b>${channel_info.title}</b></p><p>&nbsp;</p>
+      </div>
+
+    `
+
+  } catch (error) {
+    document.getElementById("latest_video").innerHTML="";
+    console.error("Error fetching latest video:", error);
+    return null;
+  }
+}
 
 async function lookupYoutube(videoId) {
-  const API_KEY = "AIzaSyCNh3zuiidSD63Bw3JF1q-IsVidB_mZNw4";
 
   const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${API_KEY}`;
 
@@ -126,7 +186,7 @@ async function lookupYoutube(videoId) {
   }
 }
 
-    function sortData(data) {
+function sortData(data) {
 
             return data.slice().sort((a, b) => {
               const main_groupA = a.main_group || "";
@@ -223,8 +283,7 @@ function formatText(text){
 
 async function render_list(){
 
-      // for test
-      lookupYoutube("VGaIWJk6KiQ").then(console.log);
+
 
       //loop through all videos loaded from airtable
 
@@ -250,7 +309,7 @@ async function render_list(){
           })
         );
 
-console.log("consolidated ", results);
+
 
         // Step 3: fill them in (still ordered)
         results.forEach((data, index) => {
@@ -271,7 +330,7 @@ console.log("consolidated ", results);
               
               </div>
               
-              <div class="vmt-video-description"><p>${formatText(data.Notes)}</p><p>${formatText(data.description)}</p></div>
+              <div class="vmt-video-description"><p>${formatText(data.Notes)}</p><hr><p>${formatText(data.description)}</p></div>
                 
               </div>
 
@@ -292,10 +351,16 @@ console.log("consolidated ", results);
   <div class="center">
         <h1>View Master Travels</h1>
         <div style=" display: flex; justify-content: center;" id="page_picker_nav"></div>
-        <h2>This is a page about my youtube channel.</h2>
-        <p>This is a paragraph talking about my youtube channel.  This is a paragraph talking about my youtube channel.  This is a paragraph talking about my youtube channel.  This is a paragraph talking about my youtube channel.</p>
+        <h2>Exploring Vintage View-Master Locations Then and Now</h2>
+        <p>I travel to real-world locations featured in vintage View-Master reels and create short documentary videos exploring what’s changed—and what hasn’t. From hidden history to unexpected discoveries, each episode brings the past and present together in surprising ways.</p>
         <p>&nbsp;</p>
-
+      <div id="latest_video">...</div>
+      <div 
+        class="g-ytsubscribe" 
+        data-channelid="UCVt3zC1DNDOUihq4P-QPwkQ"
+        data-layout="default"
+        data-count="default">
+      </div>      
       <div id="search_results">...</div>
 
 
