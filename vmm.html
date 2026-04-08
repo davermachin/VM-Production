@@ -728,6 +728,7 @@ function render_keyboard(){
   key_array.push(["O", 79]);
   key_array.push(["P", 80]);
 
+  html_output+="<div class='keyboard-row'>"
 
   for (i=0;i<key_array.length;i++){
 
@@ -739,7 +740,7 @@ function render_keyboard(){
 
     html_output += "<div style=\"background-color:"+cell_color+"\" class=\"vmm_key\" id=\"keyboard_"+key_array[i][0]+"\" onclick=\"fake_keypress("+key_array[i][1]+")\">"+key_array[i][0]+"</div>"
   }
-
+    html_output+="</div>"
     html_output += "<div class=\"vmm_break\"></div>"
 
     var key_array = [];
@@ -754,7 +755,9 @@ function render_keyboard(){
     key_array.push(["K", 75]);
     key_array.push(["L", 76]);
 
-    for (i=0;i<key_array.length;i++){
+    html_output+="<div class='keyboard-row'>"
+    
+      for (i=0;i<key_array.length;i++){
 
       if (bad_letters.includes(key_array[i][0])){
         cell_color="Tomato"
@@ -764,11 +767,11 @@ function render_keyboard(){
 
       html_output += "<div  style=\"background-color:"+cell_color+"\" class=\"vmm_key\" id=\"keyboard_"+key_array[i][0]+"\" onclick=\"fake_keypress("+key_array[i][1]+")\">"+key_array[i][0]+"</div>"
     }
-
+    html_output+="</div>"
 
 
     html_output += "<div class=\"vmm_break\"></div>"
-
+    html_output+="<div class='keyboard-row'>"
     html_output += "<div class=\"vmm_key\" id=\"keyboard_Return\" onclick=\"fake_keypress(13)\">Return</div>"
 
     var key_array = [];
@@ -780,6 +783,8 @@ function render_keyboard(){
     key_array.push(["B", 66]);
     key_array.push(["N", 78]);
     key_array.push(["M", 77]);
+
+
 
     for (i=0;i<key_array.length;i++){
 
@@ -793,7 +798,10 @@ function render_keyboard(){
     }
 
       html_output += "<div class=\"vmm_key\" id=\"keyboard_Back\" onclick=\"fake_keypress(8)\">Del</div>"
-  document.getElementById("keyboard_area").innerHTML=html_output
+
+    html_output+="</div>"
+
+      document.getElementById("keyboard_area").innerHTML=html_output
   // document.getElementById("keyboard_area").style="display:flex;"
 }
 

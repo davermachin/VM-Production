@@ -85,6 +85,18 @@
     align-items: center;
   }
 
+
+.keyboard-row {
+  
+  grid-template-columns: repeat(10, 1fr); /* 10 keys in QWERTY row */
+
+  display: flex;
+  justify-content: center; /* center all keys horizontally */
+
+  gap: 2px; /* margin between keys */
+  width: 100%; /* fill parent div */
+}
+
 .vmm_letter {
     /* Add shadows to create the "card" effect */
     box-shadow: 0 2px 4px 2px rgba(0,0,0,0.4);
@@ -138,10 +150,10 @@
   .vmm_key {
       text-align: center;
       border: 1px solid lightgrey;
-      padding: 1vw 3.5vw 1vw 3.5vw;
-      margin: 2px 2px 2px 2px;
+      padding: 1vw 3vw 1vw 3vw;
+      margin: 1px 2px 1px 2px;
       touch-action: manipulation;
-      font-size: 2.5vw;
+      font-size: 3vw;
       
     }
 
