@@ -8,7 +8,11 @@
         <script src="https://vm.vmdatabase.com/airtable.browser.js"></script>
         <script src="shared.js"></script>
 
-        <link href='https://fonts.googleapis.com/css?family=Arsenal' rel='stylesheet'>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Arsenal:ital,wght@0,400;0,700;1,400;1,700&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+
+        
         <link rel="stylesheet" href="./vm2.css">
         <link rel="stylesheet" href="./slides2.css">
 
@@ -346,7 +350,7 @@ function update_controls(optional_finish){
       if (current_question_answered==0 && game_over==0 && show_instructions==0) {
             document.getElementById("keyboard_area").style.display="flex"
             display_content += "<div align=\"center\"><h3><span style=\"float:left;cursor:pointer;text-decoration:underline;\" onclick=\"give_up()\">Give Up</span><span style=\"float:right;\">Type the secret word and press return</h3></span></div>"
-            display_content += "<p>&nbsp;</p><div align=\"center\">"
+            display_content += "<p>&nbsp;</p><p>&nbsp;</p><div align=\"center\">"
             display_content += button_options;
             display_content += "</div>";
 

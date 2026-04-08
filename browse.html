@@ -6,7 +6,12 @@
         <script src="https://code.jquery.com/jquery-1.12.2.min.js"></script>
         <script src="https://vm.vmdatabase.com/airtable.browser.js"></script>
         <script src="shared.js"></script>
-        <link href='https://fonts.googleapis.com/css?family=Arsenal' rel='stylesheet'>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Arsenal:ital,wght@0,400;0,700;1,400;1,700&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+
+
         <link rel="stylesheet" href="./vm2.css">
         <link rel="stylesheet" href="./slides2.css">
 
@@ -713,7 +718,7 @@ console.log("Filter is ",filter_countries);
                         // Country row
                         html += `
                           <tr class="country-row" data-target="${countryId}" style="cursor:pointer; background:#ddd;">
-                            <td colspan="3"><strong>${country}</strong></td>
+                            <td colspan="3">${country}</td>
                           </tr>
                         `;
 
@@ -728,7 +733,7 @@ console.log("Filter is ",filter_countries);
                                 html += `
                                   <tr class="state-row ${countryId}" data-target="${stateId}" style="${display_text_usa_exception} cursor:pointer; background:#eee;">
                                     <td width="2%"></td>
-                                    <td colspan="2"><strong>${(!state || state === "undefined") ? "All" : state}</strong></td>
+                                    <td colspan="2">${(!state || state === "undefined") ? "All" : state}</td>
                                     
                                   </tr>
                                 `;

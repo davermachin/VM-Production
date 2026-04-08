@@ -6,7 +6,10 @@
         <script src="https://vm.vmdatabase.com/airtable.browser.js"></script>
         <script src="shared.js"></script>
 
-        <link href='https://fonts.googleapis.com/css?family=Arsenal' rel='stylesheet'>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Arsenal:ital,wght@0,400;0,700;1,400;1,700&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+
         <link rel="stylesheet" href="./vm2.css">
         <link rel="stylesheet" href="./slides2.css">
 
@@ -720,7 +723,7 @@ console.log("Grouped data: ", grouped);
                         // genre row
                         html += `
                           <tr class="genre-row" data-target="${genreId}" style="cursor:pointer; background:#ddd;">
-                            <td colspan="4"><strong>${genre}</strong></td>
+                            <td colspan="4">${genre}</td>
                           </tr>
                         `;
 
@@ -732,7 +735,7 @@ console.log("Grouped data: ", grouped);
                                     html += `
                                       <tr class="media_type-row ${media_typeId}" data-target="${media_typeId}" style="${display_text} cursor:pointer; background:#eee;">
                                         <td width="2%"></td>
-                                        <td colspan="3"><strong>${media_type}</strong></td>
+                                        <td colspan="3">${media_type}</td>
                                         
                                       </tr>
                                     `;
@@ -755,7 +758,7 @@ console.log("Grouped data: ", grouped);
                                             <tr class="year-row ${yearId}" data-target="${yearId}" style="${display_text}  cursor:pointer; background:#eee;">
                                               <td></td>
                                               <td></td>
-                                              <td colspan="2"><strong>${year}</strong></td>
+                                              <td colspan="2">${year}</td>
                                               
                                             </tr>
                                           `;

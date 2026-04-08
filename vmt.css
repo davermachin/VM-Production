@@ -1,7 +1,7 @@
 p {
   margin: 0; /* Removes all default spacing */
   margin-bottom: 10px; /* Adds back only what you actually want */
-  font-size: clamp(14px, 1.75vw, 24px);
+  
 }
 
 hr {
@@ -86,7 +86,7 @@ hr {
   text-align: left;
  margin: 0; 
   font-size: 1rem;
-  font-weight: bold;
+  
   
 }
 

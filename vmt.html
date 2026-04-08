@@ -11,7 +11,10 @@
 
 <script src="shared.js"></script>
 
-<link href='https://fonts.googleapis.com/css?family=Arsenal' rel='stylesheet'>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Arsenal:ital,wght@0,400;0,700;1,400;1,700&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+
 <link rel="stylesheet" href="./vm2.css">
 <link rel="stylesheet" href="./slides2.css">
 <link rel="stylesheet" href="./vmt.css">
@@ -113,7 +116,7 @@ async function getLatestVideoFromChannel(channelId) {
 
     // 2. Get most recent video from uploads playlist
     const playlistRes = await fetch(
-      `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${uploadsPlaylistId}&maxResults=1&key=${API_KEY}`
+      `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${uploadsPlaylistId}&maxResults=50&key=${API_KEY}`
     );
     const playlistData = await playlistRes.json();
 
@@ -121,7 +124,9 @@ async function getLatestVideoFromChannel(channelId) {
       throw new Error("No videos found");
     }
 
-    const video = playlistData.items[0].snippet;
+    const video = playlistData.items[Math.floor(Math.random() * playlistData.items.length)].snippet;
+
+    //const video = playlistData.items[0].snippet;
 
     const videoId = video.resourceId.videoId;
 
@@ -208,15 +213,13 @@ function sortData(data) {
 
 function read_database(){
 
-      //read_highscores();
-
       var Airtable = require('airtable');
       var base = new Airtable({apiKey: 'patD5dYFBjdTtIAY8.20d135bce39d21c1b5ca51607082cd53bc1e64158373e0aa0065df8d54c79b0e'}).base('app5Q6OlJ3iMkJ8cd');
 
       all_records=[];
 
 
-      document.getElementById("search_results").innerHTML = "<div align='center'>...</div>"
+      document.getElementById("search_results").innerHTML = "<div align='center'><p>Loading catalog ...</p><p>&nbsp;</p></div>"
 
         view_name="YT_List";    
 
@@ -239,7 +242,7 @@ function read_database(){
 
               all_records.push(all_records_single);
 
-              document.getElementById("search_results").innerHTML = "<div align='center'>Getting reels from database... ("+all_records.length+")</div>"
+              
 
           });
 
@@ -284,8 +287,8 @@ function formatText(text){
 async function render_list(){
 
 
-// temporary to generate HTML
-
+// temporary to generate HTML to put below for SEO
+/*
 const htmlOutput = all_records
   .map(video => `
     <div class="video-item">
@@ -298,7 +301,7 @@ const htmlOutput = all_records
   .join("\n"); // join all items into one string
 
 console.log(htmlOutput);
-
+*/
 
 
       //loop through all videos loaded from airtable
@@ -351,6 +354,12 @@ console.log(htmlOutput);
 
           `;
         });
+
+        // only here remove the static SEO data
+
+        document.getElementById("seo_static").innerHTML="";
+
+
       }
 
 </script>
@@ -373,486 +382,488 @@ console.log(htmlOutput);
        
       <div id="latest_video">...</div>    
 
-      <div id="search_results">
+      <div id="search_results">...</div>
 
-        
-  <div class="video-item">
-      <a href="https://youtu.be/TwKjaH0lwrg" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/TwKjaH0lwrg/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>This video is the first in a series of regular documentaries.  It&#39;s not a video where I visit the locations from my View-Master reels - but it explores the history of stereo photography itself.  The main focus is the amazing invention of the View-Master itself - which seems like a simple kids toy - but it&#39;s more clever than you&#39;d think.</p>
-</p>
-    </div>
-  
+      <div id="seo_static">
 
-    <div class="video-item">
-      <a href="https://youtu.be/VGaIWJk6KiQ" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/VGaIWJk6KiQ/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>The second in the series of regular documentaries on the history of View-Master.  This time it&#39;s View-Master&#39;s use during World War Two - and the amazing fact that its inventor was a Nazi party member and Hitler supporter.</p>
-</p>
-    </div>
-  
+                                
+                          <div class="video-item">
+                              <a href="https://youtu.be/TwKjaH0lwrg" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/TwKjaH0lwrg/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>This video is the first in a series of regular documentaries.  It&#39;s not a video where I visit the locations from my View-Master reels - but it explores the history of stereo photography itself.  The main focus is the amazing invention of the View-Master itself - which seems like a simple kids toy - but it&#39;s more clever than you&#39;d think.</p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/MrsWpvkZvbE" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/MrsWpvkZvbE/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>This was a trip we almost didn&#39;t take.  We were staying in Santa Fe and wanted to visit a museum in Albuquerque - and just decided to go ahead an look up my View-Master reel spontaneously that afternoon and visit the locations.  I&#39;m really glad we did - this turned out to be one of my more popular videos.</p>
-<p>Here&#39;s the reel: <a href="https://vm.vmdatabase.com/index.html?go=sp-9036">SP-9036</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/VGaIWJk6KiQ" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/VGaIWJk6KiQ/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>The second in the series of regular documentaries on the history of View-Master.  This time it&#39;s View-Master&#39;s use during World War Two - and the amazing fact that its inventor was a Nazi party member and Hitler supporter.</p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/JY2P_ZSh-KU" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/JY2P_ZSh-KU/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>This reel in my collection always fascinated me - why were there Aztec ruins in New Mexico - and why were they so important that the nearby town was named after them.  I remember finding this place on a map long before we had any intention of visiting there.  We planned our trip to north-west New Mexico just to make sure we saw them!</p>
-<p>Here&#39;s the reel: <a href="https://vm.vmdatabase.com/index.html?go=aztec%20ruins">Aztec Ruins</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/MrsWpvkZvbE" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/MrsWpvkZvbE/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>This was a trip we almost didn&#39;t take.  We were staying in Santa Fe and wanted to visit a museum in Albuquerque - and just decided to go ahead an look up my View-Master reel spontaneously that afternoon and visit the locations.  I&#39;m really glad we did - this turned out to be one of my more popular videos.</p>
+                        <p>Here&#39;s the reel: <a href="https://vm.vmdatabase.com/index.html?go=sp-9036">SP-9036</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/DuzfgrPTsqk" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/DuzfgrPTsqk/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>Boulder City is a small town you drive past on your way to the Hoover Dam from Las Vegas.  This is an example of a place we&#39;d have never visited if it weren&#39;t for my View-Master collection.  I knew I had the reel - so we decided to stay at the Boulder City hotel as our base of operations for visiting the dam.</p>
-<p>Turned out to be one of our favorite small towns and we had a great time there.  The little museum in the hotel was very helpful and even used his video in their exhibits for a while.</p>
-<p>Here&#39;s the reel: <a href="https://vm.vmdatabase.com/index.html?go=boulder%20city">Boulder City</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/JY2P_ZSh-KU" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/JY2P_ZSh-KU/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>This reel in my collection always fascinated me - why were there Aztec ruins in New Mexico - and why were they so important that the nearby town was named after them.  I remember finding this place on a map long before we had any intention of visiting there.  We planned our trip to north-west New Mexico just to make sure we saw them!</p>
+                        <p>Here&#39;s the reel: <a href="https://vm.vmdatabase.com/index.html?go=aztec%20ruins">Aztec Ruins</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/_BW85ctBMBg" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/_BW85ctBMBg/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>This is the reel that started it all.  I&#39;d always wanted to see the flying fish on Catalina island - so we planned a long weekend trip there, since you can only see the fish at night.  On the ferry we had the idea to look up the View-Master reel of the island - and then decided to ride the golf cart around trying to find the picture locations.</p>
-<p>It was great fun - and it was then that I realized lots had changed on the island since the pictures were taken.  This started my research into the history of the island - which I put into video form!</p>
-<p>Here&#39;s the reel: <a href="https://vm.vmdatabase.com/index.html?go=201%20h%20a">Catalina Island</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/DuzfgrPTsqk" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/DuzfgrPTsqk/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>Boulder City is a small town you drive past on your way to the Hoover Dam from Las Vegas.  This is an example of a place we&#39;d have never visited if it weren&#39;t for my View-Master collection.  I knew I had the reel - so we decided to stay at the Boulder City hotel as our base of operations for visiting the dam.</p>
+                        <p>Turned out to be one of our favorite small towns and we had a great time there.  The little museum in the hotel was very helpful and even used his video in their exhibits for a while.</p>
+                        <p>Here&#39;s the reel: <a href="https://vm.vmdatabase.com/index.html?go=boulder%20city">Boulder City</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/1vyzRK9V2vE" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/1vyzRK9V2vE/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>We were spending a week in Chicago - and finding View-Master locations is a great way to force yourself to explore a new place.  We definitely went to places we&#39;d never normally go, like the old Stock Yards!  </p>
-<p>I also knew about the river reversing direction - so this was a great opportunity to fully understand how that happened.  The reel and the video gave me a good excuse to learn all about it.</p>
-<p>Here&#39;s the disk: <a href="https://vm.vmdatabase.com/index.html?go=333%20a%20b">Chicago</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/_BW85ctBMBg" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/_BW85ctBMBg/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>This is the reel that started it all.  I&#39;d always wanted to see the flying fish on Catalina island - so we planned a long weekend trip there, since you can only see the fish at night.  On the ferry we had the idea to look up the View-Master reel of the island - and then decided to ride the golf cart around trying to find the picture locations.</p>
+                        <p>It was great fun - and it was then that I realized lots had changed on the island since the pictures were taken.  This started my research into the history of the island - which I put into video form!</p>
+                        <p>Here&#39;s the reel: <a href="https://vm.vmdatabase.com/index.html?go=201%20h%20a">Catalina Island</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/qG8njC4kOcw" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/qG8njC4kOcw/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>Montreal was a spontaneous trip.  We were road-tripping New York and heading to Niagara Falls when we realized how close to Montreal we were.  This was a tricky one though - since there are Montreal reels and also the Expo &#39;67 reels.  </p>
-<p>In the end, I did a mix - mostly the story of Expo &#39;67 and partly some of the other Montreal locations.  At least those that had some connection to the Expo.  I guess it could have been two separate videos - maybe some day I&#39;ll revisit the idea.</p>
-<p>Here are the <a href="https://vm.vmdatabase.com/index.html?go=expo%2067">Expo 67 reels</a>.</p>
-<p>And here are the <a href="https://vm.vmdatabase.com/index.html?go=380%20a%20b">Montreal</a> reels.</p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/1vyzRK9V2vE" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/1vyzRK9V2vE/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>We were spending a week in Chicago - and finding View-Master locations is a great way to force yourself to explore a new place.  We definitely went to places we&#39;d never normally go, like the old Stock Yards!  </p>
+                        <p>I also knew about the river reversing direction - so this was a great opportunity to fully understand how that happened.  The reel and the video gave me a good excuse to learn all about it.</p>
+                        <p>Here&#39;s the disk: <a href="https://vm.vmdatabase.com/index.html?go=333%20a%20b">Chicago</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/ff8g8iDj0sw" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/ff8g8iDj0sw/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>Ford&#39;s Theatre was a &quot;must see&quot; during our lengthy stay in Washington D.C.  But, I really didn&#39;t know anything about it - which is generally true for most of the View-Master destinations.</p>
-<p>I didn&#39;t know that the internals of the building were completely reconstructed - even though the View-Master reel is titled the &quot;restored&quot; theatre.  I&#39;m not sure, today, how many people are aware of that.</p>
-<p>Here&#39;s the reel: <a href="https://vm.vmdatabase.com/index.html?go=a%20798">Ford&#39;s Theatre</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/qG8njC4kOcw" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/qG8njC4kOcw/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>Montreal was a spontaneous trip.  We were road-tripping New York and heading to Niagara Falls when we realized how close to Montreal we were.  This was a tricky one though - since there are Montreal reels and also the Expo &#39;67 reels.  </p>
+                        <p>In the end, I did a mix - mostly the story of Expo &#39;67 and partly some of the other Montreal locations.  At least those that had some connection to the Expo.  I guess it could have been two separate videos - maybe some day I&#39;ll revisit the idea.</p>
+                        <p>Here are the <a href="https://vm.vmdatabase.com/index.html?go=expo%2067">Expo 67 reels</a>.</p>
+                        <p>And here are the <a href="https://vm.vmdatabase.com/index.html?go=380%20a%20b">Montreal</a> reels.</p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/4IetJP6RzHA" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/4IetJP6RzHA/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>The Grand Canyon is one of those tourist destinations that&#39;s awe-inspiring and also intimidating at the same time.  It&#39;s been on our list to visit forever - so as we travelled route 66 we had to take the time to visit.</p>
-<p>There are lots of View-Master reels of the park - so it&#39;s very difficult to decide what to look for.  I had to do quite a bit of research up front to pick views that we&#39;d have the time to find.</p>
-<p>In the end it was a lot easier than I thought - getting there early was the only important trick!</p>
-<p>Here&#39;s everything I have on the <a href="https://vm.vmdatabase.com/index.html?go=grand%20canyon">Grand Canyon</a>.</p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/ff8g8iDj0sw" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/ff8g8iDj0sw/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>Ford&#39;s Theatre was a &quot;must see&quot; during our lengthy stay in Washington D.C.  But, I really didn&#39;t know anything about it - which is generally true for most of the View-Master destinations.</p>
+                        <p>I didn&#39;t know that the internals of the building were completely reconstructed - even though the View-Master reel is titled the &quot;restored&quot; theatre.  I&#39;m not sure, today, how many people are aware of that.</p>
+                        <p>Here&#39;s the reel: <a href="https://vm.vmdatabase.com/index.html?go=a%20798">Ford&#39;s Theatre</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/DvkaSxJKTBQ" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/DvkaSxJKTBQ/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>Hollywood was another early video for me.  It was soon after Covid and, to my disappointment we couldn&#39;t really get into the Hollywood bowl - although we did go back a few years later to see a show and I finally got the same view!</p>
-<p>Of all the videos so far, this one I sometimes think about redoing - there&#39;s such fascinating history in Hollywood - I&#39;m not really sure how well it came across.</p>
-<p>Here&#39;s the reels: <a href="https://vm.vmdatabase.com/index.html?go=hollywood">Hollywood</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/4IetJP6RzHA" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/4IetJP6RzHA/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>The Grand Canyon is one of those tourist destinations that&#39;s awe-inspiring and also intimidating at the same time.  It&#39;s been on our list to visit forever - so as we travelled route 66 we had to take the time to visit.</p>
+                        <p>There are lots of View-Master reels of the park - so it&#39;s very difficult to decide what to look for.  I had to do quite a bit of research up front to pick views that we&#39;d have the time to find.</p>
+                        <p>In the end it was a lot easier than I thought - getting there early was the only important trick!</p>
+                        <p>Here&#39;s everything I have on the <a href="https://vm.vmdatabase.com/index.html?go=grand%20canyon">Grand Canyon</a>.</p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/-hZFOM50pvw" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/-hZFOM50pvw/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>The Hoover Dam is another one of those American &quot;wonders&quot; - and it&#39;s still extremely impressive to see.  Even though there are larger dams in the world today.  It&#39;s partly the location - in the most extreme desert environment - and the history - a great depression construction project that spawned a nearby town and revolutionized the area.</p>
-<p>Plus, I never really knew how you went about building a dam in a river - so I make sure to go into that thoroughly.</p>
-<p>There&#39;s lots of Hoover Dam reels - and it&#39;s one example where the name changed, from Boulder Dam, during View-Master&#39;s production - so there&#39;s reels under both names.  Today, I some times forget which name is right!</p>
-<p><a href="https://vm.vmdatabase.com/index.html?go=boulder%20dam">Boulder Dam</a></p>
-<p><a href="https://vm.vmdatabase.com/index.html?go=hoover%20dam">Hoover Dam</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/DvkaSxJKTBQ" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/DvkaSxJKTBQ/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>Hollywood was another early video for me.  It was soon after Covid and, to my disappointment we couldn&#39;t really get into the Hollywood bowl - although we did go back a few years later to see a show and I finally got the same view!</p>
+                        <p>Of all the videos so far, this one I sometimes think about redoing - there&#39;s such fascinating history in Hollywood - I&#39;m not really sure how well it came across.</p>
+                        <p>Here&#39;s the reels: <a href="https://vm.vmdatabase.com/index.html?go=hollywood">Hollywood</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/r6X86EZCqSc" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/r6X86EZCqSc/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>We&#39;d always wanted to get back to Key West - and take the trip to Fort Jefferson, which isn&#39;t even in the View-Master reel - so this location was the corner stone of a lengthy road trip all through Florida.  I think we drove every Florida highway there is!</p>
-<p>Key West is one of those entirely unique American cities - and the dry tortugas is an amazing place as well - just wish it wasn&#39;t so hard to reach!</p>
-<p>Here are reels for <a href="https://vm.vmdatabase.com/index.html?go=key%20west">Key West</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/-hZFOM50pvw" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/-hZFOM50pvw/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>The Hoover Dam is another one of those American &quot;wonders&quot; - and it&#39;s still extremely impressive to see.  Even though there are larger dams in the world today.  It&#39;s partly the location - in the most extreme desert environment - and the history - a great depression construction project that spawned a nearby town and revolutionized the area.</p>
+                        <p>Plus, I never really knew how you went about building a dam in a river - so I make sure to go into that thoroughly.</p>
+                        <p>There&#39;s lots of Hoover Dam reels - and it&#39;s one example where the name changed, from Boulder Dam, during View-Master&#39;s production - so there&#39;s reels under both names.  Today, I some times forget which name is right!</p>
+                        <p><a href="https://vm.vmdatabase.com/index.html?go=boulder%20dam">Boulder Dam</a></p>
+                        <p><a href="https://vm.vmdatabase.com/index.html?go=hoover%20dam">Hoover Dam</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/qYduAqQb1R4" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/qYduAqQb1R4/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>Las Vegas is a popular View-Master reel subject - and it&#39;s one of the better topics to show how things have changed over the years.  The earliest View-Master reels were the original casinos, but the later reels showcase entirely different ones.  Today, I&#39;m not sure if they&#39;re all gone - replaced by something new.</p>
-<p>That&#39;s not entirely true - the Flamingo is truly &quot;old school&quot; - although you&#39;d never recognize it from the View-Master pictures.</p>
-<p>This video was different in that most of the View-Master pictures are of places that aren&#39;t there any more - so many of the &quot;now&quot; pictures are empty parking lots!</p>
-<p>Check it out: <a href="https://vm.vmdatabase.com/index.html?go=las%20vegas">Las Vegas</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/r6X86EZCqSc" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/r6X86EZCqSc/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>We&#39;d always wanted to get back to Key West - and take the trip to Fort Jefferson, which isn&#39;t even in the View-Master reel - so this location was the corner stone of a lengthy road trip all through Florida.  I think we drove every Florida highway there is!</p>
+                        <p>Key West is one of those entirely unique American cities - and the dry tortugas is an amazing place as well - just wish it wasn&#39;t so hard to reach!</p>
+                        <p>Here are reels for <a href="https://vm.vmdatabase.com/index.html?go=key%20west">Key West</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/27JjD4pArZ8" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/27JjD4pArZ8/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>I&#39;ve lived in California for almost 30 years - and I never knew there was an active volcano in the state until I saw this View-Master reel.</p>
-<p>We were on a road trip to northern California and realized how close were were to Lassen - so, we diverted and spent most of the day there.  It was definitely one of those &quot;wing it&quot; moments - trying to find the View-Master pictures from my phone as we drove through the park.</p>
-<p>I learned an awful lot about volcanos though!</p>
-<p>Here&#39;s the reel: <a href="https://vm.vmdatabase.com/index.html?go=256%20h%20a">Mt. Lassen</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/qYduAqQb1R4" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/qYduAqQb1R4/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>Las Vegas is a popular View-Master reel subject - and it&#39;s one of the better topics to show how things have changed over the years.  The earliest View-Master reels were the original casinos, but the later reels showcase entirely different ones.  Today, I&#39;m not sure if they&#39;re all gone - replaced by something new.</p>
+                        <p>That&#39;s not entirely true - the Flamingo is truly &quot;old school&quot; - although you&#39;d never recognize it from the View-Master pictures.</p>
+                        <p>This video was different in that most of the View-Master pictures are of places that aren&#39;t there any more - so many of the &quot;now&quot; pictures are empty parking lots!</p>
+                        <p>Check it out: <a href="https://vm.vmdatabase.com/index.html?go=las%20vegas">Las Vegas</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/6Ykcq863zQY" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/6Ykcq863zQY/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>This was on our first route 66 road trip - and I bought the LincolnLand View-Master pack specifically because were were going to be going through Illinois.  We ended up spending several days in Springfield finding fifteen or twenty View-Master locations.</p>
-<p>I think this was the first video where the depth of what I found in my research overwhelmed my ability to put it all into a video - so, maybe it&#39;s a bit long - or, not long enough - not sure.</p>
-<p>Here&#39;s the reel for reference: <a href="https://vm.vmdatabase.com/index.html?go=lincolnland">LincolnLand</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/27JjD4pArZ8" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/27JjD4pArZ8/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>I&#39;ve lived in California for almost 30 years - and I never knew there was an active volcano in the state until I saw this View-Master reel.</p>
+                        <p>We were on a road trip to northern California and realized how close were were to Lassen - so, we diverted and spent most of the day there.  It was definitely one of those &quot;wing it&quot; moments - trying to find the View-Master pictures from my phone as we drove through the park.</p>
+                        <p>I learned an awful lot about volcanos though!</p>
+                        <p>Here&#39;s the reel: <a href="https://vm.vmdatabase.com/index.html?go=256%20h%20a">Mt. Lassen</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/EE-LHyWRllc" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/EE-LHyWRllc/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>I think this is one of my favorite View-Master travels.  Los Angeles is a hard city to capture - it&#39;s big and sprawling - and doesn&#39;t reveal itself easily - unless you have some guide as to where to go.</p>
-<p>The View-Master reels were perfect for that - limiting our scope to the city of LA proper and directing us to locations we&#39;d not likely find otherwise.  It really revealed a character of the city that you&#39;d easily miss visiting.  There&#39;s a depth of history there if you look that&#39;s turned LA it to one of my favorite places.</p>
-<p><a href="https://vm.vmdatabase.com/index.html?go=221%20a%20b%20c%20h">Los Angeles</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/6Ykcq863zQY" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/6Ykcq863zQY/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>This was on our first route 66 road trip - and I bought the LincolnLand View-Master pack specifically because were were going to be going through Illinois.  We ended up spending several days in Springfield finding fifteen or twenty View-Master locations.</p>
+                        <p>I think this was the first video where the depth of what I found in my research overwhelmed my ability to put it all into a video - so, maybe it&#39;s a bit long - or, not long enough - not sure.</p>
+                        <p>Here&#39;s the reel for reference: <a href="https://vm.vmdatabase.com/index.html?go=lincolnland">LincolnLand</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/aGL03VPYZ4I" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/aGL03VPYZ4I/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>A route 66 stop we had to do - you see the billboards for the place from hundreds of miles away - it&#39;d gained a mythical status, really.  We even stayed in the local motel - to really immerse ourselves in it all.</p>
-<p>In the end, it&#39;s just a cave system, which made the video challenging - on TV all the cave rooms kind of look the same - although, they&#39;re more interesting in 3D.  Luckily there&#39;s a lot of folklore around the caverns and I learned a lot about the business of &quot;show&quot; caves.</p>
-<p>Plus, I still struggle to spell &quot;<a href="https://vm.vmdatabase.com/index.html?go=meramec">Meramac</a>&quot; </p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/EE-LHyWRllc" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/EE-LHyWRllc/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>I think this is one of my favorite View-Master travels.  Los Angeles is a hard city to capture - it&#39;s big and sprawling - and doesn&#39;t reveal itself easily - unless you have some guide as to where to go.</p>
+                        <p>The View-Master reels were perfect for that - limiting our scope to the city of LA proper and directing us to locations we&#39;d not likely find otherwise.  It really revealed a character of the city that you&#39;d easily miss visiting.  There&#39;s a depth of history there if you look that&#39;s turned LA it to one of my favorite places.</p>
+                        <p><a href="https://vm.vmdatabase.com/index.html?go=221%20a%20b%20c%20h">Los Angeles</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/_kBWvGXRJgA" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/_kBWvGXRJgA/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>We did Miami as part of our giant Florida road-trip.  Mainly because we were flying in and out of there - so we stayed an extra day to catch all the View-Master sights.</p>
-<p>The video for Miami ended up telling an interesting narrative - the images on the reel, which are usually just a random collection of locations, really told a story of the history of the place, and the people who&#39;ve lived there.  It&#39;s probably one of my better videos for that.</p>
-<p>Here&#39;s the reel: <a href="https://vm.vmdatabase.com/index.html?go=165%20h%20a%20b">Miami</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/aGL03VPYZ4I" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/aGL03VPYZ4I/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>A route 66 stop we had to do - you see the billboards for the place from hundreds of miles away - it&#39;d gained a mythical status, really.  We even stayed in the local motel - to really immerse ourselves in it all.</p>
+                        <p>In the end, it&#39;s just a cave system, which made the video challenging - on TV all the cave rooms kind of look the same - although, they&#39;re more interesting in 3D.  Luckily there&#39;s a lot of folklore around the caverns and I learned a lot about the business of &quot;show&quot; caves.</p>
+                        <p>Plus, I still struggle to spell &quot;<a href="https://vm.vmdatabase.com/index.html?go=meramec">Meramac</a>&quot; </p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/Ro9I22U6gcY" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/Ro9I22U6gcY/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>We stopped at Mount Vernon on our way back home from Washington D.C.  You see the View-Master reel a lot - I guess it was very popular - but I wasn&#39;t that thrilled to visit.  It&#39;s a very nice place - and the house tour is great, but short - and we didn&#39;t have enough time to really see all of the grounds properly.</p>
-<p>So, I ended up doing most of the research after the fact - and it&#39;s one of those places that&#39;s extremely well documented.  This created some very deep rabbit holes to go down - and it was hard to decide what to include in the video.</p>
-<p>I learned so much wonderful information in my research it made be appreciate how hard it must be to run a facility like this - when you have to decide what to communicate to visitors and what not to - it can be overwhelming.</p>
-<p>Here&#39;s all the <a href="https://vm.vmdatabase.com/index.html?go=mount%20vernon">Mount Vernon</a> reels I have!</p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/_kBWvGXRJgA" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/_kBWvGXRJgA/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>We did Miami as part of our giant Florida road-trip.  Mainly because we were flying in and out of there - so we stayed an extra day to catch all the View-Master sights.</p>
+                        <p>The video for Miami ended up telling an interesting narrative - the images on the reel, which are usually just a random collection of locations, really told a story of the history of the place, and the people who&#39;ve lived there.  It&#39;s probably one of my better videos for that.</p>
+                        <p>Here&#39;s the reel: <a href="https://vm.vmdatabase.com/index.html?go=165%20h%20a%20b">Miami</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/Fa2yEXEFyeE" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/Fa2yEXEFyeE/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>New York&#39;s probably the most intimidating place to visit on the planet.  There&#39;s not really <em>that</em> many View-Master reels to go through - but the city itself is staggering.  From where to stay, what to do with your car, how to get around, etc., it seemed like it&#39;d be a challenge.</p>
-<p>But, it was pretty easy - not like we didn&#39;t make mistakes on the subway getting around - but it&#39;s fun to try!  The city just has everything in arm&#39;s reach at any time - what an amazing place.</p>
-<p>I learned so much history for each location that I could have done a second video and said entirely different things.</p>
-<p><a href="https://vm.vmdatabase.com/index.html?go=new%20york%20city">New York Reels</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/Ro9I22U6gcY" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/Ro9I22U6gcY/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>We stopped at Mount Vernon on our way back home from Washington D.C.  You see the View-Master reel a lot - I guess it was very popular - but I wasn&#39;t that thrilled to visit.  It&#39;s a very nice place - and the house tour is great, but short - and we didn&#39;t have enough time to really see all of the grounds properly.</p>
+                        <p>So, I ended up doing most of the research after the fact - and it&#39;s one of those places that&#39;s extremely well documented.  This created some very deep rabbit holes to go down - and it was hard to decide what to include in the video.</p>
+                        <p>I learned so much wonderful information in my research it made be appreciate how hard it must be to run a facility like this - when you have to decide what to communicate to visitors and what not to - it can be overwhelming.</p>
+                        <p>Here&#39;s all the <a href="https://vm.vmdatabase.com/index.html?go=mount%20vernon">Mount Vernon</a> reels I have!</p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/d5LgV500HTI" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/d5LgV500HTI/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>The New York World&#39;s Fair locations was our big target while we were in the city.  We even stayed out in Flushing so we could do this easily.  It amounted to walking through empty grass fields for eight miles just so that I could take pictures of nothing - pictures of where the exhibits <em>used</em> to be.</p>
-<p>It was great fun though - really got to know Flushing Meadows well!</p>
-<p><a href="https://vm.vmdatabase.com/index.html?go=new%20york%20world">New York World&#39;s Fairs</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/Fa2yEXEFyeE" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/Fa2yEXEFyeE/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>New York&#39;s probably the most intimidating place to visit on the planet.  There&#39;s not really <em>that</em> many View-Master reels to go through - but the city itself is staggering.  From where to stay, what to do with your car, how to get around, etc., it seemed like it&#39;d be a challenge.</p>
+                        <p>But, it was pretty easy - not like we didn&#39;t make mistakes on the subway getting around - but it&#39;s fun to try!  The city just has everything in arm&#39;s reach at any time - what an amazing place.</p>
+                        <p>I learned so much history for each location that I could have done a second video and said entirely different things.</p>
+                        <p><a href="https://vm.vmdatabase.com/index.html?go=new%20york%20city">New York Reels</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/_KLFmYCxjwQ" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/_KLFmYCxjwQ/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>Niagara Falls is another one of those very common View-Master reels.  It makes the location kind of feel disappointing - because it&#39;s always a bit of a let down to find yet <em>another</em> Niagara View-Master.  But, like seems to happen all the time, the actual place is amazing - and the history was beyond exciting.</p>
-<p>I guess the popular View-Master locations are popular for a good reason.</p>
-<p>Here&#39;s the reels: <a href="https://vm.vmdatabase.com/index.html?go=niagara%20falls">Niagara Falls</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/d5LgV500HTI" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/d5LgV500HTI/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>The New York World&#39;s Fair locations was our big target while we were in the city.  We even stayed out in Flushing so we could do this easily.  It amounted to walking through empty grass fields for eight miles just so that I could take pictures of nothing - pictures of where the exhibits <em>used</em> to be.</p>
+                        <p>It was great fun though - really got to know Flushing Meadows well!</p>
+                        <p><a href="https://vm.vmdatabase.com/index.html?go=new%20york%20world">New York World&#39;s Fairs</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/4RbANncvbSU" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/4RbANncvbSU/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>This is the definition of &quot;out of the way&quot; place you&#39;d never know about unless you were a local - or a View-Master traveller.  We were just on our way north through Oregon and the database showed the reel was in our area - so we stopped by to see what we could see.</p>
-<p>It&#39;s one of those amazing &quot;road side&quot; attractions - even though it&#39;s not really on the side of the road in any meaningful way.  And, at the time, it was in pretty bad shape.  Hopefully they&#39;re doing better today.</p>
-<p>Also, this is maybe the only example of the location actually using Sawyers to do advertising - both the View-Master reels and older postcards - so, even today that advertising&#39;s paying off!</p>
-<p>I do like the animated book I made in the video - it&#39;s based on the Usborne kids books - and they made a specific one about rocks and minerals that I remembered as a kid - and used as reference for this.</p>
-<p>Here&#39;re the reels: <a href="https://vm.vmdatabase.com/index.html?go=sp-9031">Petersen&#39;s Rock Garden</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/_KLFmYCxjwQ" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/_KLFmYCxjwQ/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>Niagara Falls is another one of those very common View-Master reels.  It makes the location kind of feel disappointing - because it&#39;s always a bit of a let down to find yet <em>another</em> Niagara View-Master.  But, like seems to happen all the time, the actual place is amazing - and the history was beyond exciting.</p>
+                        <p>I guess the popular View-Master locations are popular for a good reason.</p>
+                        <p>Here&#39;s the reels: <a href="https://vm.vmdatabase.com/index.html?go=niagara%20falls">Niagara Falls</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/K0IlnCqiJ2w" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/K0IlnCqiJ2w/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>The petrified forest is one of those places you hear about as a kid and it sets your imagination going.  Why&#39;s the forest so scared?</p>
-<p>In reality - I was worried there&#39;d be nothing interesting to learn here - since I was mostly interested in &quot;before&quot; and &quot;after&quot; pictures from View-Masters and I assumed not much was changing in a national park with &quot;petrified&quot; in its name.</p>
-<p>I was obviously wrong - and I think this video is where I shifted focus a little to the history of a place as well as how things look today.</p>
-<p>Here&#39;s the reels: <a href="https://vm.vmdatabase.com/index.html?go=petrified%20forest%20national%20monument">Petrified Forest</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/4RbANncvbSU" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/4RbANncvbSU/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>This is the definition of &quot;out of the way&quot; place you&#39;d never know about unless you were a local - or a View-Master traveller.  We were just on our way north through Oregon and the database showed the reel was in our area - so we stopped by to see what we could see.</p>
+                        <p>It&#39;s one of those amazing &quot;road side&quot; attractions - even though it&#39;s not really on the side of the road in any meaningful way.  And, at the time, it was in pretty bad shape.  Hopefully they&#39;re doing better today.</p>
+                        <p>Also, this is maybe the only example of the location actually using Sawyers to do advertising - both the View-Master reels and older postcards - so, even today that advertising&#39;s paying off!</p>
+                        <p>I do like the animated book I made in the video - it&#39;s based on the Usborne kids books - and they made a specific one about rocks and minerals that I remembered as a kid - and used as reference for this.</p>
+                        <p>Here&#39;re the reels: <a href="https://vm.vmdatabase.com/index.html?go=sp-9031">Petersen&#39;s Rock Garden</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/N_OzDa7l2wY" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/N_OzDa7l2wY/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>This was an early video for me - a topic I wanted to cover mainly to do the Winchester Mystery House - which we like visiting.  But, there&#39;s not that many View-Master views to match for the house alone, so the video went on to explore San Jose in general - which does have it&#39;s fair share of secrets to reveal.</p>
-<p>The video&#39;s got some of my earlier animation experiments - which were a lot of fun!</p>
-<p>Here&#39;s the reel: <a href="https://vm.vmdatabase.com/index.html?go=winchester%20mystery%20house">Winchester Mystery House</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/K0IlnCqiJ2w" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/K0IlnCqiJ2w/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>The petrified forest is one of those places you hear about as a kid and it sets your imagination going.  Why&#39;s the forest so scared?</p>
+                        <p>In reality - I was worried there&#39;d be nothing interesting to learn here - since I was mostly interested in &quot;before&quot; and &quot;after&quot; pictures from View-Masters and I assumed not much was changing in a national park with &quot;petrified&quot; in its name.</p>
+                        <p>I was obviously wrong - and I think this video is where I shifted focus a little to the history of a place as well as how things look today.</p>
+                        <p>Here&#39;s the reels: <a href="https://vm.vmdatabase.com/index.html?go=petrified%20forest%20national%20monument">Petrified Forest</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/1z3s5bIu3_8" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/1z3s5bIu3_8/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>Old Santa Fe, New Mexico, is a delightful place to visit.  It&#39;s one of those American cities that really feels like you&#39;ve gone to another country entirely.  It&#39;s very exotic.</p>
-<p>We spent several days there and that whole area is beautiful - we ended up coming back and spending more time - and doing more videos!</p>
-<p>Here&#39;s the reel: <a href="https://vm.vmdatabase.com/index.html?go=281%20h">Santa Fe</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/N_OzDa7l2wY" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/N_OzDa7l2wY/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>This was an early video for me - a topic I wanted to cover mainly to do the Winchester Mystery House - which we like visiting.  But, there&#39;s not that many View-Master views to match for the house alone, so the video went on to explore San Jose in general - which does have it&#39;s fair share of secrets to reveal.</p>
+                        <p>The video&#39;s got some of my earlier animation experiments - which were a lot of fun!</p>
+                        <p>Here&#39;s the reel: <a href="https://vm.vmdatabase.com/index.html?go=winchester%20mystery%20house">Winchester Mystery House</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/cGN1Jt-vNQQ" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/cGN1Jt-vNQQ/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>It was our first trip to Seattle - and I bought the World&#39;s Fair packet on eBay so we could track the sites down.  This one turned out to be fun and easy.  The entire fair location is well contained and easy to get around.  It was a great time - and there&#39;s lots still there to see from the fair.  I think it&#39;s one of the best post-World&#39;s fair locations to visit.</p>
-<p>The space needle and pop-cuture museum are great - and the monorail is fun.  We spent lots of time in the city too.  It&#39;s a great place!</p>
-<p><a href="https://vm.vmdatabase.com/index.html?go=seattle%20world">Seattle World&#39;s Fair</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/1z3s5bIu3_8" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/1z3s5bIu3_8/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>Old Santa Fe, New Mexico, is a delightful place to visit.  It&#39;s one of those American cities that really feels like you&#39;ve gone to another country entirely.  It&#39;s very exotic.</p>
+                        <p>We spent several days there and that whole area is beautiful - we ended up coming back and spending more time - and doing more videos!</p>
+                        <p>Here&#39;s the reel: <a href="https://vm.vmdatabase.com/index.html?go=281%20h">Santa Fe</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/Wp5MK8j6m24" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/Wp5MK8j6m24/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>We&#39;d beed to Silver Springs several times over the decades - so I&#39;d already seen how much it was changing.  We went back for the View-Master trip - and I was still surprised how different it was.  It really represents one of those small attractions that struggling to survive.</p>
-<p>I took the time, this time, to dig into the connection between Silver Springs and the Creature From the Black Lagoon - which is one of my favorite movies.  That was a great rabbit hole to go down!</p>
-<p>Here are all the reels: <a href="https://vm.vmdatabase.com/index.html?go=silver%20springs">Silver Springs</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/cGN1Jt-vNQQ" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/cGN1Jt-vNQQ/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>It was our first trip to Seattle - and I bought the World&#39;s Fair packet on eBay so we could track the sites down.  This one turned out to be fun and easy.  The entire fair location is well contained and easy to get around.  It was a great time - and there&#39;s lots still there to see from the fair.  I think it&#39;s one of the best post-World&#39;s fair locations to visit.</p>
+                        <p>The space needle and pop-cuture museum are great - and the monorail is fun.  We spent lots of time in the city too.  It&#39;s a great place!</p>
+                        <p><a href="https://vm.vmdatabase.com/index.html?go=seattle%20world">Seattle World&#39;s Fair</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/mhdVhavAolw" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/mhdVhavAolw/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>Washington D.C. turned out to be so complicated that there was too much to fit into one video.  This video was everything that didn&#39;t fit in my previous D.C. video.</p>
-<p>There&#39;s so much to cover, just on the Smithsonian itself that it could easily be several more videos.  We&#39;ll have to make the trip back again soon!</p>
-<p>Here&#39;s reels on the <a href="https://vm.vmdatabase.com/index.html?go=smithsonian%20institution">Smithsonian</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/Wp5MK8j6m24" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/Wp5MK8j6m24/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>We&#39;d beed to Silver Springs several times over the decades - so I&#39;d already seen how much it was changing.  We went back for the View-Master trip - and I was still surprised how different it was.  It really represents one of those small attractions that struggling to survive.</p>
+                        <p>I took the time, this time, to dig into the connection between Silver Springs and the Creature From the Black Lagoon - which is one of my favorite movies.  That was a great rabbit hole to go down!</p>
+                        <p>Here are all the reels: <a href="https://vm.vmdatabase.com/index.html?go=silver%20springs">Silver Springs</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/LxFp1EFTb8k" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/LxFp1EFTb8k/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>Solvang is in our neighborhood - so it was an early View-Master destination.  Even though we live near by - I didn&#39;t know the half of what was going on there.  Learning their history was really rewarding.</p>
-<p>One interesting story - I went into the local museum and explained how I was trying to find locations from my old View-Master images - and showed them one I was having trouble finding.  Not only did they know where the picture was taken - they knew who the kids were in the old photo.  Keep in mind, the picture was 50 years old now - so those kids were in their 60s!</p>
-<p>Solvang&#39;s a great place - and I&#39;m really indebted to the <a href="https://elverhoj.org">Elverhøj museum</a> for their help!</p>
-<p>Here&#39;s the reels: <a href="https://vm.vmdatabase.com/index.html?go=solvang%20cal">Solvang</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/mhdVhavAolw" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/mhdVhavAolw/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>Washington D.C. turned out to be so complicated that there was too much to fit into one video.  This video was everything that didn&#39;t fit in my previous D.C. video.</p>
+                        <p>There&#39;s so much to cover, just on the Smithsonian itself that it could easily be several more videos.  We&#39;ll have to make the trip back again soon!</p>
+                        <p>Here&#39;s reels on the <a href="https://vm.vmdatabase.com/index.html?go=smithsonian%20institution">Smithsonian</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/FdSO6HRSUBw" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/FdSO6HRSUBw/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>We&#39;d been to St. Augustine a few times on vacations to Florida.  This time, with View-Master in hand, we really saw a different side of it.  It was the video research that made all the difference here though - you&#39;d expect a city this old to have &quot;history&quot; - but who knew about all the tourism related drama.</p>
-<p>I think, in the video, it was a real struggle to convey the dramatic narrative that came across in my research - one of those examples where there&#39;s just too much to say!</p>
-<p>The reels are here: <a href="https://vm.vmdatabase.com/index.html?go=saint%20augustine%20florida">St. Augustine</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/LxFp1EFTb8k" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/LxFp1EFTb8k/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>Solvang is in our neighborhood - so it was an early View-Master destination.  Even though we live near by - I didn&#39;t know the half of what was going on there.  Learning their history was really rewarding.</p>
+                        <p>One interesting story - I went into the local museum and explained how I was trying to find locations from my old View-Master images - and showed them one I was having trouble finding.  Not only did they know where the picture was taken - they knew who the kids were in the old photo.  Keep in mind, the picture was 50 years old now - so those kids were in their 60s!</p>
+                        <p>Solvang&#39;s a great place - and I&#39;m really indebted to the <a href="https://elverhoj.org">Elverhøj museum</a> for their help!</p>
+                        <p>Here&#39;s the reels: <a href="https://vm.vmdatabase.com/index.html?go=solvang%20cal">Solvang</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/2CZFVX_vuB8" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/2CZFVX_vuB8/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>This one was unusual for me - I had the reel, we were in Montreal - but I had no idea if it was worth seeing.</p>
-<p>Turns out it&#39;s an amazing place - and we&#39;d have never known without the View-Master reels as our guide.</p>
-<p><a href="https://vm.vmdatabase.com/index.html?go=brother%20andre">St. Joseph&#39;s Oratory</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/FdSO6HRSUBw" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/FdSO6HRSUBw/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>We&#39;d been to St. Augustine a few times on vacations to Florida.  This time, with View-Master in hand, we really saw a different side of it.  It was the video research that made all the difference here though - you&#39;d expect a city this old to have &quot;history&quot; - but who knew about all the tourism related drama.</p>
+                        <p>I think, in the video, it was a real struggle to convey the dramatic narrative that came across in my research - one of those examples where there&#39;s just too much to say!</p>
+                        <p>The reels are here: <a href="https://vm.vmdatabase.com/index.html?go=saint%20augustine%20florida">St. Augustine</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/0hb3cWjjYlA" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/0hb3cWjjYlA/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>We were really just passing through St. Louis on one of our route 66 trip - but decided to stop for the day and do the View-Master travel thing.  The <em>reel</em> doesn&#39;t <em>reveal</em> just how big and spread out the city landmarks really are.  It&#39;s one of those days where we probably hiked 10 or 20 miles and barely got it all done.</p>
-<p>This is the episode that got me interested in World&#39;s Fair locations though - since I never knew the big park was the site of a fair.  That was so interesting I did a few more videos on that kind of topic.</p>
-<p>Here&#39;s the reel: <a href="https://vm.vmdatabase.com/index.html?go=sp-9059">St. Louis, MO</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/2CZFVX_vuB8" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/2CZFVX_vuB8/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>This one was unusual for me - I had the reel, we were in Montreal - but I had no idea if it was worth seeing.</p>
+                        <p>Turns out it&#39;s an amazing place - and we&#39;d have never known without the View-Master reels as our guide.</p>
+                        <p><a href="https://vm.vmdatabase.com/index.html?go=brother%20andre">St. Joseph&#39;s Oratory</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/CL0zzWnFkCo" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/CL0zzWnFkCo/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>St. Pete was one of our side trips on our major Florida road trip.  Just blindly visited, because it was there, and I had the reel.  Main thing I learned is that you don&#39;t call it <strong><em>St. Pete&#39;s</em></strong>!</p>
-<p>The reel is here: <a href="https://vm.vmdatabase.com/index.html?go=sp-9037">St. Petersberg</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/0hb3cWjjYlA" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/0hb3cWjjYlA/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>We were really just passing through St. Louis on one of our route 66 trip - but decided to stop for the day and do the View-Master travel thing.  The <em>reel</em> doesn&#39;t <em>reveal</em> just how big and spread out the city landmarks really are.  It&#39;s one of those days where we probably hiked 10 or 20 miles and barely got it all done.</p>
+                        <p>This is the episode that got me interested in World&#39;s Fair locations though - since I never knew the big park was the site of a fair.  That was so interesting I did a few more videos on that kind of topic.</p>
+                        <p>Here&#39;s the reel: <a href="https://vm.vmdatabase.com/index.html?go=sp-9059">St. Louis, MO</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/UupcB3bFi90" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/UupcB3bFi90/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>This was the biggest surprise of all the videos so far.  We really just pulled in on our way out of St. Petersburg - and we only had about an hour before they closed.</p>
-<p>It&#39;s a small place - surrounded by urban sprawl - and most of the pictures are of plants and flowers, so of course they look different today.</p>
-<p>But, it was one of the most fun videos to do - I learned all about Florida wetland conversion - very controversial - and all about flowers, plants, and horticultural things.  Who knew?</p>
-<p>The reel is here: <a href="https://vm.vmdatabase.com/index.html?go=a%209922">Florida&#39;s Sunken Gardens</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/CL0zzWnFkCo" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/CL0zzWnFkCo/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>St. Pete was one of our side trips on our major Florida road trip.  Just blindly visited, because it was there, and I had the reel.  Main thing I learned is that you don&#39;t call it <strong><em>St. Pete&#39;s</em></strong>!</p>
+                        <p>The reel is here: <a href="https://vm.vmdatabase.com/index.html?go=sp-9037">St. Petersberg</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/3FONK5_hDGc" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/3FONK5_hDGc/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>The Timberline lodge was on our short list - and really the View-Master thing was just an excuse to go stay at the top of a mountain, at the bottom of a glacier - and take giant St. Bernard dogs for walks.</p>
-<p>There&#39;s lots of connections between View-Master locations and depression-era public works projects - their timing just lines up so well - so it comes up in my research all the time.  I do think this was the first major, deep-dive, into that topic I&#39;d done though.</p>
-<p>The connections to The Shining are top-of-mind with the Timberline - but really, there&#39;s not much to say about that - since it&#39;s only the outside front that&#39;s used in the movie.</p>
-<p>Here&#39;s the reel: <a href="https://vm.vmdatabase.com/index.html?go=211%20a%20h">Timberline Lodge</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/UupcB3bFi90" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/UupcB3bFi90/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>This was the biggest surprise of all the videos so far.  We really just pulled in on our way out of St. Petersburg - and we only had about an hour before they closed.</p>
+                        <p>It&#39;s a small place - surrounded by urban sprawl - and most of the pictures are of plants and flowers, so of course they look different today.</p>
+                        <p>But, it was one of the most fun videos to do - I learned all about Florida wetland conversion - very controversial - and all about flowers, plants, and horticultural things.  Who knew?</p>
+                        <p>The reel is here: <a href="https://vm.vmdatabase.com/index.html?go=a%209922">Florida&#39;s Sunken Gardens</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/iNgSUTC_egU" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/iNgSUTC_egU/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>After Catalina Island, the Trees of Mystery was the next place we wanted to visit.  It&#39;s the kind of place you hear about all the time - and the redwoods in general - we had to visit.  I bought the 3-reel pack just so we could do a video on it.</p>
-<p>Here&#39;s the reel: <a href="https://vm.vmdatabase.com/index.html?go=redwood%20highway">Trees of Mystery and the Redwood Highway</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/3FONK5_hDGc" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/3FONK5_hDGc/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>The Timberline lodge was on our short list - and really the View-Master thing was just an excuse to go stay at the top of a mountain, at the bottom of a glacier - and take giant St. Bernard dogs for walks.</p>
+                        <p>There&#39;s lots of connections between View-Master locations and depression-era public works projects - their timing just lines up so well - so it comes up in my research all the time.  I do think this was the first major, deep-dive, into that topic I&#39;d done though.</p>
+                        <p>The connections to The Shining are top-of-mind with the Timberline - but really, there&#39;s not much to say about that - since it&#39;s only the outside front that&#39;s used in the movie.</p>
+                        <p>Here&#39;s the reel: <a href="https://vm.vmdatabase.com/index.html?go=211%20a%20h">Timberline Lodge</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/yZq9CW1BZxk" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/yZq9CW1BZxk/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>This was the our first trip to D.C. and there was so much to see I ended up doing two videos on it.  There&#39;s obviously so much history here - and there&#39;s lots of View-Master coverage as well.  There&#39;s so much we didn&#39;t get to do as well - like get to the top of the Washington Monument.  I think you could spend a lifetime covering the history of Washington D.C.</p>
-<p>It was the research for the video that really opened this topic up - the design of the city and the number of hidden features it has - led to many late-night discussions on how or why things were what they were.</p>
-<p>Here are lots of <a href="https://vm.vmdatabase.com/index.html?go=washington%20d.c.">D.C. View-Master reels</a>.</p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/iNgSUTC_egU" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/iNgSUTC_egU/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>After Catalina Island, the Trees of Mystery was the next place we wanted to visit.  It&#39;s the kind of place you hear about all the time - and the redwoods in general - we had to visit.  I bought the 3-reel pack just so we could do a video on it.</p>
+                        <p>Here&#39;s the reel: <a href="https://vm.vmdatabase.com/index.html?go=redwood%20highway">Trees of Mystery and the Redwood Highway</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/iyR3ZUA8_Rg" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/iyR3ZUA8_Rg/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>We&#39;d been to Silver Springs several times - but never Weeki Wachee.  I was surprised they were still operating - View-Master has a way of finding those small road-side attractions - that would have been major attractions when the reels were produced.  There aren&#39;t many that are still running today.</p>
-<p>It&#39;s a location that deserves more attention - and it&#39;s a case-study in pushing through and surviving tough times.</p>
-<p>Plus, there&#39;re <a href="https://vm.vmdatabase.com/index.html?go=sp-9046">mermaids</a>!</p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/yZq9CW1BZxk" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/yZq9CW1BZxk/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>This was the our first trip to D.C. and there was so much to see I ended up doing two videos on it.  There&#39;s obviously so much history here - and there&#39;s lots of View-Master coverage as well.  There&#39;s so much we didn&#39;t get to do as well - like get to the top of the Washington Monument.  I think you could spend a lifetime covering the history of Washington D.C.</p>
+                        <p>It was the research for the video that really opened this topic up - the design of the city and the number of hidden features it has - led to many late-night discussions on how or why things were what they were.</p>
+                        <p>Here are lots of <a href="https://vm.vmdatabase.com/index.html?go=washington%20d.c.">D.C. View-Master reels</a>.</p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/RPPAZhEYtnE" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/RPPAZhEYtnE/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>This is a reel that&#39;s stood out to me.  Every time I find a copy I&#39;m amazed at the scenery.  It&#39;s great to have this hobby as an excuse to visit places like this - really out of the way, where you&#39;d not likely pass by unless you were local - but with View-Master we made the opportunity to visit.</p>
-<p>It&#39;s a brutal place, really - beautiful at times and very harsh at others - even one day to the next, everything changes.</p>
-<p>There was lots to learn about it&#39;s unique nature - and it&#39;s complex relationship with the nearby missile base - and visiting the Trinity test site, on the one day per year they allow it - was very memorable.</p>
-<p><a href="https://vm.vmdatabase.com/index.html?go=white%20sands">White Sands</a></p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/iyR3ZUA8_Rg" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/iyR3ZUA8_Rg/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>We&#39;d been to Silver Springs several times - but never Weeki Wachee.  I was surprised they were still operating - View-Master has a way of finding those small road-side attractions - that would have been major attractions when the reels were produced.  There aren&#39;t many that are still running today.</p>
+                        <p>It&#39;s a location that deserves more attention - and it&#39;s a case-study in pushing through and surviving tough times.</p>
+                        <p>Plus, there&#39;re <a href="https://vm.vmdatabase.com/index.html?go=sp-9046">mermaids</a>!</p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/9nSCZCtGpQs" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/9nSCZCtGpQs/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>I was so amazed that Lincoln fought a duel, before he was president, that I made an entire video on the topic.  Not really a View-Master &quot;travel&quot; - more of a View-Master &quot;tangent&quot;.</p>
-</p>
-    </div>
-  
+                            <div class="video-item">
+                              <a href="https://youtu.be/RPPAZhEYtnE" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/RPPAZhEYtnE/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>This is a reel that&#39;s stood out to me.  Every time I find a copy I&#39;m amazed at the scenery.  It&#39;s great to have this hobby as an excuse to visit places like this - really out of the way, where you&#39;d not likely pass by unless you were local - but with View-Master we made the opportunity to visit.</p>
+                        <p>It&#39;s a brutal place, really - beautiful at times and very harsh at others - even one day to the next, everything changes.</p>
+                        <p>There was lots to learn about it&#39;s unique nature - and it&#39;s complex relationship with the nearby missile base - and visiting the Trinity test site, on the one day per year they allow it - was very memorable.</p>
+                        <p><a href="https://vm.vmdatabase.com/index.html?go=white%20sands">White Sands</a></p>
+                        </p>
+                            </div>
+                          
 
-    <div class="video-item">
-      <a href="https://youtu.be/QPIeWLO13S8" target="_blank">
-        <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/QPIeWLO13S8/hqdefault.jpg" alt="Video Thumbnail">
-      </a>
-      <p><p>If you&#39;re really interested in how I make these videos - here&#39;s a peek behind the scenes.  Feel free to skip through the chapters though!</p>
-</p>
-    </div>
+                            <div class="video-item">
+                              <a href="https://youtu.be/9nSCZCtGpQs" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/9nSCZCtGpQs/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>I was so amazed that Lincoln fought a duel, before he was president, that I made an entire video on the topic.  Not really a View-Master &quot;travel&quot; - more of a View-Master &quot;tangent&quot;.</p>
+                        </p>
+                            </div>
+                          
+
+                            <div class="video-item">
+                              <a href="https://youtu.be/QPIeWLO13S8" target="_blank">
+                                <img class="vmt-thumbnail" src="https://i.ytimg.com/vi/QPIeWLO13S8/hqdefault.jpg" alt="Video Thumbnail">
+                              </a>
+                              <p><p>If you&#39;re really interested in how I make these videos - here&#39;s a peek behind the scenes.  Feel free to skip through the chapters though!</p>
+                        </p>
+                            </div>
 
 
-      </div> <!-- end search results div -->
+      </div> <!-- end seo static div -->
 
 
 </body>
