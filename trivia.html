@@ -207,6 +207,9 @@ function read_highscores(){
 
     function read_database(view_name){
 
+      document.getElementById("picture_area").style.display="block";
+      document.getElementById("starting_instruction_text").style.display="none";
+      
       read_highscores();
 
       var Airtable = require('airtable');
@@ -654,13 +657,8 @@ console.log("HARD")
 
       <div id="main_div" class="flex-container_vmm">
         <div><h1>View Master Quiz</h1></div>
-        <div style=" display: flex; justify-content: center;" id="page_picker_nav"></div>        
-        <div id="picture_area">
-          <div id="picture_area_content" class="box-shadow_larger">
-
-            
-            <div style="display:flex;flex-direction: row; align-items: center; margin: 25px">
-              <div  id="starting_instruction_text">
+        <div style=" display: flex; justify-content: center;" id="page_picker_nav"></div>     
+             <div  id="starting_instruction_text">
                 <div style="float:right;" id="starting_instructions_high_scores">
                 </div>
                
@@ -668,7 +666,13 @@ console.log("HARD")
                   <p>See how many view-master reels you can name.</p>
                   <p>When you see a view-master picture or title at the top of the screen - try and guess which reel it is by selecting from the four options.  If you're right, you'll get a new reel to guess.  If you're wrong, it's <i>game over</i>.</p>
                   <p>Select a topic below to begin.</p>
-              </div>
+              </div>   
+        <div id="picture_area" style="display: none;">
+          <div id="picture_area_content" class="box-shadow_larger">
+
+            
+            <div style="display:flex;flex-direction: row; align-items: center; margin: 25px">
+
 
             </div>
           </div>
