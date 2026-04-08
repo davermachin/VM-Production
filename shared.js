@@ -20,7 +20,7 @@ function displayPagePicker(divId) {
       ]
     },
     {
-      group: "Info",
+      group: "Learn",
       pages: [
         ["vmt.html", "View Master Travels"],
         ["about.html", "About Me"],
