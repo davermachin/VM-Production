@@ -54,6 +54,7 @@ h3 {
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.2s ease;
+  
 }
 
 .page-item:hover {
@@ -106,6 +107,7 @@ h3 {
   color: #333;
   font-size: 13px;
   white-space: nowrap;
+  text-align: center;
 }
 
 .dropdown-item:hover {
