@@ -1,0 +1,128 @@
+.documentary {
+    width: min(70%, 850px);
+    margin: 0 auto;
+    line-height: 1.65;
+    font-size: 16px;
+}
+
+
+/* INTRO */
+
+.documentary-intro {
+    font-size: 1.12em;
+    line-height: 1.7;
+    margin-bottom: 3em;
+}
+
+.documentary-intro p {
+    margin: 0 0 1.2em 0;
+}
+
+.documentary-intro .intro-highlight {
+    font-weight: 600;
+    margin-top: 1.5em;
+}
+
+
+/* SECTION HEADINGS */
+
+.documentary h2 {
+    margin-top: 2.5em;
+    margin-bottom: 1.3em;
+    font-size: 1.35em;
+    letter-spacing: 0.02em;
+}
+
+.documentary h3 {
+    margin-top: 2.5em;
+    margin-bottom: 1em;
+    font-size: 1.1em;
+}
+
+
+/* DOCUMENTARY TOPICS */
+
+.documentary-topics {
+    padding-left: 1.5em;
+    margin: 0;
+}
+
+.documentary-topics li {
+    padding-left: 0.4em;
+    margin-bottom: 1.15em;
+}
+
+.documentary-topics li::marker {
+    font-size: 0.8em;
+}
+
+.documentary-topics strong {
+    font-weight: 650;
+}
+
+
+/* CREDITS */
+
+.credits {
+    margin-top: 4em;
+    padding-top: 1.5em;
+    border-top: 1px solid #ccc;
+}
+
+.credits summary {
+    cursor: pointer;
+    font-size: 1.2em;
+    font-weight: 600;
+    padding: 0.5em 0;
+}
+
+.credits summary:hover {
+    opacity: 0.7;
+}
+
+.credits p {
+    margin: 0 0 1.2em 0;
+}
+
+.credits h3:first-of-type {
+    margin-top: 2em;
+}
+
+
+/* LINKS */
+
+.documentary a {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+
+/* SOUND EFFECT LIST */
+
+.sound-effects {
+    padding-left: 1.5em;
+}
+
+.sound-effects li {
+    margin-bottom: 0.5em;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 700px) {
+
+    .documentary {
+        width: 90%;
+        font-size: 16px;
+    }
+
+    .documentary-intro {
+        font-size: 1.05em;
+    }
+
+    .documentary-topics {
+        padding-left: 1.3em;
+    }
+
+}

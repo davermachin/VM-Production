@@ -141,3 +141,90 @@ hr {
    z-index: 2;             
   pointer-events: none;    
 }
+
+
+/* for the new "featured" block */
+
+.featured-documentary {
+    width: min(90%, 850px);
+    margin: 3em auto;
+    display: flex;
+    align-items: center;
+    gap: 2em;
+    padding: 1.5em;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    background: #f7f7f7;
+}
+
+.featured-documentary-image {
+    flex: 0 0 42%;
+    display: block;
+}
+
+.featured-documentary-image img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.featured-documentary-content {
+    flex: 1;
+}
+
+.featured-label {
+    font-size: 0.75em;
+    font-weight: bold;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.5em;
+    opacity: 0.6;
+}
+
+.featured-documentary h2 {
+    margin: 0 0 0.6em 0;
+    font-size: 1.6em;
+    line-height: 1.2;
+}
+
+.featured-documentary p {
+    margin: 0 0 1.2em 0;
+    line-height: 1.5;
+}
+
+.featured-documentary-button {
+    display: inline-block;
+    padding: 0.65em 1em;
+    border-radius: 6px;
+    text-decoration: none;
+    background: #333;
+    color: white;
+    font-weight: 600;
+}
+
+.featured-documentary-button:hover {
+    opacity: 0.8;
+}
+
+
+/* Mobile */
+
+@media (max-width: 650px) {
+    .featured-documentary {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1.2em;
+    }
+
+    .featured-documentary-image {
+        flex-basis: auto;
+    }
+
+    .featured-documentary h2 {
+        font-size: 1.4em;
+    }
+}
+
+
+

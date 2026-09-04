@@ -23,6 +23,7 @@ function displayPagePicker(divId) {
       group: "Learn",
       pages: [
         ["vmt.html", "View Master Travels"],
+        ["vm_doc.html", "The View Master Documentary"],        
         ["about.html", "About Me"],
         ["resources.html", "Resources"]
       ]

@@ -23,7 +23,7 @@
 <meta property="og:url"                content="https://vm.vmdatabase.com/vmt.html" />
 <meta property="og:title"              content="View Master Travels" />
 <meta property="og:description"        content="Dave Machin's YouTube Channel of View Master Related Travel Videos" />
-<meta property="og:image"              content="https://vm.vmdatabase.com/vmt_OG1.jpg" />
+<meta property="og:image"              content="https://vm.vmdatabase.com/vmt_OG2.jpg" />
 
 
 
@@ -140,13 +140,12 @@ async function getLatestVideoFromChannel(channelId) {
     console.log("Latest video info ",channel_info);
 
     document.getElementById("latest_video").innerHTML = `
-      <div class="yt-thumbnail" >
+    <div class="featured-label">RECOMMENDED VIDEO</div>
+    <h2>${channel_info.title}</h2>
+    <div class="yt-thumbnail" >
         <a href="${channel_info.url}" >
           <img src="${channel_info.thumbnail.maxres?.url}">
         </a>
-      </div>
-      <div>
-        <p><b>${channel_info.title}</b></p><p>&nbsp;</p>
       </div>
 
     `
@@ -336,10 +335,6 @@ console.log(htmlOutput);
 
           divs[index].innerHTML = `
 
-
-
-
-
             <div class="vmt-video-row">
               <div class="vmt-thumbnail-wrapper" ><a href='https://youtu.be/${data.YT_ID}' target='_blank'><img class="vmt-thumbnail"  src="${data.thumbnails.default}" alt="Thumbnail"></a></div>
               
@@ -372,16 +367,37 @@ console.log(htmlOutput);
   <div class="center">
         <h1>View Master Travels</h1>
         <div style=" display: flex; justify-content: center;" id="page_picker_nav"></div>
-        <h2>Exploring Vintage View-Master Locations Then and Now</h2>
-        <p>I travel to real-world locations featured in vintage View-Master reels and create short documentary videos exploring what’s changed—and what hasn’t. From hidden history to unexpected discoveries, each episode brings the past and present together in surprising ways.</p>
-        <p>
-          <a href="https://www.youtube.com/channel/UCVt3zC1DNDOUihq4P-QPwkQ?sub_confirmation=1">
-            Subscribe on YouTube<br><br>
-          </a>
-        </p>
-       
-      <div id="latest_video">...</div>    
 
+
+
+<div class="featured-documentary">
+    <a href="./VM_DOC.html" class="featured-documentary-image">
+        <img src="./YT_DOC_Local_Thumbnail.jpg" 
+             alt="The View-Master Documentary">
+    </a>
+
+    <div class="featured-documentary-content">
+        <div class="featured-label">FEATURED</div>
+
+        <h2>The View-Master Documentary</h2>
+
+        <p>
+            The complete story of View-Master — from its origins in 3D photography
+            to its surprising history as a toy, a military training tool, and much more.
+        </p>
+
+        <a href="./VM_DOC.html" class="featured-documentary-button">
+            Learn More
+        </a>
+    </div>
+</div>
+        
+
+
+      <div id="latest_video">...</div>    
+      <div>
+        <p><br><br><br><br><div class="featured-label">PREVIOUS VIDEOS</div></p>
+      </div>
       <div id="search_results">...</div>
 
       <div id="seo_static">
