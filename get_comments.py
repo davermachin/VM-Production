@@ -11,7 +11,7 @@ python3 -m pip install requests
 import csv
 import requests
 
-API_KEY = "AIzaSyCNh3zuiidSD63Bw3JF1q-IsVidB_mZNw4"
+API_KEY = "AIzaSyCNh3zuiidSD63Bw3JF1q-IsVidB_mZNw4" /* READ ONLY KEY */
 VIDEO_ID = "TwKjaH0lwrg"
 
 BASE_URL = "https://www.googleapis.com/youtube/v3"
